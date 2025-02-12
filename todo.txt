@@ -1,0 +1,5 @@
+3. Style prediction cards
+
+4. Implement logic to fetch predictions based off date
+5. Add loading indicator on date change
+
