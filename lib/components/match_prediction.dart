@@ -6,27 +6,56 @@ class MatchPrediction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: const Color(0xFF10B981).withOpacity(0.2),
+            // rgba(16,185,129,.2)
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
         color: Colors.transparent,
-        shadowColor: Colors.transparent,
+        shadowColor:
+            Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
         child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xB50D151E),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: const Icon(Icons.sports_soccer),
+                    // Left side group
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xB50D151E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.all(5),
+                          child: const Icon(Icons.sports_soccer),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text('Soccer',
+                            style: TextStyle(
+                              color: Color(0xFFdbe4ed),
+                            )),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    const Text('Soccer',
-                        style: TextStyle(
-                          color: Color(0xFFdbe4ed),
-                        )),
+                    // Right side button
+                    TextButton.icon(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).primaryColor,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(Icons.arrow_forward, size: 16),
+                      label: const Text("View analysis"),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -46,6 +75,10 @@ class MatchPrediction extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF0D151E),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0x802D4763), // rgba(45,71,99,.5)
+                      width: 1,
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -170,27 +203,49 @@ class MatchPrediction extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // Align children to top
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        // Explicit top alignment
                         children: [
-                          Text("Prediction", textAlign: TextAlign.left),
-                          Text("Monaco (To win either half)",
-                              textAlign: TextAlign.left),
+                          Text(
+                            "Prediction",
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            "Monaco (To win either half)",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     Expanded(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        // Add this for top alignment
                         children: [
                           Text(
                             "Odds",
-                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                            ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             "1.66",
-                            textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.bold,

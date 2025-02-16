@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:smore_mobile_app/screens/contact_us_screen.dart';
+import 'package:smore_mobile_app/screens/faq_screen.dart';
+
+import '../screens/my_account_screen.dart';
 
 class DrawerDestinationLink {
-  const DrawerDestinationLink(this.label, this.icon);
+  const DrawerDestinationLink(this.label, this.icon, this.destination);
 
   final String label;
   final Widget icon;
+  final Widget destination;
 }
 
 const List<DrawerDestinationLink> destinations = <DrawerDestinationLink>[
-  DrawerDestinationLink('My Account', Icon(Icons.account_circle_outlined)),
-  DrawerDestinationLink('Manage Plan', Icon(Icons.manage_history_outlined)),
-  DrawerDestinationLink('Contact Us', Icon(Icons.question_answer_outlined)),
-  DrawerDestinationLink('FAQ', Icon(Icons.help_outline)),
+  DrawerDestinationLink(
+      'My Account', Icon(Icons.account_circle_outlined), MyAccountScreen()),
+  DrawerDestinationLink(
+      'Manage Plan', Icon(Icons.manage_history_outlined), MyAccountScreen()),
+  DrawerDestinationLink(
+      'Contact Us', Icon(Icons.question_answer_outlined), ContactUsScreen()),
+  DrawerDestinationLink('FAQ', Icon(Icons.help_outline), FaqScreen()),
 ];
 
 class SideDrawer extends StatelessWidget {
@@ -29,17 +37,17 @@ class SideDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'admin',
                   style: TextStyle(
-                    color: Color(0xFFB7C9DB),
-                    fontSize: 16,
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Subscription ends: Jan 1, 2025',
+                  'Subscription ends: March 1, 2025',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.grey.shade600,
                       ),
@@ -74,7 +82,16 @@ class SideDrawer extends StatelessWidget {
                   minLeadingWidth: 24,
                   title: Text(destination.label),
                   leading: destination.icon,
-                  onTap: () {},
+                  onTap: () {
+                    // close the drawer
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => destination.destination,
+                      ),
+                    );
+                  },
                   dense: true,
                   visualDensity: const VisualDensity(vertical: -2),
                 ),
@@ -109,7 +126,7 @@ class SideDrawer extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               minLeadingWidth: 24,
               title: const Text('Logout'),
-              leading: const Icon(Icons.logout, color: Colors.grey),
+              leading: Icon(Icons.logout, color: Colors.red.withOpacity(0.6)),
               onTap: () {},
               dense: true,
             ),

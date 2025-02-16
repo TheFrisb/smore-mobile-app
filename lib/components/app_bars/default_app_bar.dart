@@ -40,6 +40,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: const Padding(
             padding: EdgeInsets.only(right: 8.0),
             child: CircleAvatar(
+              backgroundColor: Color(0xB50D151E),
               child: Icon(
                 Icons.account_circle_outlined,
                 size: 32,

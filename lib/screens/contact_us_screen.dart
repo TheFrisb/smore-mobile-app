@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:logger/logger.dart';
+import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
+// import 'package:url_launcher/url_launcher.dart';
+
+class ContactUsScreen extends StatelessWidget {
+  const ContactUsScreen({super.key});
+
+  static final Logger logger = Logger();
+
+  Future<void> _launchUrl(String url) async {
+    // final Uri uri = Uri.parse(url);
+    //
+    // if (await canLaunchUrl(uri)) {
+    //   await launchUrl(uri);
+    // } else {
+    //   logger.e("Could not launch $url");
+    // }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseScreen(
+      title: "Contact Us",
+      body: Column(
+        children: [
+          ContactOption(
+            icon: FontAwesomeIcons.whatsapp,
+            title: "Contact us on WhatsApp",
+            onTap: () => _launchUrl(
+                "https://wa.me/15551234567"), // Replace with your number
+          ),
+          const SizedBox(height: 16),
+          ContactOption(
+            icon: Icons.email_outlined,
+            title: "Send us an email",
+            onTap: () => _launchUrl(
+                "mailto:support@smoreapp.com"), // Replace with your email
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ContactOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const ContactOption({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D151E),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(icon, color: Theme.of(context).primaryColor),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade400,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:smore_mobile_app/components/default_app_bar.dart';
+import 'package:smore_mobile_app/components/app_bars/default_app_bar.dart';
 import 'package:smore_mobile_app/components/side_drawer.dart';
 
 import '../components/coming_soon_card.dart';
 import '../components/date_picker.dart';
+import '../components/default_bottom_navigation_bar.dart';
 import '../components/predictions_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -79,45 +80,6 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
         endDrawer: const SideDrawer(),
-        bottomNavigationBar: SizedBox(
-          height: kBottomNavigationBarHeight + 4,
-          child: Column(
-            children: [
-              Container(
-                height: 1.5,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      const Color(0xFF0BA5EC).withOpacity(0.5),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.1, 0.5, 0.9], // Wider visible section
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
-              ),
-              BottomNavigationBar(
-                items: const [
-                  BottomNavigationBarItem(
-                    label: 'Predictions',
-                    icon: Icon(Icons.insights_outlined),
-                  ),
-                  BottomNavigationBarItem(
-                    label: 'AI Chat',
-                    icon: Icon(Icons.chat_bubble_outline),
-                  ),
-                  BottomNavigationBarItem(
-                      label: 'Odds Calculator',
-                      icon: Icon(Icons.percent_outlined)),
-                ],
-                onTap: (index) {
-                  _tabController.animateTo(index);
-                },
-              ),
-            ],
-          ),
-        ));
+        bottomNavigationBar: const DefaultBottomNavigationBar());
   }
 }
