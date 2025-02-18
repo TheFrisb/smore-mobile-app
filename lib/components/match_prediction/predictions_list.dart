@@ -1,7 +1,8 @@
 // predictions_list.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:smore_mobile_app/components/match_prediction.dart';
+import 'package:smore_mobile_app/components/match_prediction/match_prediction.dart';
+import 'package:smore_mobile_app/components/match_prediction/match_prediction_v2.dart';
 
 class PredictionsList extends StatelessWidget {
   final int activeTabIndex;
@@ -51,7 +52,7 @@ class PredictionsList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        MatchPrediction(),
+        MatchPredictionV2(),
         SizedBox(height: 16),
         MatchPrediction(),
         SizedBox(height: 16),

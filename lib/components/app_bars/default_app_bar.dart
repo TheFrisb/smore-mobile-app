@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   final TabController tabController;
@@ -10,26 +11,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: ShaderMask(
-        shaderCallback: (Rect bounds) {
-          return const LinearGradient(
-            colors: [
-              Color(0xFFFFFFFF), // #FFF
-              Color(0xFFB7C9DB), // #b7c9db
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ).createShader(bounds);
-        },
-        blendMode: BlendMode.srcIn,
-        child: const Text(
-          "SMORE",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white, // Base text color (required for gradient)
-          ),
-        ),
-      ),
+      title: const BrandLogo(),
       actions: [
         // add avatar icon on right with InkResponse
         InkResponse(

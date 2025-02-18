@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-class MatchPrediction extends StatelessWidget {
-  const MatchPrediction({super.key});
+import '../../screens/analysis_detail_screen.dart';
+
+class MatchPredictionV2 extends StatelessWidget {
+  const MatchPredictionV2({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            color: const Color(0xFF10B981).withOpacity(0.2),
+            color: Theme.of(context).primaryColor.withOpacity(0.2),
             // rgba(16,185,129,.2)
             width: 1,
           ),
@@ -44,11 +46,17 @@ class MatchPrediction extends StatelessWidget {
                     ),
                     // Right side button
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AnalysisDetailScreen(),
+                          ),
+                        );
+                      },
                       style: TextButton.styleFrom(
                         foregroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 4),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -65,12 +73,16 @@ class MatchPrediction extends StatelessWidget {
                         style: TextStyle(
                           color: Color(0xFFdbe4ed),
                         )),
+                    Spacer(),
+                    Row(
+                      children: [],
+                    )
                   ],
                 ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.only(
-                      top: 8, left: 8, right: 8, bottom: 24),
+                      top: 8, left: 16, right: 16, bottom: 8),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFF0D151E),
@@ -80,53 +92,61 @@ class MatchPrediction extends StatelessWidget {
                       width: 1,
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       Text(
                         "EUROPE: Champions League",
                         style: TextStyle(
-                          color: Theme.of(context).primaryColor,
+                          color: Color(0xFF00DEA2),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "Monaco",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A384E),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.2),
-                            width: 1,
+                      SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Left team aligned to start
+                              Text(
+                                "Monaco",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Manchester City",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "vs",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_drop_up,
+                                color: Color(0xFF00DEA2),
+                              ),
+                              Text(
+                                "Odds",
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                "1.66",
+                                style: TextStyle(
+                                  color: Color(0xFF00DEA2),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Manchester City",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -203,60 +223,34 @@ class MatchPrediction extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  // Align children to top
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        // Explicit top alignment
-                        children: [
-                          Text(
-                            "Prediction",
-                            style: TextStyle(
-                              color: Colors.grey.shade400,
-                            ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      // Explicit top alignment
+                      children: [
+                        Text(
+                          "Prediction",
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Monaco (To win either half)",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            "Monaco (To win either half)",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        // Add this for top alignment
-                        children: [
-                          Text(
-                            "Odds",
-                            style: TextStyle(
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "1.66",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ],
+                    )
                   ],
-                )
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  // Add this for top alignment
+                  children: [],
+                ),
               ],
             )));
   }

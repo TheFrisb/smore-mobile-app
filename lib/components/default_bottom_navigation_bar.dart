@@ -15,21 +15,16 @@ class DefaultBottomNavigationBar extends StatelessWidget {
       child: Column(
         children: [
           const BrandGradientLine(height: 1.5),
-          BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(
-                label: 'Predictions',
-                icon: Icon(Icons.insights_outlined),
-              ),
-              BottomNavigationBarItem(
-                label: 'AI Chat',
-                icon: Icon(Icons.chat_bubble_outline),
-              ),
-            ],
-            onTap: (index) {
-              logger.i("Bottom navigation bar tapped, index: $index");
-            },
-          ),
+          BottomNavigationBar(items: const [
+            BottomNavigationBarItem(
+              label: 'Predictions',
+              icon: Icon(Icons.insights_outlined),
+            ),
+            BottomNavigationBarItem(
+              label: 'AI Chat',
+              icon: Icon(Icons.chat_bubble_outline),
+            ),
+          ], onTap: (index) {}),
         ],
       ),
     );

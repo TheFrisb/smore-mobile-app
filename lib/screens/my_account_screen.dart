@@ -103,7 +103,7 @@ class MyAccountScreen extends StatelessWidget {
                       fontSize: 18,
                     )),
                 Spacer(),
-                Text("Change Plan",
+                Text("Manage Plan",
                     style: TextStyle(
                         fontSize: 14, color: Theme.of(context).primaryColor))
               ],

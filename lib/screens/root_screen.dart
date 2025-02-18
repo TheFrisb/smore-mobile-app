@@ -1,9 +1,6 @@
 // lib/screens/root_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'home_screen.dart';
-
+import 'package:smore_mobile_app/screens/home_screen.dart';
 
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});

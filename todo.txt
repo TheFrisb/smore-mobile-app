@@ -1,20 +1,7 @@
-
-
-2. Implement Contact Us
-- Show whatsapp
-- Show email
-
-
+2. Implement Detailed Prediction View
+3. Implement Login
+4. Implement Register
+5. Implement AI Chat
 
 
 
-
-5. Improve Prediction UI
-
-6. Implement Detailed Prediction View
-
-7. Implement AI Chat
-
-8. Implement Login
-
-9. Implement Register

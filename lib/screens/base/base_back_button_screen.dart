@@ -4,6 +4,7 @@ import 'package:smore_mobile_app/components/app_bars/back_button_app_bar.dart';
 class BaseScreen extends StatelessWidget {
   final String title;
   final Widget body;
+  final Color? backgroundColor;
   final EdgeInsetsGeometry? padding;
 
   const BaseScreen({
@@ -11,12 +12,13 @@ class BaseScreen extends StatelessWidget {
     required this.title,
     required this.body,
     this.padding,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1e2f42),
+      backgroundColor: backgroundColor ?? const Color(0xFF1e2f42),
       appBar: BackButtonAppBar(title: title),
       body: SafeArea(
         child: Padding(
