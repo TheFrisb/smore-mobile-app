@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:smore_mobile_app/components/app_bars/back_button_app_bar.dart';
+import 'package:smore_mobile_app/components/base_app_bar.dart';
 
-class BaseBackButtonScreen extends StatelessWidget {
+class BaseAppBarScreen extends StatelessWidget {
   final String title;
   final Widget body;
   final Color? backgroundColor;
   final EdgeInsetsGeometry? padding;
 
-  const BaseBackButtonScreen({
+  const BaseAppBarScreen({
     super.key,
     required this.title,
     required this.body,
@@ -19,7 +19,7 @@ class BaseBackButtonScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor ?? const Color(0xFF1e2f42),
-      appBar: BackButtonAppBar(title: title),
+      appBar: const BaseAppBar(),
       body: SafeArea(
         child: Padding(
           padding: padding ?? const EdgeInsets.all(16.0),

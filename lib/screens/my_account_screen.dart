@@ -7,7 +7,7 @@ class MyAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScreen(
+    return BaseBackButtonScreen(
         title: "My Account",
         body: Column(
           children: [

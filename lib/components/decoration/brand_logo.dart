@@ -7,26 +7,42 @@ class BrandLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (Rect bounds) {
-        return const LinearGradient(
-          colors: [
-            Color(0xFFFFFFFF), // #FFF
-            Color(0xFFB7C9DB), // #b7c9db
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ).createShader(bounds);
-      },
-      blendMode: BlendMode.srcIn,
-      child: Text(
-        "SMORE",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: fontSize ?? 14,
-          color: Colors.white, // Base text color (required for gradient)
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Background text for proper sizing
+        Text(
+          "SMORE",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: fontSize ?? 24,
+            color: Colors.transparent,
+          ),
         ),
-      ),
+        // Gradient overlay
+        ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              colors: [
+                Color(0xFFFFFFFF), // #FFF
+                Color(0xFFB7C9DB), // #b7c9db
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcIn,
+          child: Text(
+            "SMORE",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: fontSize ?? 24,
+              height: 1.1, // Adjust line height
+              color: Colors.white, // Required for gradient
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

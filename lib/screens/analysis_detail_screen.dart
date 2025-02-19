@@ -7,7 +7,7 @@ class AnalysisDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScreen(
+    return BaseBackButtonScreen(
       title: "Match analysis",
       padding: const EdgeInsets.all(0),
       backgroundColor: Color(0xFF0D151E),

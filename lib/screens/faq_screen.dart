@@ -6,7 +6,7 @@ class FaqScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const BaseScreen(
+    return const BaseBackButtonScreen(
         title: "FAQ",
         body: Column(
           children: [

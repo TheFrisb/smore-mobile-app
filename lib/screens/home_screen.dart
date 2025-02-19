@@ -5,7 +5,6 @@ import 'package:smore_mobile_app/components/side_drawer.dart';
 
 import '../components/coming_soon_card.dart';
 import '../components/date_picker.dart';
-import '../components/default_bottom_navigation_bar.dart';
 import '../components/match_prediction/predictions_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -79,7 +78,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-        endDrawer: const SideDrawer(),
-        bottomNavigationBar: const DefaultBottomNavigationBar());
+        endDrawer: const SideDrawer());
   }
 }

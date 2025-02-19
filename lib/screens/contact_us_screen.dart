@@ -21,7 +21,7 @@ class ContactUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScreen(
+    return BaseBackButtonScreen(
       title: "Contact Us",
       body: Column(
         children: [
