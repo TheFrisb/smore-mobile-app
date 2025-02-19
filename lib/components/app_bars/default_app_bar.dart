@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final TabController tabController;
   static final Logger logger = Logger();
+  final bool showGradient;
 
-  const DefaultAppBar({super.key, required this.tabController});
+  const DefaultAppBar({super.key, this.showGradient = false});
 
   @override
   Widget build(BuildContext context) {
@@ -32,49 +33,14 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(48 + 1),
-        child: Column(
-          children: [
-            TabBar(
-              controller: tabController,
-              tabs: const [
-                Tab(
-                  icon: Icon(Icons.sports_soccer),
-                  text: "Soccer",
-                ),
-                Tab(
-                  icon: Icon(Icons.sports_basketball),
-                  text: "Basketball",
-                ),
-                Tab(
-                  icon: Icon(Icons.sports_football),
-                  text: "Football",
-                ),
-              ],
-              dividerColor: Colors.transparent,
-            ),
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    const Color(0xFF0BA5EC).withOpacity(0.5),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      // if showGradient is true, add BrandGradientLine
+      bottom: showGradient
+          ? const PreferredSize(
+              preferredSize: Size.fromHeight(1.0), child: BrandGradientLine())
+          : null,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 48 + 1);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 1.0);
 }

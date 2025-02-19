@@ -173,7 +173,7 @@ class AnalysisDetailScreen extends StatelessWidget {
             ),
           ),
 
-          BrandGradientLine(),
+          const BrandGradientLine(),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(

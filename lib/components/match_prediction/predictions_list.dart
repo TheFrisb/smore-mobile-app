@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:smore_mobile_app/components/match_prediction/match_prediction.dart';
 import 'package:smore_mobile_app/components/match_prediction/match_prediction_v2.dart';
 
+import 'match_prediction_v3.dart';
+
 class PredictionsList extends StatelessWidget {
   final int activeTabIndex;
   final DateTime selectedDate;
@@ -56,7 +58,7 @@ class PredictionsList extends StatelessWidget {
         SizedBox(height: 16),
         MatchPrediction(),
         SizedBox(height: 16),
-        MatchPrediction(),
+        MatchPredictionV3(),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/components/app_bars/default_app_bar.dart';
 import 'package:smore_mobile_app/components/side_drawer.dart';
+import 'package:smore_mobile_app/components/sport_tab_bar.dart';
 
 import '../components/coming_soon_card.dart';
 import '../components/date_picker.dart';
@@ -45,11 +46,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: const Color(0xFF1e2f42),
-        appBar: DefaultAppBar(
-          tabController: _tabController,
-        ),
+        appBar: const DefaultAppBar(),
         body: Column(
           children: [
+            SportTabBar(tabController: _tabController),
             CustomDatePicker(
               initialDate: _selectedDate,
               onDateChanged: (date) {

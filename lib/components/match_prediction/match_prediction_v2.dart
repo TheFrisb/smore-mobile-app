@@ -92,15 +92,26 @@ class MatchPredictionV2 extends StatelessWidget {
                       width: 1,
                     ),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Text(
-                        "EUROPE: Champions League",
-                        style: TextStyle(
-                          color: Color(0xFF00DEA2),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.network(
+                            'https://i.ibb.co/ycMKNM1j/5184cb92d206f0f477f1da8bdfeceda2.png',
+                            width: 16,
+                            height: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "EUROPE: Champions League",
+                            style: TextStyle(
+                              color: Color(0xFF00DEA2),
+                            ),
+                          )
+                        ],
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,23 +121,44 @@ class MatchPredictionV2 extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Left team aligned to start
-                              Text(
-                                "Monaco",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                children: [
+                                  Image.network(
+                                    'https://i.ibb.co/398wwWfm/bf58eb61dc1e97bc9968cba1bc036587.png',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    "Manchester United",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                "Manchester City",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Image.network(
+                                    'https://i.ibb.co/JFWF2v8s/da7ba366b7dbe06c4651bda15bad072c.png',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "Barcelona",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          Row(
+                          const Row(
                             children: [
                               Icon(
                                 Icons.arrow_drop_up,
@@ -229,12 +261,12 @@ class MatchPredictionV2 extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       // Explicit top alignment
                       children: [
-                        Text(
+                        const Text(
                           "Prediction",
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Monaco (To win either half)",
+                          "Manchester United (To win either half)",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -244,12 +276,6 @@ class MatchPredictionV2 extends StatelessWidget {
                       ],
                     )
                   ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  // Add this for top alignment
-                  children: [],
                 ),
               ],
             )));

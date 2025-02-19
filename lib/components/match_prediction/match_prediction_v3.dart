@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 
 import '../../screens/analysis_detail_screen.dart';
 
-class MatchPrediction extends StatelessWidget {
-  const MatchPrediction({super.key});
+class MatchPredictionV3 extends StatelessWidget {
+  const MatchPredictionV3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +74,6 @@ class MatchPrediction extends StatelessWidget {
                         style: TextStyle(
                           color: Color(0xFFdbe4ed),
                         )),
-                    Spacer(),
-                    Row(
-                      children: [],
-                    )
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -95,7 +92,6 @@ class MatchPrediction extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.network(
                             'https://i.ibb.co/ycMKNM1j/5184cb92d206f0f477f1da8bdfeceda2.png',
@@ -103,77 +99,115 @@ class MatchPrediction extends StatelessWidget {
                             height: 16,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             "EUROPE: Champions League",
                             style: TextStyle(
-                              color: Color(0xFF00DEA2),
+                              // color: Theme.of(context)
+                              //     .primaryColor
+                              //     .withOpacity(0.7),
+                              color: Color(0xB500DEA2),
+                              fontWeight: FontWeight.bold,
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            textAlign: TextAlign.center,
-                            '12/02/2025, 20:00 (GMT +1)',
+                          ),
+                          const Spacer(),
+                          const Text(
+                            "Prediction",
                             style: TextStyle(
-                              color: Colors.grey.shade400,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
+                              color: Color(0xFFdbe4ed),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
+                      const BrandGradientLine(),
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              // Left team aligned to start
-                              Row(
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.network(
-                                    'https://i.ibb.co/398wwWfm/bf58eb61dc1e97bc9968cba1bc036587.png',
-                                    width: 20,
-                                    height: 20,
+                                  // Left team aligned to start
+                                  Row(
+                                    children: [
+                                      Image.network(
+                                        'https://i.ibb.co/398wwWfm/bf58eb61dc1e97bc9968cba1bc036587.png',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        "Manchester United",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    "Manchester United",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Image.network(
-                                    'https://i.ibb.co/JFWF2v8s/da7ba366b7dbe06c4651bda15bad072c.png',
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "Barcelona",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Image.network(
+                                        'https://i.ibb.co/JFWF2v8s/da7ba366b7dbe06c4651bda15bad072c.png',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        "Barcelona",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          const Row(
+                          Text(
+                            "Manchester United\n(To win either half)",
+                            softWrap: true,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Date: ",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "12/02/2025, 20:00 (GMT+1)",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade100,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Wrap(
                             children: [
                               Icon(
                                 Icons.arrow_drop_up,
@@ -191,35 +225,11 @@ class MatchPrediction extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          ),
+                          )
                         ],
                       )
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      // Explicit top alignment
-                      children: [
-                        const Text(
-                          "Prediction",
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Manchester United (To win either half)",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
                 ),
               ],
             )));
