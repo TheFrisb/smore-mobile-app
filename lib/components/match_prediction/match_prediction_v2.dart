@@ -106,7 +106,8 @@ class MatchPredictionV2 extends StatelessWidget {
                           const Text(
                             "EUROPE: Champions League",
                             style: TextStyle(
-                              color: Color(0xFF00DEA2),
+                              color: Color(0xB500DEA2),
+                              fontWeight: FontWeight.bold,
                             ),
                           )
                         ],
@@ -147,7 +148,7 @@ class MatchPredictionV2 extends StatelessWidget {
                                     height: 20,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
+                                  const Text(
                                     "Barcelona",
                                     style: TextStyle(
                                       fontSize: 14,

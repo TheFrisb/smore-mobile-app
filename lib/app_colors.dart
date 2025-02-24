@@ -81,7 +81,6 @@ ThemeData appTheme() {
       secondaryContainer: AppColors.secondary.shade800,
       error: AppColors.warning.shade600,
       onError: Colors.white,
-      background: AppColors.primary.shade50,
       surface: AppColors.primary.shade100,
     ),
     extensions: const <ThemeExtension<dynamic>>[

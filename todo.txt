@@ -1,7 +1,17 @@
-2. Implement Detailed Prediction View
-3. Implement Login
-4. Implement Register
-5. Implement AI Chat
+8. Implement forgot password
+9. Implement change password (my account)
+--
+11. Implement Manage Plan page
+12. Implement in-app purchases
+13. Do not show prediction and analysis if user has not purchased a plan
+14. Make AI-Chat available only for users that have purchased that addon
+15. Implement purchase prediction option for users without a plan
+--
+16.
+--
 
-
-
+1. Fetch matches through API
+2. Implement history tab
+3. Time Zone picker
+4. Implement AI Chat
+5. Implement Google SSO

@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:smore_mobile_app/screens/root_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:smore_mobile_app/providers/prediction_provider.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
+import 'package:smore_mobile_app/screens/auth_wrapper_screen.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => PredictionProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: AppTheme.dark,
-      home: const RootScreen(),
+      home: const AuthWrapperScreen(),
     );
   }
 }

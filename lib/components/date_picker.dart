@@ -21,7 +21,8 @@ class CustomDatePicker extends StatelessWidget {
         child: Column(
           children: [
             DatePicker(
-              DateTime(2025, 1, 1),
+              // datetime of 24 february 2025
+              DateTime.now().subtract(const Duration(days: 1)),
               height: 90,
               initialSelectedDate: initialDate,
               selectionColor: const Color(0xFF00503B),

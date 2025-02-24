@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   static final Logger logger = Logger();
@@ -13,6 +15,17 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: const BrandLogo(),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(FontAwesomeIcons.telegram,
+            size: 32, color: Color(0xFFB7C9DB)),
+        onPressed: () async {
+          Uri url = Uri.parse("https://t.me/smoreltd");
+          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+            logger.e("Failed to launch Telegram URL");
+          }
+        },
+      ),
       actions: [
         // add avatar icon on right with InkResponse
         InkResponse(

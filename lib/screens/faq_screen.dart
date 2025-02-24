@@ -10,7 +10,7 @@ class FaqScreen extends StatelessWidget {
         title: "FAQ",
         body: Column(
           children: [
-            const FaqItem(
+            FaqItem(
               question: "How do I reset my password?",
               answer: "Go to your account settings and click 'Reset Password'. "
                   "You'll receive an email with further instructions.",

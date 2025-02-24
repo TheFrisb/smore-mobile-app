@@ -10,7 +10,7 @@ class AnalysisDetailScreen extends StatelessWidget {
     return BaseBackButtonScreen(
       title: "Match analysis",
       padding: const EdgeInsets.all(0),
-      backgroundColor: Color(0xFF0D151E),
+      backgroundColor: const Color(0xFF0D151E),
       body: Column(
         children: [
           // Header Section

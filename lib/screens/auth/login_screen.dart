@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/app_bars/title_app_bar.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
+import 'package:smore_mobile_app/screens/auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,22 +16,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _obscurePassword = true;
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      final provider = context.read<UserProvider>();
 
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() => _isLoading = false);
+      try {
+        await provider.login(
+          _usernameController.text,
+          _passwordController.text,
+        );
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
-
-      // Add your actual login logic here
-      debugPrint('Login with: ${_usernameController.text}');
     }
   }
 
@@ -41,9 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<UserProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFF1e2f42),
-      appBar: TitleAppBar(title: 'Login'),
+      appBar: const TitleAppBar(title: 'Login'),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -53,11 +63,8 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                // Logo/Header
                 const Center(
-                  child: BrandLogo(
-                    fontSize: 32,
-                  ),
+                  child: BrandLogo(fontSize: 32),
                 ),
                 const SizedBox(height: 40),
 
@@ -67,25 +74,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF15212E),
-                    // Background color
                     labelText: 'Username',
                     labelStyle: const TextStyle(color: Colors.white70),
-                    // Label color
                     prefixIcon: const Icon(Icons.person, color: Colors.white70),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF223548)), // Default border
+                      borderSide: const BorderSide(color: Color(0xFF223548)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF223548)), // Inactive border
+                      borderSide: const BorderSide(color: Color(0xFF223548)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF10648C)), // Active border
+                      borderSide: const BorderSide(color: Color(0xFF10648C)),
                     ),
                   ),
                   validator: (value) {
@@ -104,10 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF15212E),
-                    // Background color
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.white70),
-                    // Label color
                     prefixIcon: const Icon(Icons.lock, color: Colors.white70),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -147,7 +147,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // Add forgot password logic
                       debugPrint('Forgot password pressed');
                     },
                     style: TextButton.styleFrom(
@@ -160,14 +159,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Login Button
                 FilledButton(
-                  onPressed: _isLoading ? null : _submitForm,
+                  onPressed: provider.isLoading ? null : _submitForm,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: _isLoading
+                  child: provider.isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
@@ -194,7 +193,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const Text('Don\'t have an account?'),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()),
+                      ),
                       icon: const Icon(Icons.arrow_forward, size: 16),
                       label: const Text("Register"),
                       iconAlignment: IconAlignment.end,

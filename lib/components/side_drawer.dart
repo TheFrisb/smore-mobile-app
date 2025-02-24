@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/screens/contact_us_screen.dart';
 import 'package:smore_mobile_app/screens/faq_screen.dart';
 
+import '../providers/user_provider.dart';
 import '../screens/my_account_screen.dart';
 
 class DrawerDestinationLink {
@@ -127,7 +129,10 @@ class SideDrawer extends StatelessWidget {
               minLeadingWidth: 24,
               title: const Text('Logout'),
               leading: Icon(Icons.logout, color: Colors.red.withOpacity(0.6)),
-              onTap: () {},
+              onTap: () {
+                // use UserProvider to logout
+                context.read<UserProvider>().logout();
+              },
               dense: true,
             ),
           ),

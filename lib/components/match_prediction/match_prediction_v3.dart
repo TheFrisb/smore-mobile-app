@@ -92,6 +92,8 @@ class MatchPredictionV3 extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.network(
                             'https://i.ibb.co/ycMKNM1j/5184cb92d206f0f477f1da8bdfeceda2.png',
@@ -99,7 +101,7 @@ class MatchPredictionV3 extends StatelessWidget {
                             height: 16,
                           ),
                           const SizedBox(width: 8),
-                          Text(
+                          const Text(
                             "EUROPE: Champions League",
                             style: TextStyle(
                               // color: Theme.of(context)
@@ -107,6 +109,7 @@ class MatchPredictionV3 extends StatelessWidget {
                               //     .withOpacity(0.7),
                               color: Color(0xB500DEA2),
                               fontWeight: FontWeight.bold,
+                              fontSize: 12,
                             ),
                           ),
                           const Spacer(),
@@ -114,6 +117,7 @@ class MatchPredictionV3 extends StatelessWidget {
                             "Prediction",
                             style: TextStyle(
                               color: Color(0xFFdbe4ed),
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -144,7 +148,7 @@ class MatchPredictionV3 extends StatelessWidget {
                                       const Text(
                                         "Manchester United",
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -162,7 +166,7 @@ class MatchPredictionV3 extends StatelessWidget {
                                       const Text(
                                         "Barcelona",
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -208,6 +212,8 @@ class MatchPredictionV3 extends StatelessWidget {
                             ),
                           ),
                           const Wrap(
+                            alignment: WrapAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Icon(
                                 Icons.arrow_drop_up,
@@ -215,6 +221,9 @@ class MatchPredictionV3 extends StatelessWidget {
                               ),
                               Text(
                                 "Odds",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                ),
                               ),
                               SizedBox(width: 4),
                               Text(
