@@ -5,11 +5,19 @@ import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/service/dio_client.dart';
 
+class DateGroup {
+  final DateTime date;
+  final List<Prediction> predictions;
+
+  DateGroup(this.date, this.predictions);
+}
+
 class PredictionProvider with ChangeNotifier {
   final DioClient _dioClient = DioClient();
   static final Logger logger = Logger();
 
   List<Prediction> _predictions = [];
+
   bool _isLoading = false;
   String? _error;
 
@@ -18,6 +26,69 @@ class PredictionProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   String? get error => _error;
+  List<DateGroup> _dateGroups = [];
+  String? _nextPageUrl;
+
+  List<DateGroup> get dateGroups => _dateGroups;
+
+  bool get hasNextPage => _nextPageUrl != null;
+
+  Future<void> fetchPaginatedPredictions() async {
+    logger.i('Fetching paginated predictions');
+    if (_isLoading) return;
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final String url = _nextPageUrl ?? '/history/predictions/';
+      logger.i('Fetching predictions from URL: $url');
+
+      final response = await _dioClient.dio.get(url);
+      final data = response.data as Map<String, dynamic>;
+      final List<dynamic> results = data['results'];
+      final newPredictions =
+          results.map((json) => Prediction.fromJson(json)).toList();
+
+      _nextPageUrl = data['next'];
+      _processAndAddPredictions(newPredictions);
+      logger.i('Fetched ${newPredictions.length} predictions');
+    } on DioException catch (e) {
+      logger.e('Error fetching predictions: $e');
+      _error = _handleDioError(e);
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 404) {
+        _nextPageUrl = null;
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void _processAndAddPredictions(List<Prediction> newPredictions) {
+    for (final prediction in newPredictions) {
+      final kickoffDate = prediction.match.kickoffDateTime;
+      final date =
+          DateTime(kickoffDate.year, kickoffDate.month, kickoffDate.day);
+
+      if (_dateGroups.isNotEmpty && _dateGroups.last.date == date) {
+        _dateGroups.last.predictions.add(prediction);
+        continue;
+      }
+
+      final existingGroup = _dateGroups.firstWhere(
+        (group) => group.date == date,
+        orElse: () => DateGroup(date, []),
+      );
+
+      if (existingGroup.predictions.isNotEmpty) {
+        existingGroup.predictions.add(prediction);
+      } else {
+        _dateGroups.add(DateGroup(date, [prediction]));
+      }
+    }
+  }
 
   Future<void> fetchPredictions(DateTime date) async {
     _isLoading = true;

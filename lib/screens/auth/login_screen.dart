@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         )
                       : const Text(
-                          'LOGIN',
+                          'Sign in',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -185,6 +185,47 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
 
+                const SizedBox(height: 20),
+
+                FilledButton(
+                  onPressed: provider.isLoading ? null : _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    side: BorderSide(
+                      color: Theme.of(context).primaryColor.withOpacity(0.5),
+                      width: 1,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: const Color(0xFF14202D),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Center the text in the button
+                      Center(
+                        child: Text(
+                          'Sign in with Google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      // Align the image to the left, vertically centered
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Image.asset(
+                          'assets/google_logo.png',
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 20),
 
                 // Register Button
@@ -199,7 +240,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             builder: (context) => const RegisterScreen()),
                       ),
                       icon: const Icon(Icons.arrow_forward, size: 16),
-                      label: const Text("Register"),
+                      label: const Text("Register",
+                          style: TextStyle(fontSize: 16)),
                       iconAlignment: IconAlignment.end,
                     ),
                   ],

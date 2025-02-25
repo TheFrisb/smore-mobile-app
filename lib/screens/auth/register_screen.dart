@@ -254,13 +254,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         )
                       : const Text(
-                          'REGISTER',
+                          'Sign up',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
+                ),
+
+                const SizedBox(height: 20),
+
+                FilledButton(
+                  style: ElevatedButton.styleFrom(
+                    side: BorderSide(
+                      color: Theme.of(context).primaryColor.withOpacity(0.5),
+                      width: 1,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: const Color(0xFF14202D),
+                  ),
+                  onPressed: () {},
+                  child: Stack(
+                    children: [
+                      // Center the text in the button
+                      Center(
+                        child: Text(
+                          'Sign up with Google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      // Align the image to the left, vertically centered
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Image.asset(
+                          'assets/google_logo.png',
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 20),
@@ -273,7 +315,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextButton.icon(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_forward, size: 16),
-                      label: const Text("Login"),
+                      label:
+                          const Text("Login", style: TextStyle(fontSize: 16)),
                       iconAlignment: IconAlignment.end,
                     ),
                   ],

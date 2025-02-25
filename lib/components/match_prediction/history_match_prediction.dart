@@ -7,18 +7,21 @@ import '../../models/sport/prediction.dart';
 import '../../screens/analysis_detail_screen.dart';
 import '../decoration/brand_gradient_line.dart';
 
-class MatchPrediction extends StatelessWidget {
+class HistoryMatchPrediction extends StatelessWidget {
   final Prediction prediction;
   static final Logger logger = Logger();
 
-  const MatchPrediction({super.key, required this.prediction});
+  const HistoryMatchPrediction({super.key, required this.prediction});
 
   @override
   Widget build(BuildContext context) {
     return Card(
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            color: Theme.of(context).primaryColor.withOpacity(0.2),
+            // color: Theme.of(context).primaryColor.withOpacity(0.2),
+            color: prediction.status == 'WON'
+                ? const Color(0xB500DEA2).withOpacity(0.5)
+                : const Color(0xFFEF4444).withOpacity(0.5),
             // rgba(16,185,129,.2)
             width: 1,
           ),
@@ -26,7 +29,10 @@ class MatchPrediction extends StatelessWidget {
         ),
         color: Colors.transparent,
         shadowColor:
-            Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
+            // Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
+            prediction.status == 'WON'
+                ? Theme.of(context).drawerTheme.backgroundColor
+                : const Color(0xFFEF4444).withOpacity(0.1),
         child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -77,7 +83,7 @@ class MatchPrediction extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                const Row(
+                Row(
                   children: [
                     Text("Match",
                         style: TextStyle(
@@ -85,7 +91,26 @@ class MatchPrediction extends StatelessWidget {
                         )),
                     Spacer(),
                     Row(
-                      children: [],
+                      children: [
+                        Text(
+                          prediction.status,
+                          style: TextStyle(
+                            color: prediction.status == 'WON'
+                                ? const Color(0xFF00DEA2)
+                                : const Color(0xFFEF4444),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          prediction.status == 'WON'
+                              ? Icons.check_circle
+                              : Icons.cancel,
+                          color: prediction.status == 'WON'
+                              ? const Color(0xFF00DEA2)
+                              : const Color(0xFFEF4444),
+                        ),
+                      ],
                     )
                   ],
                 ),
@@ -99,6 +124,7 @@ class MatchPrediction extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: const Color(0x802D4763), // rgba(45,71,99,.5)
+
                       width: 1,
                     ),
                   ),
@@ -109,7 +135,7 @@ class MatchPrediction extends StatelessWidget {
                         children: [
                           CachedNetworkSVGImage(
                             prediction.match.league.country.logoUrl,
-                            height: 16,
+                            width: 24,
                             fadeDuration: const Duration(milliseconds: 0),
                             placeholder: const CircularProgressIndicator(
                               strokeWidth: 2,
@@ -269,7 +295,9 @@ class MatchPrediction extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: prediction.status == 'WON'
+                            ? const Color(0xFF00DEA2)
+                            : const Color(0xFFEF4444),
                       ),
                     ),
                   ],

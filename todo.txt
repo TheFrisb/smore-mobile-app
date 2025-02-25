@@ -10,8 +10,4 @@
 16.
 --
 
-1. Fetch matches through API
-2. Implement history tab
-3. Time Zone picker
-4. Implement AI Chat
 5. Implement Google SSO

@@ -1,9 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
+import '../models/sport/prediction.dart';
+
 class AnalysisDetailScreen extends StatelessWidget {
-  const AnalysisDetailScreen({super.key});
+  final Prediction prediction;
+  static final Logger logger = Logger();
+
+  const AnalysisDetailScreen({super.key, required this.prediction});
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +47,20 @@ class AnalysisDetailScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.network(
-                            'https://i.ibb.co/ycMKNM1j/5184cb92d206f0f477f1da8bdfeceda2.png',
+                          CachedNetworkSVGImage(
+                            prediction.match.league.country.logoUrl,
                             width: 16,
-                            height: 16,
+                            fadeDuration: const Duration(milliseconds: 0),
+                            placeholder: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                            errorWidget: const Icon(Icons.error),
+                            fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            "EUROPE: Champions League",
-                            style: TextStyle(
+                          Text(
+                            prediction.match.league.name,
+                            style: const TextStyle(
                               color: Color(0xFF00DEA2),
                             ),
                           ),
@@ -56,7 +69,10 @@ class AnalysisDetailScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         textAlign: TextAlign.center,
-                        "12/02/2025 20:00 (GMT +1)",
+                        prediction.match.kickoffDateTime
+                            .toLocal()
+                            .toString()
+                            .substring(0, 16),
                         style: TextStyle(
                           color: Colors.grey.shade400,
                           fontSize: 10,
@@ -70,14 +86,24 @@ class AnalysisDetailScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Image.network(
-                                'https://i.ibb.co/398wwWfm/bf58eb61dc1e97bc9968cba1bc036587.png',
+                              Image(
+                                image: CachedNetworkImageProvider(
+                                    prediction.match.homeTeam.logoUrl),
                                 width: 64,
-                                height: 64,
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const CircularProgressIndicator();
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  logger.e(error);
+                                  return const Icon(Icons.error);
+                                },
                               ),
-                              const Text(
-                                "Manchester United",
-                                style: TextStyle(
+                              Text(
+                                prediction.match.homeTeam.name,
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -100,14 +126,24 @@ class AnalysisDetailScreen extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.network(
-                                    'https://i.ibb.co/JFWF2v8s/da7ba366b7dbe06c4651bda15bad072c.png',
+                                  Image(
+                                    image: CachedNetworkImageProvider(
+                                        prediction.match.awayTeam.logoUrl),
                                     width: 64,
-                                    height: 64,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const CircularProgressIndicator();
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      logger.e(error);
+                                      return const Icon(Icons.error);
+                                    },
                                   ),
-                                  const Text(
-                                    "Barcelona",
-                                    style: TextStyle(
+                                  Text(
+                                    prediction.match.awayTeam.name,
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -159,9 +195,9 @@ class AnalysisDetailScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     const BrandGradientLine(),
                     const SizedBox(height: 16),
-                    const Text(
-                      "In the upcoming El Clásico, Real Madrid's recent acquisition of Kylian Mbappé and Endrick has bolstered their attacking prowess, making them formidable opponents. However, Barcelona's midfield, featuring talents like Pedri, Gavi, Dani Olmo, and Frenkie de Jong, is considered one of the strongest in La Liga, providing them with a strategic advantage in controlling the game's tempo. While Real Madrid's offensive strength is undeniable, Barcelona's cohesive midfield play and recent form suggest they have the upper hand. Therefore, I predict a closely contested match with Barcelona emerging victorious.",
-                      style: TextStyle(
+                    Text(
+                      prediction.detailedAnalysis,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         height: 1.5,
@@ -192,14 +228,36 @@ class AnalysisDetailScreen extends StatelessWidget {
                         fontSize: 12,
                       ),
                     ),
-                    Text(
-                      "Monaco (To win either half)",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    // if match status won ro lost dispaly checkamrk or close icon
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          prediction.prediction,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: prediction.status == 'WON'
+                                ? const Color(0xFF00DEA2)
+                                : prediction.status == 'LOST'
+                                    ? const Color(0xFFEF4444)
+                                    : Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        if (prediction.status != 'PENDING')
+                          const SizedBox(width: 8),
+                        if (prediction.status != 'PENDING')
+                          Icon(
+                            prediction.status == 'WON'
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color: prediction.status == 'WON'
+                                ? const Color(0xFF00DEA2)
+                                : const Color(0xFFEF4444),
+                          ),
+                      ],
+                    )
                   ],
                 ),
                 const Row(

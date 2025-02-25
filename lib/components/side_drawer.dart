@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/screens/contact_us_screen.dart';
 import 'package:smore_mobile_app/screens/faq_screen.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../providers/user_provider.dart';
 import '../screens/my_account_screen.dart';
@@ -85,7 +86,6 @@ class SideDrawer extends StatelessWidget {
                   title: Text(destination.label),
                   leading: destination.icon,
                   onTap: () {
-                    // close the drawer
                     Navigator.pop(context);
                     Navigator.push(
                       context,
@@ -100,6 +100,24 @@ class SideDrawer extends StatelessWidget {
               );
             },
           ).expand((widget) => [widget, const SizedBox(height: 8)]),
+
+          // Timezone item
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              minLeadingWidth: 24,
+              title: Text(
+                  'Timezone: ${context.watch<UserProvider>().userTimezone ?? 'Not set'}'),
+              leading: const Icon(Icons.access_time),
+              onTap: () {
+                print(tz.timeZoneDatabase.locations.keys.toList());
+              },
+              dense: true,
+              visualDensity: const VisualDensity(vertical: -2),
+            ),
+          ),
+          const SizedBox(height: 8),
 
           const Spacer(),
 
@@ -130,7 +148,6 @@ class SideDrawer extends StatelessWidget {
               title: const Text('Logout'),
               leading: Icon(Icons.logout, color: Colors.red.withOpacity(0.6)),
               onTap: () {
-                // use UserProvider to logout
                 context.read<UserProvider>().logout();
               },
               dense: true,
