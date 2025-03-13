@@ -34,7 +34,7 @@ class DefaultBottomNavigationBar extends StatelessWidget {
                 icon: Icon(Icons.history_outlined),
               ),
               BottomNavigationBarItem(
-                label: 'AI Chat',
+                label: 'AI Analyst',
                 icon: Icon(Icons.chat_bubble_outline),
               ),
             ],

@@ -37,7 +37,7 @@ class MyAccountScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 // add border radius
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   color: const Color(0xFF0D151E),
                 ),
                 width: double.infinity,
@@ -64,7 +64,7 @@ class MyAccountScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 // add border radius
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   color: const Color(0xFF0D151E),
                 ),
                 width: double.infinity,
@@ -91,7 +91,7 @@ class MyAccountScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 // add border radius
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   color: const Color(0xFF0D151E),
                 ),
                 width: double.infinity,
@@ -162,7 +162,7 @@ class MyAccountScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   onPressed: () {
@@ -174,7 +174,7 @@ class MyAccountScreen extends StatelessWidget {
                         duration: const Duration(seconds: 5),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     );

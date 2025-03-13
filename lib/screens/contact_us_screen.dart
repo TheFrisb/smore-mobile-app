@@ -61,10 +61,10 @@ class ContactOption extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0D151E),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),

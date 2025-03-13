@@ -5,6 +5,7 @@ import 'package:smore_mobile_app/screens/faq_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../providers/user_provider.dart';
+import '../screens/manage_plan_screen.dart';
 import '../screens/my_account_screen.dart';
 
 class DrawerDestinationLink {
@@ -19,7 +20,7 @@ const List<DrawerDestinationLink> destinations = <DrawerDestinationLink>[
   DrawerDestinationLink(
       'My Account', Icon(Icons.account_circle_outlined), MyAccountScreen()),
   DrawerDestinationLink(
-      'Manage Plan', Icon(Icons.manage_history_outlined), MyAccountScreen()),
+      'Manage Plan', Icon(Icons.manage_history_outlined), ManagePlanScreen()),
   DrawerDestinationLink(
       'Contact Us', Icon(Icons.question_answer_outlined), ContactUsScreen()),
   DrawerDestinationLink('FAQ', Icon(Icons.help_outline), FaqScreen()),

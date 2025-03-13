@@ -22,7 +22,7 @@ class MatchPrediction extends StatelessWidget {
             // rgba(16,185,129,.2)
             width: 1,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
         ),
         color: Colors.transparent,
         shadowColor:
@@ -40,7 +40,7 @@ class MatchPrediction extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             color: const Color(0xB50D151E),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           padding: const EdgeInsets.all(5),
                           child: const Icon(Icons.sports_soccer),
@@ -68,7 +68,7 @@ class MatchPrediction extends StatelessWidget {
                         foregroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       icon: const Icon(Icons.arrow_forward, size: 16),
@@ -96,7 +96,7 @@ class MatchPrediction extends StatelessWidget {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFF0D151E),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: const Color(0x802D4763), // rgba(45,71,99,.5)
                       width: 1,
@@ -258,18 +258,61 @@ class MatchPrediction extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   // Explicit top alignment
                   children: [
-                    const Text(
-                      textAlign: TextAlign.center,
-                      "Prediction",
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.lock_outlined,
+                        size: 32,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
                       textAlign: TextAlign.center,
-                      prediction.prediction,
+                      "Prediction locked",
                       style: TextStyle(
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const BrandGradientLine(),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "Subscribe to access our expert predictions",
+                      style:
+                          TextStyle(fontSize: 14, color: Colors.grey.shade200),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        // Add navigation to subscription plans screen
+                        Navigator.pushNamed(context, '/subscription-plans');
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).primaryColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor:
+                            Theme.of(context).primaryColor.withOpacity(0.1),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("View Plans"),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_rounded, size: 16),
+                        ],
                       ),
                     ),
                   ],

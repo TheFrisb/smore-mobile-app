@@ -195,14 +195,265 @@ class AnalysisDetailScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     const BrandGradientLine(),
                     const SizedBox(height: 16),
-                    Text(
-                      prediction.detailedAnalysis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        height: 1.5,
+                    // Text(
+                    //   prediction.detailedAnalysis,
+                    //   style: const TextStyle(
+                    //     color: Colors.white,
+                    //     fontSize: 14,
+                    //     height: 1.5,
+                    //   ),
+                    // ),
+
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                Icons.lock_outlined,
+                                size: 48,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                              "Premium Prediction",
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            const BrandGradientLine(),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                              textAlign: TextAlign.center,
+                              "Subscribe to access our expert predictions for upcoming matches, featuring detailed analysis and insights.",
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade200),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  "Daily Expert Predictions",
+                                  style: TextStyle(fontSize: 12),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  "92%+ Success Rate",
+                                  style: TextStyle(fontSize: 12),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  "High odds",
+                                  style: TextStyle(fontSize: 12),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Add navigation to subscription plans screen
+                                Navigator.pushNamed(
+                                    context, '/subscription-plans');
+                              },
+                              style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("View Plans"),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.arrow_forward_ios, size: 14),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: const Color(
+                                        0x802D4763), // Use existing border color
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .primaryColor
+                                          .withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.3),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "OR",
+                                      style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: const Color(
+                                        0x802D4763), // Match left side
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: Colors.grey.shade200,
+                                  fontSize: 14,
+                                ),
+                                children: [
+                                  const TextSpan(
+                                    text: "Purchase just this prediction for ",
+                                  ),
+                                  TextSpan(
+                                    text: "\$9.99",
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            FilledButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                side: BorderSide(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.5),
+                                  width: 1,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                backgroundColor: const Color(0xFF14202D),
+                              ),
+                              child: const Stack(
+                                children: [
+                                  // Center the text in the button
+                                  Center(
+                                      child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Purchase prediction',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Icon(Icons.check_circle,
+                                          size: 20,
+                                          color: const Color(0xFF00DEA2)),
+                                    ],
+                                  )),
+                                  // Align the image to the left, vertically centered
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -218,46 +469,52 @@ class AnalysisDetailScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center, // start
                   children: [
+                    const Icon(
+                      Icons.lock_outlined,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
                     const Text(
-                      "Prediction",
+                      "Prediction locked",
                       style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
+                        color: Colors.red,
+                        fontSize: 14,
                       ),
                     ),
-                    // if match status won ro lost dispaly checkamrk or close icon
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          prediction.prediction,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: prediction.status == 'WON'
-                                ? const Color(0xFF00DEA2)
-                                : prediction.status == 'LOST'
-                                    ? const Color(0xFFEF4444)
-                                    : Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        if (prediction.status != 'PENDING')
-                          const SizedBox(width: 8),
-                        if (prediction.status != 'PENDING')
-                          Icon(
-                            prediction.status == 'WON'
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color: prediction.status == 'WON'
-                                ? const Color(0xFF00DEA2)
-                                : const Color(0xFFEF4444),
-                          ),
-                      ],
-                    )
+                    // Row(
+                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                    //   children: [
+                    //     Text(
+                    //       prediction.prediction,
+                    //       style: TextStyle(
+                    //         fontSize: 14,
+                    //         fontWeight: FontWeight.bold,
+                    //         color: prediction.status == 'WON'
+                    //             ? const Color(0xFF00DEA2)
+                    //             : prediction.status == 'LOST'
+                    //                 ? const Color(0xFFEF4444)
+                    //                 : Theme.of(context).primaryColor,
+                    //       ),
+                    //     ),
+                    //     if (prediction.status != 'PENDING')
+                    //       const SizedBox(width: 8),
+                    //     if (prediction.status != 'PENDING')
+                    //       Icon(
+                    //         prediction.status == 'WON'
+                    //             ? Icons.check_circle
+                    //             : Icons.cancel,
+                    //         color: prediction.status == 'WON'
+                    //             ? const Color(0xFF00DEA2)
+                    //             : const Color(0xFFEF4444),
+                    //       ),
+                    //   ],
+                    // )
                   ],
                 ),
                 const Row(

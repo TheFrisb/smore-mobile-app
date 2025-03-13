@@ -25,7 +25,7 @@ class HistoryMatchPrediction extends StatelessWidget {
             // rgba(16,185,129,.2)
             width: 1,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
         ),
         color: Colors.transparent,
         shadowColor:
@@ -46,7 +46,7 @@ class HistoryMatchPrediction extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             color: const Color(0xB50D151E),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           padding: const EdgeInsets.all(5),
                           child: const Icon(Icons.sports_soccer),
@@ -74,7 +74,7 @@ class HistoryMatchPrediction extends StatelessWidget {
                         foregroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       icon: const Icon(Icons.arrow_forward, size: 16),
@@ -121,7 +121,7 @@ class HistoryMatchPrediction extends StatelessWidget {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFF0D151E),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: const Color(0x802D4763), // rgba(45,71,99,.5)
 

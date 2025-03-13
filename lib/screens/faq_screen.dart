@@ -70,14 +70,14 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF0D151E),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           // Header with question
           InkWell(
             onTap: _toggleExpansion,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(

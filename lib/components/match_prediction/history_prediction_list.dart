@@ -110,7 +110,7 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 Icons.calendar_month_outlined,
