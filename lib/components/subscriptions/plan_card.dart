@@ -42,7 +42,7 @@ class PlanCard extends StatelessWidget {
             end: Alignment.bottomRight,
           );
     final Color borderColor =
-        isSelected ? Color(0xFF13618A) : Color(0xFF165273);
+        isSelected ? const Color(0xFF13618A) : const Color(0xFF165273);
 
     return Container(
       decoration: BoxDecoration(
@@ -53,7 +53,7 @@ class PlanCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.1), // Shadow for elevation
             blurRadius: 4,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -70,11 +70,11 @@ class PlanCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(_getProductIcon(product.name),
+                      Icon(_getProductIcon(product.name.name),
                           color: AppColors.secondary, size: 32),
                       const SizedBox(width: 6),
                       Text(
-                        product.name,
+                        product.name.name,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

@@ -12,6 +12,14 @@ class AuthWrapperScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, _) {
+        if (!userProvider.isInitialized) {
+          return const Scaffold(
+              backgroundColor: Color(0xFF1e2f42),
+              body: Center(
+                child: CircularProgressIndicator(),
+              ));
+        }
+
         if (userProvider.user == null) {
           return const LoginScreen();
         }

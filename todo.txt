@@ -1,8 +1,17 @@
-1. Implement in-app purchases
-2. Implement purchase prediction option for users without a plan
-3. Do not show prediction and analysis if user has not purchased a plan
-4. Make AI-Chat available only for users that have purchased that addon
-5. Fix application bugs
+2. Implement no internet connection
 
-5. Implement Google SSO
-6. Implement forgot password
+3. Implement forgot password
+4. FAQ get from API
+
+
+5. Predictions switch to dropdown
+9. Render user plan in my account with logic
+- 3 hours
+
+
+--
+1. Implement purchase prediction
+2. Implement subscriptions
+3. Implement Google SSO
+5. Fix application bugs
+7. Make application production ready

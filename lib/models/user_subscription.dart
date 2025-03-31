@@ -1,25 +1,48 @@
 import 'package:smore_mobile_app/models/product.dart';
 
+enum SubscriptionStatus {
+  ACTIVE,
+  INACTIVE,
+}
+
 class UserSubscription {
-  final String status;
-  final String frequency;
-  final double price;
-  final DateTime startDate;
-  final DateTime endDate;
-  final List<Product> products;
+  final SubscriptionStatus _status;
+  final String _frequency;
+  final double _price;
+  final DateTime _startDate;
+  final DateTime _endDate;
+  final List<Product> _products;
 
   UserSubscription({
-    required this.status,
-    required this.frequency,
-    required this.price,
-    required this.startDate,
-    required this.endDate,
-    required this.products,
-  });
+    required SubscriptionStatus status,
+    required String frequency,
+    required double price,
+    required DateTime startDate,
+    required DateTime endDate,
+    required List<Product> products,
+  })  : _status = status,
+        _frequency = frequency,
+        _price = price,
+        _startDate = startDate,
+        _endDate = endDate,
+        _products = products;
+
+  // Getter methods
+  SubscriptionStatus get status => _status;
+
+  String get frequency => _frequency;
+
+  double get price => _price;
+
+  DateTime get startDate => _startDate;
+
+  DateTime get endDate => _endDate;
+
+  List<Product> get products => _products;
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) {
     return UserSubscription(
-      status: json['status'],
+      status: _parseStatus(json['status']),
       frequency: json['frequency'],
       price: json['price'].toDouble(),
       startDate: DateTime.parse(json['start_date']),
@@ -27,5 +50,16 @@ class UserSubscription {
       products:
           List<Product>.from(json['products'].map((x) => Product.fromJson(x))),
     );
+  }
+
+  static SubscriptionStatus _parseStatus(String status) {
+    switch (status) {
+      case 'active':
+        return SubscriptionStatus.ACTIVE;
+      case 'inactive':
+        return SubscriptionStatus.INACTIVE;
+      default:
+        throw Exception('Unknown subscription status: $status');
+    }
   }
 }

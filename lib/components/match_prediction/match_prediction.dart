@@ -2,8 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:smore_mobile_app/app_colors.dart';
+import 'package:smore_mobile_app/models/sport/sport_type.dart';
+import 'package:smore_mobile_app/utils/string_utils.dart';
 
+import '../../constants/constants.dart';
 import '../../models/sport/prediction.dart';
+import '../../providers/purchase_provider.dart'; // Adjust import based on your structure
+import '../../providers/user_provider.dart'; // Adjust import based on your structure
 import '../../screens/analysis_detail_screen.dart';
 import '../decoration/brand_gradient_line.dart';
 
@@ -11,313 +18,573 @@ class MatchPrediction extends StatelessWidget {
   final Prediction prediction;
   static final Logger logger = Logger();
 
-  const MatchPrediction({super.key, required this.prediction});
+  MatchPrediction({super.key, required this.prediction});
+
+  bool hasPurchased = false;
 
   @override
   Widget build(BuildContext context) {
+    // Access providers
+    final userProvider = Provider.of<UserProvider>(context);
+    final purchaseProvider = Provider.of<PurchaseProvider>(context);
+
     return Card(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: Theme.of(context).primaryColor.withOpacity(0.2),
-            // rgba(16,185,129,.2)
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: Colors.transparent,
-        shadowColor:
-            Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
-        child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Left side group
-                    Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xB50D151E),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          padding: const EdgeInsets.all(5),
-                          child: const Icon(Icons.sports_soccer),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text('Soccer',
-                            style: TextStyle(
-                              color: Color(0xFFdbe4ed),
-                            )),
-                      ],
-                    ),
-                    // Right side button
-                    TextButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AnalysisDetailScreen(
-                              prediction: prediction,
-                            ),
-                          ),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(Icons.arrow_forward, size: 16),
-                      label: const Text("View analysis"),
-                    ),
-                  ],
+      shape: RoundedRectangleBorder(
+        side: _getBorderColor(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: Colors.transparent,
+      shadowColor: _getShadowColor(context),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildTopRow(context),
+            const SizedBox(height: 24),
+            _buildSecondaryRow(
+                context, userProvider.canViewPrediction(prediction)),
+            const SizedBox(height: 8),
+            Container(
+              padding:
+                  const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D151E),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0x802D4763),
+                  width: 1,
                 ),
-                const SizedBox(height: 24),
-                const Row(
-                  children: [
-                    Text("Match",
-                        style: TextStyle(
-                          color: Color(0xFFdbe4ed),
-                        )),
-                    Spacer(),
-                    Row(
-                      children: [],
-                    )
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.only(
-                      top: 8, left: 16, right: 16, bottom: 8),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0D151E),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0x802D4763), // rgba(45,71,99,.5)
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CachedNetworkSVGImage(
-                            prediction.match.league.country.logoUrl,
-                            height: 16,
-                            fadeDuration: const Duration(milliseconds: 0),
-                            placeholder: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                            errorWidget: const Icon(Icons.error),
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            prediction.match.league.name,
-                            style: const TextStyle(
-                              color: Color(0xB500DEA2),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                      CachedNetworkSVGImage(
+                        prediction.match.league.country.logoUrl,
+                        height: 16,
+                        fadeDuration: const Duration(milliseconds: 0),
+                        placeholder:
+                            const CircularProgressIndicator(strokeWidth: 2),
+                        errorWidget: const Icon(Icons.error),
+                        fit: BoxFit.contain,
                       ),
-                      const SizedBox(height: 8),
-                      const BrandGradientLine(),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Left team aligned to start
-                              Row(
-                                children: [
-                                  Image(
-                                    image: CachedNetworkImageProvider(
-                                        prediction.match.homeTeam.logoUrl),
-                                    width: 16,
-                                    height: 16,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const CircularProgressIndicator();
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      logger.e(error);
-                                      return const Icon(Icons.error);
-                                    },
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    prediction.match.homeTeam.name,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Image(
-                                    image: CachedNetworkImageProvider(
-                                        prediction.match.awayTeam.logoUrl),
-                                    width: 16,
-                                    height: 16,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const CircularProgressIndicator();
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      logger.e(error);
-                                      return const Icon(Icons.error);
-                                    },
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    prediction.match.awayTeam.name,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.arrow_drop_up,
-                                color: Color(0xFF00DEA2),
-                              ),
-                              const Text(
-                                "Odds",
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                prediction.odds.toString(),
-                                style: const TextStyle(
-                                  color: Color(0xFF00DEA2),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      const SizedBox(width: 8),
+                      Text(
+                        prediction.match.league.name,
+                        style: const TextStyle(
+                          color: Color(0xB500DEA2),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "Date: ",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: prediction.match.kickoffDateTime
-                                      .toLocal()
-                                      .toString()
-                                      .substring(0, 16),
-                                  style: TextStyle(
-                                    color: Colors.grey.shade100,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  // Explicit top alignment
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.lock_outlined,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      textAlign: TextAlign.center,
-                      "Prediction locked",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const BrandGradientLine(),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    Text(
-                      textAlign: TextAlign.center,
-                      "Subscribe to access our expert predictions",
-                      style:
-                          TextStyle(fontSize: 14, color: Colors.grey.shade200),
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton(
-                      onPressed: () {
-                        // Add navigation to subscription plans screen
-                        Navigator.pushNamed(context, '/subscription-plans');
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                  const SizedBox(height: 12),
+                  const BrandGradientLine(),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Date, Time: ",
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 12,
+                              ),
+                            ),
+                            TextSpan(
+                              text: prediction.match.kickoffDateTime
+                                  .toLocal()
+                                  .toString()
+                                  .substring(0, 16),
+                              style: TextStyle(
+                                color: Colors.grey.shade100,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.1),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("View Plans"),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward_rounded, size: 16),
-                        ],
-                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: prediction.match.homeTeam.logoUrl,
+                              height: 48,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              prediction.match.homeTeam.name,
+                              style: TextStyle(
+                                color: AppColors.secondary.shade100,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        _buildVersusRow(context),
+                        Column(
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: prediction.match.awayTeam.logoUrl,
+                              height: 48,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              prediction.match.awayTeam.name,
+                              style: TextStyle(
+                                color: AppColors.secondary.shade100,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
-                  ],
-                )),
-              ],
-            )));
+                  ),
+                  if (userProvider.canViewPrediction(prediction)) _buildOdds()
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (userProvider.canViewPrediction(prediction))
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Prediction",
+                    style: TextStyle(
+                      color: AppColors.secondary.shade100,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    prediction.prediction,
+                    style: TextStyle(
+                      color: _getPredictionColor(context),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+            else
+              _buildPredictionLockedSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVersusRow(BuildContext context) {
+    if (prediction.status == PredictionStatus.PENDING) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CachedNetworkImage(
+            imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
+            height: 32,
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          prediction.match.homeTeamScore,
+          style: TextStyle(
+            color: AppColors.secondary.shade100,
+          ),
+        ),
+        const SizedBox(width: 24),
+        CachedNetworkImage(
+          imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
+          height: 32,
+        ),
+        const SizedBox(width: 24),
+        Text(
+          prediction.match.awayTeamScore,
+          style: TextStyle(
+            color: AppColors.primary.shade100,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOdds() {
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        const BrandGradientLine(),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.arrow_drop_up,
+              color: Color(0xFF00DEA2),
+            ),
+            const Text("Odds"),
+            const SizedBox(width: 4),
+            Text(
+              prediction.odds.toString(),
+              style: const TextStyle(
+                color: Color(0xFF00DEA2),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildPredictionLockedSection(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Subscribe Button
+        Container(
+          width: 200,
+          decoration: BoxDecoration(
+            color: const Color(0xFF14202D).withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: const Color(0xFF1E3A5A).withOpacity(0.5),
+            ),
+          ),
+          child: InkWell(
+            onTap: () {},
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Subscribe',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward,
+                    color: Theme.of(context).primaryColor,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Access text
+        Text(
+          'to access all predictions',
+          style: TextStyle(
+            color: AppColors.secondary.shade100,
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(height: 16),
+        // OR Divider
+        Row(
+          children: [
+            Expanded(
+              child: Divider(
+                color: const Color(0xFF64748B).withOpacity(0.2),
+                thickness: 1,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                'OR',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Divider(
+                color: const Color(0xFF64748B).withOpacity(0.2),
+                thickness: 1,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Unlock Button
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xB50D151E),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Theme.of(context).primaryColor.withOpacity(0.5),
+              width: 1,
+            ),
+          ),
+          child: InkWell(
+            onTap: () {},
+            child: Container(
+              width: 200,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Unlock',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(
+                    Icons.lock_open,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Price text
+        RichText(
+          text: TextSpan(
+            text: 'this prediction for ',
+            style: TextStyle(
+              color: AppColors.secondary.shade100,
+              fontSize: 12,
+            ),
+            children: [
+              TextSpan(
+                text: '\$9.99',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  bool showDetailedAnalysis() {
+    return prediction.status == PredictionStatus.PENDING &&
+        prediction.hasDetailedAnalysis == true;
+  }
+
+  Color? _getShadowColor(BuildContext context) {
+    switch (prediction.status) {
+      case PredictionStatus.PENDING:
+        return Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5);
+      case PredictionStatus.WON:
+        return Theme.of(context).drawerTheme.backgroundColor;
+      case PredictionStatus.LOST:
+        return const Color(0xFFEF4444).withOpacity(0.1);
+      default:
+        return Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5);
+    }
+  }
+
+  Widget _buildSecondaryRow(BuildContext context, bool canViewPrediction) {
+    if (canViewPrediction && prediction.status == PredictionStatus.PENDING) {
+      return const SizedBox.shrink();
+    }
+
+    if (!canViewPrediction) {
+      return const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.lock_outline,
+            color: Colors.red,
+          ),
+          SizedBox(width: 8),
+          Text(
+            "Prediction locked",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      );
+    }
+
+    Color color = _getPredictionColor(context) ?? Colors.white;
+    Icon icon = Icon(
+      prediction.status == PredictionStatus.WON
+          ? Icons.check_circle
+          : Icons.cancel,
+      color: color,
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          prediction.status.name,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(width: 8),
+        icon,
+      ],
+    );
+  }
+
+  Color? _getPredictionColor(BuildContext context) {
+    switch (prediction.status) {
+      case PredictionStatus.PENDING:
+        return Theme.of(context).primaryColor;
+      case PredictionStatus.WON:
+        return const Color(0xFF00DEA2);
+      case PredictionStatus.LOST:
+        return const Color(0xFFEF4444);
+      default:
+        return Theme.of(context).primaryColor;
+    }
+  }
+
+  BorderSide _getBorderColor(BuildContext context) {
+    Color borderColor;
+
+    switch (prediction.status) {
+      case PredictionStatus.PENDING:
+        borderColor = Theme.of(context).primaryColor.withOpacity(0.2);
+        break;
+      case PredictionStatus.WON:
+        borderColor = const Color(0xB500DEA2).withOpacity(0.5);
+        break;
+      case PredictionStatus.LOST:
+        borderColor = const Color(0xFFEF4444).withOpacity(0.5);
+        break;
+      default:
+        borderColor = Theme.of(context).primaryColor.withOpacity(0.2);
+    }
+
+    return BorderSide(
+      color: borderColor,
+      width: 1,
+    );
+  }
+
+  Widget _buildTopRow(BuildContext context) {
+    if (showDetailedAnalysis()) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xB50D151E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(5),
+                child: Icon(_getProductIcon()),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                StringUtils.capitalize(prediction.match.type.name),
+                style: const TextStyle(color: Color(0xFFdbe4ed)),
+              ),
+            ],
+          ),
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AnalysisDetailScreen(
+                    prediction: prediction,
+                  ),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).primaryColor,
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            icon: const Icon(Icons.arrow_forward, size: 16),
+            label: const Text("View analysis"),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xB50D151E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(5),
+                child: Icon(_getProductIcon()),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                StringUtils.capitalize(prediction.match.type.name),
+                style: const TextStyle(color: Color(0xFFdbe4ed)),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+  }
+
+  IconData _getProductIcon() {
+    switch (prediction.match.type) {
+      case SportType.SOCCER:
+        return Icons.sports_soccer;
+      case SportType.BASKETBALL:
+        return Icons.sports_basketball;
+      case SportType.TENNIS:
+        return Icons.sports_tennis;
+      case SportType.NFL:
+        return Icons.sports_football;
+      case SportType.NHL:
+        return Icons.sports_hockey;
+      default:
+        return Icons.sports;
+    }
   }
 }

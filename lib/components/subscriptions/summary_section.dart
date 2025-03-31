@@ -9,11 +9,11 @@ class SummarySection extends StatelessWidget {
   final VoidCallback onSubscribe;
 
   const SummarySection({
-    Key? key,
+    super.key,
     required this.selectedProducts,
     required this.isYearly,
     required this.onSubscribe,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class SummarySection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      p.name,
+                      p.name.name,
                       style: TextStyle(color: AppColors.primary.shade200),
                     ),
                     Text(

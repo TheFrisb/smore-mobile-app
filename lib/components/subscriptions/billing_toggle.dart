@@ -6,10 +6,10 @@ class BillingToggle extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const BillingToggle({
-    Key? key,
+    super.key,
     required this.isYearly,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

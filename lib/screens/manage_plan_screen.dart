@@ -24,7 +24,7 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
   bool _isYearly = false;
   bool _isLoading = true;
   List<Product> _products = [];
-  Set<int> _selectedProductIds = {};
+  final Set<int> _selectedProductIds = {};
 
   @override
   void initState() {

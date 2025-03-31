@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:smore_mobile_app/components/match_prediction/history_match_prediction.dart';
+import 'package:smore_mobile_app/components/match_prediction/match_prediction.dart';
 import 'package:smore_mobile_app/providers/prediction_provider.dart';
 
 class HistoryPredictionsList extends StatefulWidget {
@@ -84,9 +84,8 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
             ...provider.dateGroups.expand((group) => [
                   _buildDateHeader(context, group.date),
                   ...group.predictions.map((prediction) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: HistoryMatchPrediction(prediction: prediction),
-                      )),
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: MatchPrediction(prediction: prediction))),
                   const SizedBox(height: 16),
                 ]),
             if (provider.isLoading)

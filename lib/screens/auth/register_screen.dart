@@ -282,7 +282,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Stack(
                     children: [
                       // Center the text in the button
-                      Center(
+                      const Center(
                         child: Text(
                           'Sign up with Google',
                           style: TextStyle(

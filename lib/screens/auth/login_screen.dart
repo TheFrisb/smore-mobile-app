@@ -204,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Stack(
                     children: [
                       // Center the text in the button
-                      Center(
+                      const Center(
                         child: Text(
                           'Sign in with Google',
                           style: TextStyle(

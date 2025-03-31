@@ -26,7 +26,7 @@ class PredictionProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   String? get error => _error;
-  List<DateGroup> _dateGroups = [];
+  final List<DateGroup> _dateGroups = [];
   String? _nextPageUrl;
 
   List<DateGroup> get dateGroups => _dateGroups;
@@ -117,6 +117,10 @@ class PredictionProvider with ChangeNotifier {
   }
 
   String _handleDioError(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout) {
+      return 'Please check your internet connection.';
+    }
+
     switch (e.response?.statusCode) {
       case 400:
         return 'Invalid request';

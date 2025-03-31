@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:smore_mobile_app/models/product.dart';
+import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/user.dart';
@@ -14,15 +16,34 @@ class UserProvider with ChangeNotifier {
 
   User? _user;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _userTimezone;
 
   User? get user => _user;
 
   bool get isLoading => _isLoading;
 
+  bool get isInitialized => _isInitialized;
+
   bool get isAuthenticated => _user != null;
 
+  bool hasAccessToProduct(ProductName productName) {
+    if (_user == null) {
+      return false;
+    }
+
+    return _user!.hasAccessToProduct(productName);
+  }
+
   String? get userTimezone => _userTimezone;
+
+  bool canViewPrediction(Prediction prediction) {
+    if (prediction.status != PredictionStatus.PENDING) {
+      return true;
+    }
+
+    return _user?.canViewPrediction(prediction) ?? false;
+  }
 
   Future<void> initialize() async {
     logger.i('Initializing user provider');
@@ -40,6 +61,7 @@ class UserProvider with ChangeNotifier {
       await logout();
     } finally {
       _isLoading = false;
+      _isInitialized = true;
       notifyListeners();
     }
   }
