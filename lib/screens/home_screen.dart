@@ -3,12 +3,12 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/app_bars/default_app_bar.dart';
 import 'package:smore_mobile_app/components/side_drawer.dart';
-import 'package:smore_mobile_app/components/sport_tab_bar.dart';
+import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/providers/prediction_provider.dart';
 
-import '../components/coming_soon_card.dart';
 import '../components/date_picker.dart';
 import '../components/match_prediction/predictions_list.dart';
+import '../components/match_prediction/sport_dropdown.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,34 +19,17 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDate = DateTime.now();
+  ProductName? _selectedProductName;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_onTabChanged);
-    // Fetch initial predictions
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PredictionProvider>(context, listen: false)
-          .fetchPredictions(_selectedDate);
+          .fetchPredictions(_selectedDate, _selectedProductName);
     });
-  }
-
-  void _onTabChanged() {
-    if (_tabController.indexIsChanging) {
-      HomeScreen.logger.i("Tab changed to index: ${_tabController.index}");
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -56,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen>
       appBar: const DefaultAppBar(),
       body: Column(
         children: [
-          SportTabBar(tabController: _tabController),
           CustomDatePicker(
             initialDate: _selectedDate,
             onDateChanged: (date) {
@@ -64,24 +46,26 @@ class _HomeScreenState extends State<HomeScreen>
                 HomeScreen.logger.i("Date changed to: $date");
                 _selectedDate = date;
                 Provider.of<PredictionProvider>(context, listen: false)
-                    .fetchPredictions(date);
+                    .fetchPredictions(_selectedDate, _selectedProductName);
               });
             },
+          ),
+          Center(
+            child: ProductDropdown(
+              selectedProduct: _selectedProductName,
+              onChanged: (newProduct) {
+                setState(() {
+                  _selectedProductName = newProduct;
+                  Provider.of<PredictionProvider>(context, listen: false)
+                      .fetchPredictions(_selectedDate, newProduct);
+                });
+              },
+            ),
           ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  PredictionsList(
-                    activeTabIndex: _tabController.index,
-                    selectedDate: _selectedDate,
-                  ),
-                  const Center(child: ComingSoonCard(sportName: "Basketball")),
-                  const Center(child: ComingSoonCard(sportName: "NFL")),
-                ],
-              ),
+              child: PredictionsList(selectedDate: _selectedDate),
             ),
           ),
         ],

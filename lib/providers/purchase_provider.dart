@@ -14,7 +14,7 @@ class PurchaseProvider with ChangeNotifier {
   bool _isAvailable = false;
   bool _isLoading = false;
   String? _error;
-  String? _currentPredictionId;
+  int? _currentPredictionId;
 
   PurchaseProvider(this.userProvider) {
     _init();
@@ -66,6 +66,14 @@ class PurchaseProvider with ChangeNotifier {
       if (response.notFoundIDs.isNotEmpty) {
         logger.w('Product not found: ${response.notFoundIDs}');
       }
+      logger.i('Product details fetched: ${response.productDetails}');
+
+      for (var product in response.productDetails) {
+        logger.i('Product ID: ${product.id}');
+        logger.i('Product title: ${product.title}');
+        logger.i('Product price: ${product.price}');
+      }
+
       _products = response.productDetails;
     } catch (e) {
       _error = 'Failed to initialize purchases: $e';
@@ -126,16 +134,18 @@ class PurchaseProvider with ChangeNotifier {
     }
   }
 
-  Future<void> buyPrediction(String predictionId) async {
+  Future<void> buyPrediction(int predictionId) async {
     _isLoading = true;
     _error = null;
-    _currentPredictionId = predictionId; // Store prediction ID for verification
+    _currentPredictionId = predictionId;
     notifyListeners();
 
     try {
       final product = _products.firstWhere((p) => p.id == 'buy_prediction');
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: product);
+      logger
+          .i('Initiating purchase for: ${product.id}, Price: ${product.price}');
       await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
     } catch (e) {
       _error = 'Failed to initiate purchase: $e';

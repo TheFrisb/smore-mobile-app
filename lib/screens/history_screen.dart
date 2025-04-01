@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/app_bars/default_app_bar.dart';
 import 'package:smore_mobile_app/components/match_prediction/history_prediction_list.dart';
 import 'package:smore_mobile_app/components/side_drawer.dart';
-import 'package:smore_mobile_app/components/sport_tab_bar.dart';
 
-import '../components/coming_soon_card.dart';
+import '../components/match_prediction/sport_dropdown.dart';
+import '../models/product.dart';
+import '../providers/prediction_provider.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -16,31 +18,9 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _HistoryScreenState extends State<HistoryScreen> {
   final DateTime _currentDate = DateTime.now();
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_onTabChanged);
-    // no functionality yet..
-  }
-
-  void _onTabChanged() {
-    if (_tabController.indexIsChanging) {
-      HistoryScreen.logger.i("Tab changed to index: ${_tabController.index}");
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
-    super.dispose();
-  }
+  ProductName? _selectedProductName;
 
   @override
   Widget build(BuildContext context) {
@@ -49,21 +29,22 @@ class _HistoryScreenState extends State<HistoryScreen>
       appBar: const DefaultAppBar(),
       body: Column(
         children: [
-          SportTabBar(tabController: _tabController),
+          Center(
+            child: ProductDropdown(
+              selectedProduct: _selectedProductName,
+              onChanged: (newProduct) {
+                setState(() {
+                  _selectedProductName = newProduct;
+                  Provider.of<PredictionProvider>(context, listen: false)
+                      .fetchPaginatedPredictions(_selectedProductName);
+                });
+              },
+            ),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  HistoryPredictionsList(
-                    activeTabIndex: _tabController.index,
-                    currentDate: _currentDate,
-                  ),
-                  const Center(child: ComingSoonCard(sportName: "Basketball")),
-                  const Center(child: ComingSoonCard(sportName: "NFL")),
-                ],
-              ),
+              child: HistoryPredictionsList(productName: _selectedProductName),
             ),
           ),
         ],

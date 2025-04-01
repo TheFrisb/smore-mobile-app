@@ -1,17 +1,10 @@
-2. Implement no internet connection
-
-3. Implement forgot password
-4. FAQ get from API
-
-
-5. Predictions switch to dropdown
-9. Render user plan in my account with logic
-- 3 hours
+6. Implement purchase prediction - 1 hour
+7. Implement subscriptions - 1 hour
+8. Implement Google SSO - 1 hour
 
 
---
-1. Implement purchase prediction
-2. Implement subscriptions
-3. Implement Google SSO
-5. Fix application bugs
-7. Make application production ready
+1. Prediction switch to dropdown - 30 mins
+2. Fix application bugs - 30 mins
+3. FAQ get from API - 15 mins
+4. Implement forgot password - 1 hour
+5. Render user plan in my account - 45 mins

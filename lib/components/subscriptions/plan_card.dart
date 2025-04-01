@@ -110,7 +110,7 @@ class PlanCard extends StatelessWidget {
                       color: AppColors.secondary,
                     ),
                   ),
-                  if (product.type == ProductType.addon) ...[
+                  if (product.type == ProductType.ADDON) ...[
                     const SizedBox(width: 8),
                     Text(
                       'per month',
@@ -122,7 +122,7 @@ class PlanCard extends StatelessWidget {
                   ]
                 ],
               ),
-              if (product.type == ProductType.subscription) ...[
+              if (product.type == ProductType.SUBSCRIPTION) ...[
                 const SizedBox(height: 4),
                 Text(
                   'per month',

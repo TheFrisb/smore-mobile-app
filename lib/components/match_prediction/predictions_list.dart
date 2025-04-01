@@ -7,22 +7,15 @@ import 'package:smore_mobile_app/providers/prediction_provider.dart';
 import 'match_prediction.dart';
 
 class PredictionsList extends StatelessWidget {
-  final int activeTabIndex;
   final DateTime selectedDate;
 
   const PredictionsList({
     super.key,
-    required this.activeTabIndex,
     required this.selectedDate,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (activeTabIndex != 0) {
-      // 0 is Soccer tab index
-      return const SizedBox.shrink();
-    }
-
     final formattedDate = DateFormat('EEEE d MMMM y').format(selectedDate);
 
     return Consumer<PredictionProvider>(
@@ -43,6 +36,7 @@ class PredictionsList extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.all(4),
@@ -70,7 +64,8 @@ class PredictionsList extends StatelessWidget {
             const SizedBox(height: 24),
             ...predictionProvider.predictions.map((prediction) => Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: MatchPrediction(prediction: prediction),
+                  child: MatchPrediction(
+                      prediction: prediction, key: ValueKey(prediction.id)),
                 )),
           ],
         );

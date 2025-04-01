@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/auth/login_screen.dart';
-import 'package:smore_mobile_app/screens/authenticated_user_screen.dart';
+import 'package:smore_mobile_app/screens/wrappers/authenticated_user_screen.dart';
 
 class AuthWrapperScreen extends StatelessWidget {
   const AuthWrapperScreen({super.key});

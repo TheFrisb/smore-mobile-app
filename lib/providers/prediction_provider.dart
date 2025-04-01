@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/service/dio_client.dart';
 
@@ -33,7 +34,7 @@ class PredictionProvider with ChangeNotifier {
 
   bool get hasNextPage => _nextPageUrl != null;
 
-  Future<void> fetchPaginatedPredictions() async {
+  Future<void> fetchPaginatedPredictions(ProductName? productName) async {
     logger.i('Fetching paginated predictions');
     if (_isLoading) return;
 
@@ -42,10 +43,23 @@ class PredictionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final String url = _nextPageUrl ?? '/history/predictions/';
-      logger.i('Fetching predictions from URL: $url');
+      String url;
+      Map<String, dynamic> queryParameters = {};
+      if (_nextPageUrl != null) {
+        url = _nextPageUrl!; // Use the next page URL as-is
+      } else {
+        url = '/history/predictions/';
+        if (productName != null) {
+          queryParameters['product_name'] = productName.name;
+        }
+      }
+      logger.i(
+          'Fetching predictions from URL: $url with query: $queryParameters');
 
-      final response = await _dioClient.dio.get(url);
+      final response = await _dioClient.dio.get(
+        url,
+        queryParameters: queryParameters,
+      );
       final data = response.data as Map<String, dynamic>;
       final List<dynamic> results = data['results'];
       final newPredictions =
@@ -90,18 +104,25 @@ class PredictionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPredictions(DateTime date) async {
+  Future<void> fetchPredictions(DateTime date, ProductName? productName) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
+    Map<String, dynamic> queryParameters = {
+      'date': date.toIso8601String().split('T')[0],
+    };
+
+    if (productName != null) {
+      queryParameters['product'] = productName.displayName;
+    }
+
     try {
-      logger.i('Fetching predictions for date: $date');
+      logger.i(
+          'Fetching predictions for date: $date and product: ${productName?.displayName}');
       final response = await _dioClient.dio.get(
         '/predictions/',
-        queryParameters: {
-          'date': date.toIso8601String().split('T')[0], // e.g., "2025-02-24"
-        },
+        queryParameters: queryParameters,
       );
 
       final List<dynamic> data = response.data;

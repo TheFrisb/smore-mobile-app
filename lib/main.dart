@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/providers/prediction_provider.dart';
 import 'package:smore_mobile_app/providers/purchase_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
-import 'package:smore_mobile_app/screens/auth_wrapper_screen.dart';
+import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
 

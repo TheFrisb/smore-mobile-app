@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/match_prediction/match_prediction.dart';
 import 'package:smore_mobile_app/providers/prediction_provider.dart';
 
+import '../../models/product.dart';
+
 class HistoryPredictionsList extends StatefulWidget {
-  final int activeTabIndex;
-  final DateTime currentDate;
+  final ProductName? productName;
 
   const HistoryPredictionsList({
     super.key,
-    required this.activeTabIndex,
-    required this.currentDate,
+    required this.productName,
   });
 
   @override
@@ -35,9 +35,9 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
     if (!_didFetch) {
       final provider = Provider.of<PredictionProvider>(context, listen: false);
       if (provider.dateGroups.isEmpty) {
-        provider.fetchPaginatedPredictions();
+        provider.fetchPaginatedPredictions(widget.productName);
       }
-      _didFetch = true; // Prevents repeated fetches
+      _didFetch = true;
     }
   }
 
@@ -53,16 +53,22 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
             _scrollController.position.maxScrollExtent - 500 &&
         !provider.isLoading &&
         provider.hasNextPage) {
-      provider.fetchPaginatedPredictions();
+      provider.fetchPaginatedPredictions(widget.productName);
+    }
+  }
+
+  @override
+  void didUpdateWidget(HistoryPredictionsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.productName != widget.productName) {
+      _didFetch = false;
+      final provider = Provider.of<PredictionProvider>(context, listen: false);
+      provider.fetchPaginatedPredictions(widget.productName);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.activeTabIndex != 0) {
-      return const SizedBox.shrink();
-    }
-
     return Consumer<PredictionProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading && provider.dateGroups.isEmpty) {
