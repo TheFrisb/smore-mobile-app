@@ -1,10 +1,11 @@
-6. Implement purchase prediction - 1 hour
-7. Implement subscriptions - 1 hour
-8. Implement Google SSO - 1 hour
+1. Fetch FAQ from API
+2. Prediction break on & and (
+3. Implement forgot password
+4. Ensure detail view uses sized boxes like match prediction
 
-
-1. Prediction switch to dropdown - 30 mins
-2. Fix application bugs - 30 mins
-3. FAQ get from API - 15 mins
-4. Implement forgot password - 1 hour
-5. Render user plan in my account - 45 mins
+1. Render user plan in my account
+2. Implement Google SSO
+3. Implement purchase prediction
+4. Implement subscriptions
+5. Add splash screen
+6. Add app icon

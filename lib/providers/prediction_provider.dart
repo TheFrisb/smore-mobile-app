@@ -1,4 +1,3 @@
-// providers/prediction_provider.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -17,55 +16,63 @@ class PredictionProvider with ChangeNotifier {
   final DioClient _dioClient = DioClient();
   static final Logger logger = Logger();
 
+  ProductName? _currentHistoryProduct;
   List<Prediction> _predictions = [];
-
-  bool _isLoading = false;
+  bool _isLoadingUpcomingPredictions = false;
+  bool _isLoadingHistoryPredictions = false;
   String? _error;
+  final List<DateGroup> _dateGroups = [];
+  String? _nextPageUrl;
 
   List<Prediction> get predictions => _predictions;
 
-  bool get isLoading => _isLoading;
+  bool get isLoadingUpcomingPredictions => _isLoadingUpcomingPredictions;
+
+  bool get isLoadingHistoryPredictions => _isLoadingHistoryPredictions;
 
   String? get error => _error;
-  final List<DateGroup> _dateGroups = [];
-  String? _nextPageUrl;
 
   List<DateGroup> get dateGroups => _dateGroups;
 
   bool get hasNextPage => _nextPageUrl != null;
 
   Future<void> fetchPaginatedPredictions(ProductName? productName) async {
-    logger.i('Fetching paginated predictions');
-    if (_isLoading) return;
+    logger.i(
+        'Fetching paginated predictions, isLoading: $_isLoadingHistoryPredictions');
 
-    _isLoading = true;
+    if (productName != _currentHistoryProduct) {
+      _dateGroups.clear();
+      _nextPageUrl = null;
+      _currentHistoryProduct = productName;
+    }
+
+    if (_isLoadingHistoryPredictions) return;
+
+    _isLoadingHistoryPredictions = true;
     _error = null;
     notifyListeners();
 
     try {
-      String url;
-      Map<String, dynamic> queryParameters = {};
-      if (_nextPageUrl != null) {
-        url = _nextPageUrl!; // Use the next page URL as-is
-      } else {
-        url = '/history/predictions/';
-        if (productName != null) {
-          queryParameters['product_name'] = productName.name;
-        }
-      }
+      String url = _nextPageUrl ?? '/history/predictions/';
+      Map<String, dynamic> queryParameters =
+          _nextPageUrl == null && productName != null
+              ? {'product': productName.toQueryParameter()}
+              : {};
+
       logger.i(
           'Fetching predictions from URL: $url with query: $queryParameters');
-
-      final response = await _dioClient.dio.get(
-        url,
-        queryParameters: queryParameters,
-      );
+      final response =
+          await _dioClient.dio.get(url, queryParameters: queryParameters);
       final data = response.data as Map<String, dynamic>;
-      final List<dynamic> results = data['results'];
-      final newPredictions =
-          results.map((json) => Prediction.fromJson(json)).toList();
 
-      _nextPageUrl = data['next'];
+      if (!data.containsKey('results') || data['results'] is! List) {
+        throw Exception('Invalid API response: missing or invalid "results"');
+      }
+      final newPredictions = (data['results'] as List<dynamic>)
+          .map((json) => Prediction.fromJson(json))
+          .toList();
+      _nextPageUrl = data['next'] is String ? data['next'] as String : null;
+
       _processAndAddPredictions(newPredictions);
       logger.i('Fetched ${newPredictions.length} predictions');
     } on DioException catch (e) {
@@ -74,8 +81,12 @@ class PredictionProvider with ChangeNotifier {
       if (e.response?.statusCode == 400 || e.response?.statusCode == 404) {
         _nextPageUrl = null;
       }
+    } on Exception catch (e) {
+      logger.e('Unexpected error fetching predictions: $e');
+      _error = 'An unexpected error occurred while fetching predictions.';
+      _nextPageUrl = null;
     } finally {
-      _isLoading = false;
+      _isLoadingHistoryPredictions = false;
       notifyListeners();
     }
   }
@@ -86,73 +97,86 @@ class PredictionProvider with ChangeNotifier {
       final date =
           DateTime(kickoffDate.year, kickoffDate.month, kickoffDate.day);
 
-      if (_dateGroups.isNotEmpty && _dateGroups.last.date == date) {
-        _dateGroups.last.predictions.add(prediction);
-        continue;
-      }
-
       final existingGroup = _dateGroups.firstWhere(
         (group) => group.date == date,
         orElse: () => DateGroup(date, []),
       );
 
-      if (existingGroup.predictions.isNotEmpty) {
-        existingGroup.predictions.add(prediction);
-      } else {
+      if (existingGroup.predictions.isEmpty) {
         _dateGroups.add(DateGroup(date, [prediction]));
+      } else {
+        existingGroup.predictions.add(prediction);
       }
     }
   }
 
   Future<void> fetchPredictions(DateTime date, ProductName? productName) async {
-    _isLoading = true;
+    _isLoadingUpcomingPredictions = true;
     _error = null;
     notifyListeners();
 
     Map<String, dynamic> queryParameters = {
       'date': date.toIso8601String().split('T')[0],
     };
-
     if (productName != null) {
-      queryParameters['product'] = productName.displayName;
+      queryParameters['product'] = productName.toQueryParameter();
     }
 
     try {
       logger.i(
           'Fetching predictions for date: $date and product: ${productName?.displayName}');
-      final response = await _dioClient.dio.get(
-        '/predictions/',
-        queryParameters: queryParameters,
-      );
-
-      final List<dynamic> data = response.data;
-      _predictions = data.map((json) => Prediction.fromJson(json)).toList();
+      final response = await _dioClient.dio
+          .get('/predictions/', queryParameters: queryParameters);
+      final data = response.data;
+      if (data is! List) {
+        throw Exception('Invalid API response: expected a list');
+      }
+      _predictions = (data).map((json) => Prediction.fromJson(json)).toList();
       logger.i('Fetched ${_predictions.length} predictions');
     } on DioException catch (e) {
       logger.e('Error fetching predictions: $e');
       _error = _handleDioError(e);
     } finally {
-      _isLoading = false;
+      _isLoadingUpcomingPredictions = false;
       notifyListeners();
     }
   }
 
   String _handleDioError(DioException e) {
-    if (e.type == DioExceptionType.connectionTimeout) {
-      return 'Please check your internet connection.';
-    }
-
-    switch (e.response?.statusCode) {
-      case 400:
-        return 'Invalid request';
-      case 401:
-        return 'Unauthorized. Please login again.';
-      case 404:
-        return 'No predictions found for this date';
-      case 500:
-        return 'Server error. Try again later.';
+    String message;
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        message = 'Please check your internet connection.';
+        break;
+      case DioExceptionType.receiveTimeout:
+        message = 'Server took too long to respond.';
+        break;
+      case DioExceptionType.sendTimeout:
+        message = 'Request timed out. Please try again.';
+        break;
+      case DioExceptionType.badResponse:
+        switch (e.response?.statusCode) {
+          case 400:
+            message = 'Invalid request';
+            break;
+          case 401:
+            message = 'Unauthorized. Please login again.';
+            break;
+          case 404:
+            message = 'No predictions found for this date';
+            break;
+          case 500:
+            message = 'Server error. Try again later.';
+            break;
+          default:
+            message = 'Unexpected error: ${e.response?.statusCode}';
+        }
+        break;
       default:
-        return e.message ?? 'An error occurred';
+        message = 'An unexpected error occurred: ${e.message}';
     }
+    logger.e(
+        'Dio error details: type=${e.type}, status=${e.response?.statusCode}, message=${e.message}');
+    return message;
   }
 }

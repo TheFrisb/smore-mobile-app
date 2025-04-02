@@ -35,6 +35,14 @@ const Map<ProductName, String> _displayNames = {
 
 extension ProductNameExtension on ProductName {
   String get displayName => _displayNames[this]!;
+
+  String toQueryParameter() {
+    if (this != ProductName.NFL_NHL_NCAA) {
+      return displayName;
+    } else {
+      return 'NFL_NHL_NCAA';
+    }
+  }
 }
 
 class Product {

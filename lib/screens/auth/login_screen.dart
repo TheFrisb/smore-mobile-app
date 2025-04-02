@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF15212E),
-                    labelText: 'Username',
+                    labelText: 'Username / Email',
                     labelStyle: const TextStyle(color: Colors.white70),
                     prefixIcon: const Icon(Icons.person, color: Colors.white70),
                     border: OutlineInputBorder(
@@ -103,6 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _submitForm(),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF15212E),

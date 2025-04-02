@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
+
+import '../app_colors.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsScreen extends StatelessWidget {
@@ -66,8 +68,15 @@ class ContactOption extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+              color: AppColors.primary.shade800.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                width: 1,
+              )),
           child: Row(
             children: [
               Icon(icon, color: Theme.of(context).primaryColor),

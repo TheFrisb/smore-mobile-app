@@ -1,4 +1,3 @@
-// components/match_prediction/history_prediction_list.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -21,24 +20,11 @@ class HistoryPredictionsList extends StatefulWidget {
 
 class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   final ScrollController _scrollController = ScrollController();
-  bool _didFetch = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_didFetch) {
-      final provider = Provider.of<PredictionProvider>(context, listen: false);
-      if (provider.dateGroups.isEmpty) {
-        provider.fetchPaginatedPredictions(widget.productName);
-      }
-      _didFetch = true;
-    }
   }
 
   @override
@@ -51,18 +37,8 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
     final provider = Provider.of<PredictionProvider>(context, listen: false);
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 500 &&
-        !provider.isLoading &&
+        !provider.isLoadingHistoryPredictions &&
         provider.hasNextPage) {
-      provider.fetchPaginatedPredictions(widget.productName);
-    }
-  }
-
-  @override
-  void didUpdateWidget(HistoryPredictionsList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.productName != widget.productName) {
-      _didFetch = false;
-      final provider = Provider.of<PredictionProvider>(context, listen: false);
       provider.fetchPaginatedPredictions(widget.productName);
     }
   }
@@ -71,14 +47,13 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   Widget build(BuildContext context) {
     return Consumer<PredictionProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading && provider.dateGroups.isEmpty) {
+        if (provider.isLoadingHistoryPredictions &&
+            provider.dateGroups.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (provider.error != null) {
           return Center(child: Text(provider.error!));
         }
-
         if (provider.dateGroups.isEmpty) {
           return const Center(child: Text('No predictions available'));
         }
@@ -91,10 +66,12 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
                   _buildDateHeader(context, group.date),
                   ...group.predictions.map((prediction) => Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
-                      child: MatchPrediction(prediction: prediction))),
+                      child: MatchPrediction(
+                          key: ValueKey(prediction.id),
+                          prediction: prediction))),
                   const SizedBox(height: 16),
                 ]),
-            if (provider.isLoading)
+            if (provider.isLoadingHistoryPredictions)
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Center(child: CircularProgressIndicator()),

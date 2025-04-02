@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/screens/contact_us_screen.dart';
 import 'package:smore_mobile_app/screens/faq_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -50,12 +52,7 @@ class SideDrawer extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  'Subscription ends: March 1, 2025',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                ),
+                _buildSubscriptionEndDate(context),
                 const SizedBox(height: 12),
                 Container(
                   height: 1,
@@ -156,6 +153,29 @@ class SideDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubscriptionEndDate(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    UserSubscription? userSubscription = userProvider.userSubscription;
+
+    String text;
+    if (userSubscription == null) {
+      text = 'No active subscription';
+    } else if (userSubscription.isInactive) {
+      text =
+          'Subscription expired on ${DateFormat('dd MMM yyyy').format(userSubscription.endDate)}';
+    } else {
+      text =
+          'Subscription ends on ${DateFormat('dd MMM yyyy').format(userSubscription.endDate)}';
+    }
+
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Colors.grey.shade600,
+          ),
     );
   }
 }

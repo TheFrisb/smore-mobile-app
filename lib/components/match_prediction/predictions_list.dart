@@ -20,7 +20,7 @@ class PredictionsList extends StatelessWidget {
 
     return Consumer<PredictionProvider>(
       builder: (context, predictionProvider, child) {
-        if (predictionProvider.isLoading) {
+        if (predictionProvider.isLoadingUpcomingPredictions) {
           return const Center(child: CircularProgressIndicator());
         }
 

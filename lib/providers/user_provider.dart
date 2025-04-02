@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
+import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/user.dart';
@@ -36,6 +37,8 @@ class UserProvider with ChangeNotifier {
   }
 
   String? get userTimezone => _userTimezone;
+
+  UserSubscription? get userSubscription => _user?.userSubscription;
 
   bool canViewPrediction(Prediction prediction) {
     if (prediction.status != PredictionStatus.PENDING) {

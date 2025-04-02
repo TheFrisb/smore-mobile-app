@@ -54,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ProductDropdown(
               selectedProduct: _selectedProductName,
               onChanged: (newProduct) {
+                if (_selectedProductName == newProduct) return;
+                
                 setState(() {
                   _selectedProductName = newProduct;
                   Provider.of<PredictionProvider>(context, listen: false)

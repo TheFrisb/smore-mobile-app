@@ -40,6 +40,10 @@ class UserSubscription {
 
   List<Product> get products => _products;
 
+  bool get isActive => _status == SubscriptionStatus.ACTIVE;
+
+  bool get isInactive => _status == SubscriptionStatus.INACTIVE;
+
   factory UserSubscription.fromJson(Map<String, dynamic> json) {
     return UserSubscription(
       status: _parseStatus(json['status']),

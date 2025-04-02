@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
 class FaqScreen extends StatelessWidget {
@@ -78,11 +79,18 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
           InkWell(
             onTap: _toggleExpansion,
             borderRadius: BorderRadius.circular(16),
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: AppColors.primary.shade800.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withOpacity(0.3),
+                    width: 1,
+                  )),
               child: Row(
                 children: [
-                  Icon(Icons.help_outline,
+                  Icon(Icons.shield_outlined,
                       color: Theme.of(context).primaryColor),
                   const SizedBox(width: 12),
                   Expanded(

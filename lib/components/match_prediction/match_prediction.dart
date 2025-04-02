@@ -65,7 +65,7 @@ class MatchPrediction extends StatelessWidget {
                       CachedNetworkSVGImage(
                         prediction.match.league.country.logoUrl,
                         height: 16,
-                        fadeDuration: const Duration(milliseconds: 0),
+                        fadeDuration: const Duration(milliseconds: 50),
                         placeholder:
                             const CircularProgressIndicator(strokeWidth: 2),
                         errorWidget: const Icon(Icons.error),
@@ -119,39 +119,45 @@ class MatchPrediction extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: prediction.match.homeTeam.logoUrl,
-                              height: 48,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              prediction.match.homeTeam.name,
-                              style: TextStyle(
-                                color: AppColors.secondary.shade100,
-                                fontSize: 12,
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: prediction.match.homeTeam.logoUrl,
+                                height: 48,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                prediction.match.homeTeam.name,
+                                style: TextStyle(
+                                  color: AppColors.secondary.shade100,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                         _buildVersusRow(context),
-                        Column(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: prediction.match.awayTeam.logoUrl,
-                              height: 48,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              prediction.match.awayTeam.name,
-                              style: TextStyle(
-                                color: AppColors.secondary.shade100,
-                                fontSize: 12,
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: prediction.match.awayTeam.logoUrl,
+                                height: 48,
                               ),
-                            ),
-                          ],
-                        )
+                              const SizedBox(height: 8),
+                              Text(
+                                prediction.match.awayTeam.name,
+                                style: TextStyle(
+                                  color: AppColors.secondary.shade100,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -180,6 +186,7 @@ class MatchPrediction extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               )
@@ -192,42 +199,41 @@ class MatchPrediction extends StatelessWidget {
   }
 
   Widget _buildVersusRow(BuildContext context) {
-    if (prediction.status == PredictionStatus.PENDING) {
-      return Row(
+    return SizedBox(
+      width: 120, // Fixed width for consistency, adjust as needed
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CachedNetworkImage(
-            imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
-            height: 32,
-          ),
+          if (prediction.status == PredictionStatus.PENDING)
+            CachedNetworkImage(
+              imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
+              height: 32,
+            )
+          else ...[
+            Text(
+              prediction.match.homeTeamScore,
+              style: TextStyle(
+                color: AppColors.secondary.shade100,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(width: 16),
+            CachedNetworkImage(
+              imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
+              height: 32,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              prediction.match.awayTeamScore,
+              style: TextStyle(
+                color: AppColors.primary.shade100,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ],
-      );
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          prediction.match.homeTeamScore,
-          style: TextStyle(
-            color: AppColors.secondary.shade100,
-          ),
-        ),
-        const SizedBox(width: 24),
-        CachedNetworkImage(
-          imageUrl: "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
-          height: 32,
-        ),
-        const SizedBox(width: 24),
-        Text(
-          prediction.match.awayTeamScore,
-          style: TextStyle(
-            color: AppColors.primary.shade100,
-          ),
-        ),
-      ],
+      ),
     );
   }
 

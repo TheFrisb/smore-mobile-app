@@ -19,8 +19,16 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  final DateTime _currentDate = DateTime.now();
   ProductName? _selectedProductName;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PredictionProvider>(context, listen: false)
+          .fetchPaginatedPredictions(_selectedProductName);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: ProductDropdown(
               selectedProduct: _selectedProductName,
               onChanged: (newProduct) {
+                if (_selectedProductName == newProduct) return;
                 setState(() {
                   _selectedProductName = newProduct;
                   Provider.of<PredictionProvider>(context, listen: false)

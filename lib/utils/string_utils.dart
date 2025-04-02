@@ -15,4 +15,8 @@ class StringUtils {
   static String toKebabCase(String str) {
     return str.replaceAll(' ', '-').toLowerCase();
   }
+
+  static String encodeQueryParam(String str) {
+    return Uri.encodeQueryComponent(str);
+  }
 }
