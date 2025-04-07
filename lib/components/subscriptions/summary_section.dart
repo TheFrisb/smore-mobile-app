@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import '../../app_colors.dart';
 import '../../models/product.dart';
@@ -7,18 +8,37 @@ class SummarySection extends StatelessWidget {
   final List<Product> selectedProducts;
   final bool isYearly;
   final VoidCallback onSubscribe;
+  final bool useDiscountedPrices;
+  final int? firstSelectedProductId;
+  static final Logger _logger = Logger();
 
   const SummarySection({
     super.key,
     required this.selectedProducts,
     required this.isYearly,
     required this.onSubscribe,
+    required this.useDiscountedPrices,
+    required this.firstSelectedProductId,
   });
+
+  double _getProductSalePrice(Product product) {
+    bool useDiscount = false;
+
+    if (selectedProducts.length > 1 && product.id != firstSelectedProductId) {
+      useDiscount = true;
+    }
+
+    bool isMonthly = !isYearly;
+
+    double salePrice = product.getSalePrice(isMonthly, useDiscount);
+
+    return salePrice;
+  }
 
   @override
   Widget build(BuildContext context) {
     final totalPrice = selectedProducts.fold<double>(
-        0, (sum, p) => sum + (isYearly ? p.yearlyPrice : p.monthlyPrice));
+        0, (sum, p) => sum + _getProductSalePrice(p));
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -68,11 +88,10 @@ class SummarySection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      p.name.name,
+                      p.displayName,
                       style: TextStyle(color: AppColors.primary.shade200),
                     ),
-                    Text(
-                        '\$${(isYearly ? p.yearlyPrice : p.monthlyPrice).toStringAsFixed(2)}',
+                    Text('\$${_getProductSalePrice(p).toStringAsFixed(2)}',
                         style: TextStyle(color: AppColors.primary.shade200)),
                   ],
                 ),

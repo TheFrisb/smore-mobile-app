@@ -192,7 +192,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(
+              const Icon(
                 Icons.lock_outline,
                 color: Colors.red,
                 size: 24,

@@ -1,11 +1,11 @@
-1. Fetch FAQ from API
-2. Prediction break on & and (
-3. Implement forgot password
-4. Ensure detail view uses sized boxes like match prediction
 
-1. Render user plan in my account
-2. Implement Google SSO
-3. Implement purchase prediction
-4. Implement subscriptions
-5. Add splash screen
-6. Add app icon
+1. Implement purchase predictions
+2. Implement subscriptions
+3. Implement Google SSO
+
+
+
+
+
+1. Add splash screen
+2. Add application icon

@@ -44,7 +44,7 @@ class SideDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'admin',
+                  context.watch<UserProvider>().user?.username ?? '',
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 18,

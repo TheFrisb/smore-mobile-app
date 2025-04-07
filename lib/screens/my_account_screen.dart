@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/products/product_display_name.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
+import '../models/product.dart';
 import '../models/user.dart';
+import '../models/user_subscription.dart';
 import '../providers/user_provider.dart';
 import '../service/dio_client.dart';
+import '../service/user_service.dart';
+import 'manage_plan_screen.dart';
 
 class MyAccountScreen extends StatelessWidget {
   const MyAccountScreen({super.key});
+
+  static final Logger log = Logger();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +37,7 @@ class MyAccountScreen extends StatelessWidget {
           if (user == null) {
             return const Center(
                 child: Text(
-                    'No user data available. This is most likely a bug in the application. Please contact support.'));
+                    'No user data available. Please check your internet connection.'));
           }
 
           return Column(
@@ -118,38 +127,7 @@ class MyAccountScreen extends StatelessWidget {
                 height: 2,
               ),
               const SizedBox(height: 32),
-              Row(
-                children: [
-                  const Text("Current plan",
-                      style: TextStyle(
-                        fontSize: 18,
-                      )),
-                  const Spacer(),
-                  Text("Manage Plan",
-                      style: TextStyle(
-                          fontSize: 14, color: Theme.of(context).primaryColor))
-                ],
-              ),
-              Row(
-                children: [
-                  Text("Expires in 30 days",
-                      style:
-                          TextStyle(fontSize: 14, color: Colors.grey.shade400))
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Icon(Icons.sports_soccer_outlined,
-                      color: Theme.of(context).primaryColor),
-                  const SizedBox(width: 8),
-                  const Text("Soccer", style: TextStyle(fontSize: 18)),
-                  const Spacer(),
-                  Text("\$69.99/month",
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade400)),
-                ],
-              ),
+              _build_plans_section(context),
               const SizedBox(height: 32),
               const BrandGradientLine(
                 height: 2,
@@ -165,19 +143,30 @@ class MyAccountScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () {
-                    // Show confirmation snackbar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                            'Password change instructions sent to your email'),
-                        duration: const Duration(seconds: 5),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                  onPressed: () async {
+                    try {
+                      await UserService().sendPasswordResetRequest(user.email);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              'Password change instructions sent to your email'),
+                          duration: const Duration(seconds: 5),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } catch (e) {
+                      log.e(e);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'An unexpected error has occured. Please try again or contact support if the issue persists.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     'Change Password',
@@ -193,6 +182,85 @@ class MyAccountScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _build_plans_section(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    UserSubscription? userSubscription = userProvider.userSubscription;
+
+    return Column(
+      children: [
+        if (userSubscription != null && userSubscription.isActive) ...[
+          Row(
+            children: [
+              const Text("Current plan",
+                  style: TextStyle(
+                    fontSize: 18,
+                  )),
+              const Spacer(),
+              // tapable text
+              InkResponse(
+                // on tap navigate to subscription screen
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManagePlanScreen()));
+                },
+                child: Text("Manage Plan",
+                    style: TextStyle(
+                        fontSize: 14, color: Theme.of(context).primaryColor)),
+              )
+            ],
+          ),
+          Row(
+            children: [
+              Text(
+                  "Expires on ${DateFormat('dd MMM yyyy').format(userSubscription.endDate)}",
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade400))
+            ],
+          ),
+          const SizedBox(height: 24),
+          for (Product product in userSubscription.products) ...[
+            Row(
+              children: [
+                ProductDisplayName(product: product),
+                const Spacer(),
+                Text(
+                    "\$${userSubscription.getProductSalePrice(product)}/${userSubscription.frequency.nounDisplayName}",
+                    style:
+                        TextStyle(fontSize: 12, color: Colors.grey.shade400)),
+              ],
+            ),
+            if (product != userSubscription.products.last) ...[
+              const SizedBox(height: 12),
+            ]
+          ]
+        ] else ...[
+          Row(
+            children: [
+              const Text("No active plan",
+                  style: TextStyle(
+                    fontSize: 18,
+                  )),
+              const Spacer(),
+              InkResponse(
+                // on tap navigate to subscription screen
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManagePlanScreen()));
+                },
+                child: Text("View Plans",
+                    style: TextStyle(
+                        fontSize: 14, color: Theme.of(context).primaryColor)),
+              )
+            ],
+          ),
+        ]
+      ],
     );
   }
 }

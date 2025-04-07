@@ -5,6 +5,8 @@ import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/auth/register_screen.dart';
 
+import 'forgot_password_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -148,9 +150,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      debugPrint('Forgot password pressed');
-                    },
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen()),
+                    ),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
                     ),

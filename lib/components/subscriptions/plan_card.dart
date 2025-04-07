@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/products/product_display_name.dart';
+import 'package:smore_mobile_app/models/user_subscription.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
 
 import '../../app_colors.dart';
 import '../../models/product.dart';
@@ -9,6 +14,7 @@ class PlanCard extends StatelessWidget {
   final bool isYearly;
   final bool isSelected;
   final ValueChanged<bool?> onSelected;
+  final bool showDiscount;
 
   const PlanCard({
     super.key,
@@ -16,13 +22,11 @@ class PlanCard extends StatelessWidget {
     required this.isYearly,
     required this.isSelected,
     required this.onSelected,
+    required this.showDiscount,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double priceToShow =
-        isYearly ? product.yearlyPrice / 12 : product.monthlyPrice;
-
     // Define colors based on selection
     final LinearGradient bgGradient = isSelected
         ? LinearGradient(
@@ -68,29 +72,24 @@ class PlanCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(_getProductIcon(product.name.name),
-                          color: AppColors.secondary, size: 32),
-                      const SizedBox(width: 6),
-                      Text(
-                        product.name.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  ProductDisplayName(
+                    product: product,
+                    iconSize: 32,
+                    titleFontSize: 18,
                   ),
                   _buildCustomCheckbox(isSelected),
                 ],
               ),
               const SizedBox(height: 16),
+              if (product.type == ProductType.ADDON) ...[
+                _buildCurrentPlan(context),
+                if (showDiscount) _buildDiscount(),
+                const SizedBox(height: 16),
+              ],
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (isYearly) ...[
+                  if (isYearly || showDiscount) ...[
                     Text(
                       '\$${product.monthlyPrice.toStringAsFixed(2)}',
                       style: TextStyle(
@@ -103,7 +102,7 @@ class PlanCard extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                   Text(
-                    '\$${priceToShow.toStringAsFixed(2)}',
+                    '\$${product.getSalePrice(!isYearly, showDiscount).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -119,7 +118,7 @@ class PlanCard extends StatelessWidget {
                         color: AppColors.primary.shade300,
                       ),
                     ),
-                  ]
+                  ],
                 ],
               ),
               if (product.type == ProductType.SUBSCRIPTION) ...[
@@ -131,6 +130,13 @@ class PlanCard extends StatelessWidget {
                     color: AppColors.primary.shade300,
                   ),
                 ),
+                _buildCurrentPlan(context),
+                if (showDiscount) ...[
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  _buildDiscount(),
+                ],
                 const SizedBox(height: 16),
                 const BrandGradientLine(
                   height: 1,
@@ -187,6 +193,82 @@ class PlanCard extends StatelessWidget {
               )
             : null,
       ),
+    );
+  }
+
+  Widget _buildDiscount() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF195060),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.success.shade500,
+          width: 1,
+        ),
+      ),
+      child: Text(
+        "Discount",
+        style: TextStyle(
+          color: AppColors.success.shade500,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentPlan(BuildContext context) {
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: true);
+
+    final UserSubscription? userSubscription =
+        userProvider.user?.userSubscription;
+
+    if (userSubscription == null) {
+      return const SizedBox.shrink();
+    }
+
+    // find current product id in user subscription products
+    final bool isCurrentPlan = userSubscription.products
+        .any((product) => product.id == this.product.id);
+
+    if (!isCurrentPlan) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+              width: 1,
+            ),
+          ),
+          child: Text(
+            "Current Plan",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Current plan expiry date: ${DateFormat('dd MMM yyyy').format(userSubscription.endDate)}',
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.primary.shade400,
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 

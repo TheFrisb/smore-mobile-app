@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/providers/prediction_provider.dart';
 import 'package:smore_mobile_app/providers/purchase_provider.dart';
@@ -9,6 +10,8 @@ import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
   runApp(
     MultiProvider(
@@ -23,6 +26,8 @@ void main() {
       child: const MyApp(),
     ),
   );
+
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatefulWidget {

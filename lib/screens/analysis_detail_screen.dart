@@ -1,14 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/match_prediction/prediction_text.dart';
+import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
 import '../app_colors.dart';
-import '../constants/constants.dart';
 import '../models/sport/prediction.dart';
 import '../providers/user_provider.dart';
 
@@ -39,16 +39,6 @@ class AnalysisDetailScreen extends StatelessWidget {
                   decoration: const BoxDecoration(
                     color: Color(0xFF080D13),
                   ),
-
-                  // decoration: const BoxDecoration(
-                  //   gradient: RadialGradient(
-                  //     center: Alignment.topLeft,
-                  //     colors: [
-                  //       Color(0xFF121D2D),
-                  //       Color(0xFF04142A),
-                  //     ],
-                  //   ),
-                  // ),
                   child: Column(
                     children: [
                       Row(
@@ -86,79 +76,11 @@ class AnalysisDetailScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image(
-                                image: CachedNetworkImageProvider(
-                                    prediction.match.homeTeam.logoUrl),
-                                width: 64,
-                                fit: BoxFit.cover,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return const CircularProgressIndicator();
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  logger.e(error);
-                                  return const Icon(Icons.error);
-                                },
-                              ),
-                              Text(
-                                prediction.match.homeTeam.name,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          )),
-                          const SizedBox(width: 8),
-                          Center(
-                              child: Column(
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl:
-                                    "${Constants.staticFilesBaseUrl}/assets/images/vs.png",
-                                height: 32,
-                              )
-                            ],
-                          )),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image(
-                                    image: CachedNetworkImageProvider(
-                                        prediction.match.awayTeam.logoUrl),
-                                    width: 64,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const CircularProgressIndicator();
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      logger.e(error);
-                                      return const Icon(Icons.error);
-                                    },
-                                  ),
-                                  Text(
-                                    prediction.match.awayTeam.name,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ]),
-                          ),
-                        ],
+                      PredictionVsRow(
+                        prediction: prediction,
+                        teamFontSize: 14,
+                        teamLogoHeight: 64,
+                        vsImageHeight: 32,
                       ),
                     ],
                   ),
@@ -233,13 +155,11 @@ class AnalysisDetailScreen extends StatelessWidget {
                         fontSize: 12,
                         color: AppColors.primary.shade400,
                       )),
-                  Text(
-                    prediction.prediction,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600),
-                  )
+                  PredictionText(
+                      predictionText: prediction.prediction,
+                      fontSize: 16,
+                      color: Theme.of(context).primaryColor,
+                      textAlign: TextAlign.left),
                 ],
               )
             else

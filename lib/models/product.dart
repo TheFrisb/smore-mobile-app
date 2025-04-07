@@ -50,7 +50,9 @@ class Product {
   final ProductName name;
   final String analysesPerMonth;
   final double monthlyPrice;
+  final double discountedMonthlyPrice;
   final double yearlyPrice;
+  final double discountedYearlyPrice;
   final ProductType type;
 
   Product({
@@ -58,7 +60,9 @@ class Product {
     required this.name,
     required this.analysesPerMonth,
     required this.monthlyPrice,
+    required this.discountedMonthlyPrice,
     required this.yearlyPrice,
+    required this.discountedYearlyPrice,
     required this.type,
   });
 
@@ -67,7 +71,11 @@ class Product {
     final nameStr = json['name'] as String;
     final analysesPerMonth = json['analysis_per_month'] as String;
     final monthlyPrice = double.parse(json['monthly_price'] as String);
+    final discountedMonthlyPrice =
+        double.parse(json['discounted_monthly_price'] as String);
     final yearlyPrice = double.parse(json['yearly_price'] as String);
+    final discountedYearlyPrice =
+        double.parse(json['discounted_yearly_price'] as String);
     final typeStr = json['type'] as String;
 
     final nameEnum = _productNameMap[nameStr] ??
@@ -80,9 +88,19 @@ class Product {
       name: nameEnum,
       analysesPerMonth: analysesPerMonth,
       monthlyPrice: monthlyPrice,
+      discountedMonthlyPrice: discountedMonthlyPrice,
       yearlyPrice: yearlyPrice,
+      discountedYearlyPrice: discountedYearlyPrice,
       type: typeEnum,
     );
+  }
+
+  double getSalePrice(bool isMonthly, bool isDiscounted) {
+    if (isMonthly) {
+      return isDiscounted ? discountedMonthlyPrice : monthlyPrice;
+    } else {
+      return isDiscounted ? discountedYearlyPrice : yearlyPrice;
+    }
   }
 
   String get displayName => _displayNames[name]!;

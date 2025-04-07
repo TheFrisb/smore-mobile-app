@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
 import '../components/subscriptions/billing_toggle.dart';
@@ -24,12 +25,59 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
   bool _isYearly = false;
   bool _isLoading = true;
   List<Product> _products = [];
-  final Set<int> _selectedProductIds = {};
+  Set<int> _selectedProductIds = {};
+  int? firstSelectedProductId;
 
   @override
   void initState() {
     super.initState();
     _fetchProducts();
+    _setInitialState();
+  }
+
+  void _setInitialState() {
+    UserSubscription? userSubscription =
+        Provider.of<UserProvider>(context, listen: false)
+            .user
+            ?.userSubscription;
+
+    if (userSubscription == null) {
+      _logger.i('No user subscription found.');
+      return;
+    }
+
+    _isYearly = !userSubscription.isMonthly;
+
+    _selectedProductIds =
+        userSubscription.products.map((product) => product.id).toSet();
+
+    firstSelectedProductId = userSubscription.firstChosenProduct.id;
+
+    _logger.i(
+      'Initial state set: isYearly: $_isYearly, selectedProductIds: $_selectedProductIds, firstSelectedProductId: $firstSelectedProductId',
+    );
+  }
+
+  double _getProductSalePrice(Product product) {
+    bool useDiscount = false;
+
+    if (_selectedProductIds.length > 1 &&
+        product.id != firstSelectedProductId) {
+      useDiscount = true;
+    }
+
+    bool isMonthly = !_isYearly;
+
+    double salePrice = product.getSalePrice(isMonthly, useDiscount);
+    _logger.i(
+      'Product ID: ${product.id}, Sale Price: $salePrice, Is Monthly: $isMonthly, Use Discount: $useDiscount',
+    );
+
+    if (isMonthly) {
+      return salePrice;
+    } else {
+      return salePrice / 12;
+    }
   }
 
   Future<void> _fetchProducts() async {
@@ -61,7 +109,6 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dio = DioClient().dio;
     return BaseBackButtonScreen(
       padding: const EdgeInsets.only(left: 16, right: 16),
       title: "Manage Plan",
@@ -73,12 +120,43 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
             );
           }
           final User? user = userProvider.user;
+          final UserSubscription? userSubscription =
+              userProvider.user?.userSubscription;
           if (user == null) {
             return const Center(
               child: Text(
                 'No user data available. This is most likely a bug in the application. Please contact support.',
               ),
             );
+          }
+
+          if (userSubscription != null &&
+              userSubscription.providerType ==
+                  SubscriptionProviderType.STRIPE) {
+            return Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'You are subscribed through Stripe.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Please manage your subscription from our website.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ));
           }
 
           return Stack(
@@ -108,18 +186,36 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: PlanCard(
-                            key: UniqueKey(),
+                            key: ValueKey(product.id),
                             // Unique key for each PlanCard
                             product: product,
                             isYearly: _isYearly,
                             isSelected:
                                 _selectedProductIds.contains(product.id),
+                            showDiscount: () {
+                              if (_selectedProductIds.isNotEmpty &&
+                                  product.id != firstSelectedProductId) {
+                                return true;
+                              }
+                              return false;
+                            }(),
                             onSelected: (value) {
                               setState(() {
                                 if (value == true) {
                                   _selectedProductIds.add(product.id);
+
+                                  firstSelectedProductId ??= product.id;
                                 } else {
                                   _selectedProductIds.remove(product.id);
+
+                                  if (product.id == firstSelectedProductId) {
+                                    if (_selectedProductIds.isNotEmpty) {
+                                      firstSelectedProductId =
+                                          _selectedProductIds.first;
+                                    } else {
+                                      firstSelectedProductId = null;
+                                    }
+                                  }
                                 }
                               });
                             },
@@ -139,6 +235,13 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
                               .where((p) => _selectedProductIds.contains(p.id))
                               .toList(),
                           isYearly: _isYearly,
+                          firstSelectedProductId: firstSelectedProductId,
+                          useDiscountedPrices: () {
+                            if (_selectedProductIds.length > 1) {
+                              return true;
+                            }
+                            return false;
+                          }(),
                           onSubscribe: () {
                             _logger.i(
                               'Subscribe to ${_selectedProductIds.map((id) => _products.firstWhere((p) => p.id == id).name).join(', ')}',

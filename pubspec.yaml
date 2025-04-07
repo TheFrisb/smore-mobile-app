@@ -57,6 +57,7 @@ dependencies:
   flutter_markdown: ^0.7.6+2
   connectivity_plus: ^6.1.3
   dropdown_button2: ^2.3.9
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
@@ -111,3 +112,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+flutter_native_splash:
+  color: "#1e2f42"
+  image: assets/google_logo.png

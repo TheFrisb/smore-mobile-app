@@ -1,34 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:smore_mobile_app/app_colors.dart';
+import 'package:smore_mobile_app/models/faq_item.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
-class FaqScreen extends StatelessWidget {
+import '../service/faq_service.dart';
+
+class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
 
   @override
+  State<FaqScreen> createState() => _FaqScreenState();
+}
+
+class _FaqScreenState extends State<FaqScreen> {
+  late final Future<List<FrequentlyAskedQuestion>> _faqFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _faqFuture = FaqService().getFaqItems();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const BaseBackButtonScreen(
-        title: "FAQ",
-        body: Column(
-          children: [
-            FaqItem(
-              question: "How do I reset my password?",
-              answer: "Go to your account settings and click 'Reset Password'. "
-                  "You'll receive an email with further instructions.",
-            )
-          ],
-        ));
+    return BaseBackButtonScreen(
+      title: "FAQ",
+      body: FutureBuilder<List<FrequentlyAskedQuestion>>(
+        future: _faqFuture,
+        builder: (context, snapshot) {
+          // Loading state
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          // Error state
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Failed to load FAQs.\nPlease check your internet connection.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.red.shade400,
+                  fontSize: 16,
+                ),
+              ),
+            );
+          }
+
+          // Empty state
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'No FAQs available',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            );
+          }
+
+          // Data loaded state
+          final faqItems = snapshot.data!;
+          return ListView.builder(
+            itemCount: faqItems.length,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: FaqItem(frequentlyAskedQuestion: faqItems[index]),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 
 class FaqItem extends StatefulWidget {
-  final String question;
-  final String answer;
+  final FrequentlyAskedQuestion frequentlyAskedQuestion;
 
   const FaqItem({
     super.key,
-    required this.question,
-    required this.answer,
+    required this.frequentlyAskedQuestion,
   });
 
   @override
@@ -37,7 +92,6 @@ class FaqItem extends StatefulWidget {
 
 class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _borderAnimation;
   bool _isExpanded = false;
 
   @override
@@ -46,9 +100,6 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
-    );
-    _borderAnimation = Tween<double>(begin: 0.1, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
 
@@ -68,34 +119,36 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF0D151E),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          // Header with question
+          // Question header
           InkWell(
             onTap: _toggleExpansion,
             borderRadius: BorderRadius.circular(16),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                  color: AppColors.primary.shade800.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
-                    width: 1,
-                  )),
+                color: AppColors.primary.shade800.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
               child: Row(
                 children: [
-                  Icon(Icons.shield_outlined,
-                      color: Theme.of(context).primaryColor),
+                  Icon(
+                    Icons.shield_outlined,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      widget.question,
+                      widget.frequentlyAskedQuestion.question,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -115,7 +168,7 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
             ),
           ),
 
-          // Answer content with animated border
+          // Answer content
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -131,9 +184,9 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
                 children: [
                   if (_isExpanded)
                     Padding(
-                      padding: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
                       child: Text(
-                        widget.answer,
+                        widget.frequentlyAskedQuestion.answer,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade400,

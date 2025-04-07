@@ -59,7 +59,7 @@ class ProductDropdown extends StatelessWidget {
               ...ProductName.values
                   .where((product) => product != ProductName.AI_ANALYST)
                   .map((product) => _buildDropdownMenuItem(context, product))
-                  .toList(),
+                  ,
             ],
             customButton: _buildSelectedDisplay(context),
             // buttonStyleData: ButtonStyleData(

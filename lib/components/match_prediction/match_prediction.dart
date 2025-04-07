@@ -5,6 +5,8 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/match_prediction/locked_prediction_section.dart';
+import 'package:smore_mobile_app/components/match_prediction/prediction_text.dart';
+import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
 import 'package:smore_mobile_app/models/sport/sport_type.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
 
@@ -113,54 +115,7 @@ class MatchPrediction extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl: prediction.match.homeTeam.logoUrl,
-                                height: 48,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                prediction.match.homeTeam.name,
-                                style: TextStyle(
-                                  color: AppColors.secondary.shade100,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                        _buildVersusRow(context),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl: prediction.match.awayTeam.logoUrl,
-                                height: 48,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                prediction.match.awayTeam.name,
-                                style: TextStyle(
-                                  color: AppColors.secondary.shade100,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  PredictionVsRow(prediction: prediction),
                   if (userProvider.canViewPrediction(prediction)) _buildOdds()
                 ],
               ),
@@ -179,15 +134,20 @@ class MatchPrediction extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    prediction.prediction,
-                    style: TextStyle(
-                      color: _getPredictionColor(context),
+                  PredictionText(
+                      predictionText: prediction.prediction,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                      color: _getPredictionColor(context),
+                      textAlign: TextAlign.center),
+                  // Text(
+                  //   prediction.prediction,
+                  //   style: TextStyle(
+                  //     color: _getPredictionColor(context),
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  // ),
                 ],
               )
             else
@@ -200,7 +160,7 @@ class MatchPrediction extends StatelessWidget {
 
   Widget _buildVersusRow(BuildContext context) {
     return SizedBox(
-      width: 120, // Fixed width for consistency, adjust as needed
+      width: 120,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -334,7 +294,7 @@ class MatchPrediction extends StatelessWidget {
     );
   }
 
-  Color? _getPredictionColor(BuildContext context) {
+  Color _getPredictionColor(BuildContext context) {
     switch (prediction.status) {
       case PredictionStatus.PENDING:
         return Theme.of(context).primaryColor;
