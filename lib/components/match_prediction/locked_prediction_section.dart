@@ -60,7 +60,6 @@ class LockedPredictionSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        // Access text
         Text(
           'to access all predictions',
           style: TextStyle(
@@ -69,7 +68,6 @@ class LockedPredictionSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // OR Divider
         Row(
           children: [
             Expanded(
@@ -97,48 +95,57 @@ class LockedPredictionSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        // Unlock Button
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xB50D151E),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withOpacity(0.5),
-              width: 1,
-            ),
-          ),
-          child: InkWell(
-            onTap: () {
-              final purchaseProvider =
-                  Provider.of<PurchaseProvider>(context, listen: false);
-              purchaseProvider.buyPrediction(predictionId);
-            },
-            child: Container(
-              width: 200,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Unlock',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.lock_open,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ],
+        // Unlock Button with Loading Spinner
+        Consumer<PurchaseProvider>(
+          builder: (context, purchaseProvider, child) {
+            if (purchaseProvider.isLoading) {
+              return CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).primaryColor,
+                ),
+              );
+            }
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xB50D151E),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Theme.of(context).primaryColor.withOpacity(0.5),
+                  width: 1,
+                ),
               ),
-            ),
-          ),
+              child: InkWell(
+                onTap: () {
+                  purchaseProvider.buyPrediction(predictionId);
+                },
+                child: Container(
+                  width: 200,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Unlock',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.lock_open,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        // Price text
         RichText(
           text: TextSpan(
             text: 'this prediction for ',

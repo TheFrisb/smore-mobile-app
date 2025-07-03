@@ -49,7 +49,6 @@ class _MyAppState extends State<MyApp> {
     // Set up the network status listener
     _connectivity.onConnectivityChanged
         .listen((List<ConnectivityResult> results) {
-      print('Connectivity results: $results');
       if (results.contains(ConnectivityResult.none)) {
         // No internet connection
         _showSnackBar();

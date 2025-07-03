@@ -11,6 +11,7 @@ class User {
   final String _lastName;
   final bool _isEmailVerified;
   final UserSubscription? _userSubscription;
+  final List<int> _purchasedPredictionIds;
 
   User({
     required int id,
@@ -19,6 +20,7 @@ class User {
     required bool isEmailVerified,
     required String firstName,
     required String lastName,
+    required List<int> purchasedPredictionIds,
     UserSubscription? userSubscription,
   })  : _id = id,
         _username = username,
@@ -26,6 +28,7 @@ class User {
         _isEmailVerified = isEmailVerified,
         _firstName = firstName,
         _lastName = lastName,
+        _purchasedPredictionIds = purchasedPredictionIds,
         _userSubscription = userSubscription;
 
   // Getter methods for external access
@@ -51,6 +54,7 @@ class User {
       firstName: json['first_name'],
       lastName: json['last_name'],
       isEmailVerified: json['is_email_verified'],
+      purchasedPredictionIds: List<int>.from(json['purchased_prediction_ids']),
       userSubscription: json['user_subscription'] != null
           ? UserSubscription.fromJson(json['user_subscription'])
           : null,
@@ -58,6 +62,8 @@ class User {
   }
 
   bool canViewPrediction(Prediction prediction) {
+    if (_purchasedPredictionIds.contains(prediction.id)) return true;
+
     Product predictionProduct = prediction.product;
     return hasAccessToProduct(predictionProduct.name);
   }
