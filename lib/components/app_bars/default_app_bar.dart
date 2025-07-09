@@ -20,7 +20,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(FontAwesomeIcons.telegram,
             size: 32, color: Color(0xFFB7C9DB)),
         onPressed: () async {
-          Uri url = Uri.parse("https://t.me/smoreltd");
+          Uri url = Uri.parse("https://t.me/smoreinfo");
           if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
             logger.e("Failed to launch Telegram URL");
           }

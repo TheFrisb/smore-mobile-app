@@ -15,7 +15,7 @@ class ProductDisplayName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (product.name == ProductName.NFL_NHL_NCAA) {
+    if (product.name == ProductName.NFL_NHL) {
       return _buildNFLNHLNCAA(context);
     }
 

@@ -1,13 +1,5 @@
-2. Implement subscriptions
-3. Implement Google SSO
+1. Login notification has extra padding
 
+2. Remove payments referrences
+- Locked prediction page
 
-
-
-1. Implement purchase predictions
-- Get unlocked prediction ids in UserProvider
-- Consume the product in the app
-- Make request to server to confirm purchase
-- Show states on the button on click
-2. Add splash screen
-3. Add application icon

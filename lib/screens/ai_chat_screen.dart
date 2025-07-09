@@ -202,46 +202,46 @@ class _AiChatScreenState extends State<AiChatScreen> {
           const SizedBox(height: 16),
           const BrandGradientLine(),
           const SizedBox(height: 16),
-          Container(
-            width: 200,
-            decoration: BoxDecoration(
-              color: const Color(0xFF14202D).withOpacity(0.5),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color(0xFF1E3A5A).withOpacity(0.5),
-              ),
-            ),
-            child: InkWell(
-              onTap: () {
-                // TODO: Navigate to subscription page
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Subscribe',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Theme.of(context).primaryColor,
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
+          // Container(
+          //   width: 200,
+          //   decoration: BoxDecoration(
+          //     color: const Color(0xFF14202D).withOpacity(0.5),
+          //     borderRadius: BorderRadius.circular(8),
+          //     border: Border.all(
+          //       color: const Color(0xFF1E3A5A).withOpacity(0.5),
+          //     ),
+          //   ),
+          //   child: InkWell(
+          //     onTap: () {
+          //       // TODO: Navigate to subscription page
+          //     },
+          //     child: Padding(
+          //       padding:
+          //           const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Text(
+          //             'Subscribe',
+          //             style: TextStyle(
+          //               color: Theme.of(context).primaryColor,
+          //               fontWeight: FontWeight.w600,
+          //             ),
+          //           ),
+          //           const SizedBox(width: 8),
+          //           Icon(
+          //             Icons.arrow_forward,
+          //             color: Theme.of(context).primaryColor,
+          //             size: 20,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 8),
           Text(
-            'to access AI predictions',
+            'You can obtain AI access from our website',
             style: TextStyle(
               color: AppColors.secondary.shade100,
               fontSize: 14,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_colors.dart';
 // import 'package:url_launcher/url_launcher.dart';
@@ -12,13 +13,10 @@ class ContactUsScreen extends StatelessWidget {
   static final Logger logger = Logger();
 
   Future<void> _launchUrl(String url) async {
-    // final Uri uri = Uri.parse(url);
-    //
-    // if (await canLaunchUrl(uri)) {
-    //   await launchUrl(uri);
-    // } else {
-    //   logger.e("Could not launch $url");
-    // }
+    Uri uriResource = Uri.parse(url);
+    if (!await launchUrl(uriResource, mode: LaunchMode.externalApplication)) {
+      logger.e("Failed to launch url: $url");
+    }
   }
 
   @override
@@ -30,15 +28,13 @@ class ContactUsScreen extends StatelessWidget {
           ContactOption(
             icon: FontAwesomeIcons.whatsapp,
             title: "Contact us on WhatsApp",
-            onTap: () => _launchUrl(
-                "https://wa.me/15551234567"), // Replace with your number
+            onTap: () => _launchUrl("https://wa.me/+359884108275"),
           ),
           const SizedBox(height: 16),
           ContactOption(
             icon: Icons.email_outlined,
             title: "Send us an email",
-            onTap: () => _launchUrl(
-                "mailto:support@smoreapp.com"), // Replace with your email
+            onTap: () => _launchUrl("mailto:smore1x2@gmail.com"),
           ),
         ],
       ),

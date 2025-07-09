@@ -8,7 +8,7 @@ enum ProductName {
   SOCCER,
   BASKETBALL,
   AI_ANALYST,
-  NFL_NHL_NCAA,
+  NFL_NHL,
   TENNIS,
 }
 
@@ -22,7 +22,7 @@ const Map<String, ProductName> _productNameMap = {
   'Basketball': ProductName.BASKETBALL,
   'Tennis': ProductName.TENNIS,
   'AI Analyst': ProductName.AI_ANALYST,
-  'NFL_NHL_NCAA': ProductName.NFL_NHL_NCAA,
+  'NFL_NHL': ProductName.NFL_NHL,
 };
 
 const Map<ProductName, String> _displayNames = {
@@ -30,17 +30,17 @@ const Map<ProductName, String> _displayNames = {
   ProductName.BASKETBALL: 'Basketball',
   ProductName.TENNIS: 'Tennis',
   ProductName.AI_ANALYST: 'AI Analyst',
-  ProductName.NFL_NHL_NCAA: 'NFL, NHL, NCAA',
+  ProductName.NFL_NHL: 'NFL, NHL',
 };
 
 extension ProductNameExtension on ProductName {
   String get displayName => _displayNames[this]!;
 
   String toQueryParameter() {
-    if (this != ProductName.NFL_NHL_NCAA) {
+    if (this != ProductName.NFL_NHL) {
       return displayName;
     } else {
-      return 'NFL_NHL_NCAA';
+      return 'NFL_NHL';
     }
   }
 }

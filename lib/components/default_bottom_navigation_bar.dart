@@ -18,7 +18,9 @@ class DefaultBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: kBottomNavigationBarHeight + 4,
+      height: kBottomNavigationBarHeight +
+          MediaQuery.viewPaddingOf(context).bottom +
+          3,
       child: Column(
         children: [
           const BrandGradientLine(height: 1),

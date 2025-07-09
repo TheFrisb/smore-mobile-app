@@ -122,12 +122,12 @@ class MyAccountScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              const BrandGradientLine(
-                height: 2,
-              ),
-              const SizedBox(height: 32),
-              _build_plans_section(context),
+              // const SizedBox(height: 32),
+              // const BrandGradientLine(
+              //   height: 2,
+              // ),
+              // const SizedBox(height: 32),
+              // _build_plans_section(context),
               const SizedBox(height: 32),
               const BrandGradientLine(
                 height: 2,

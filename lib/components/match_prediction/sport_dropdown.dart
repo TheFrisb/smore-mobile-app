@@ -58,8 +58,7 @@ class ProductDropdown extends StatelessWidget {
               // Existing product items
               ...ProductName.values
                   .where((product) => product != ProductName.AI_ANALYST)
-                  .map((product) => _buildDropdownMenuItem(context, product))
-                  ,
+                  .map((product) => _buildDropdownMenuItem(context, product)),
             ],
             customButton: _buildSelectedDisplay(context),
             // buttonStyleData: ButtonStyleData(
@@ -147,15 +146,16 @@ class ProductDropdown extends StatelessWidget {
 
   Widget _buildItemContent(BuildContext context, ProductName product,
       {bool isSelected = false}) {
-    final isEnabled = product != ProductName.TENNIS;
+    final isEnabled =
+        product != ProductName.TENNIS && product != ProductName.NFL_NHL;
     Color color = isEnabled
         ? (product == selectedProduct || isSelected
             ? Theme.of(context).primaryColor
             : Colors.white)
         : Colors.white.withOpacity(0.5);
 
-    if (product == ProductName.NFL_NHL_NCAA) {
-      return _buildNFLNHLNCAA(color: color);
+    if (product == ProductName.NFL_NHL) {
+      return _buildNFLNHLNCAA(context, color: color);
     }
 
     return _buildSimpleProduct(context, product, color: color);
@@ -194,14 +194,20 @@ class ProductDropdown extends StatelessWidget {
     );
   }
 
-  Widget _buildNFLNHLNCAA({required Color color}) {
+  Widget _buildNFLNHLNCAA(BuildContext context, {required Color color}) {
     return Row(
       children: [
         _buildIconText(Icons.sports_football_outlined, 'NFL', color),
         Text(',   ', style: TextStyle(color: color)),
         _buildIconText(Icons.sports_hockey_outlined, 'NHL', color),
-        Text(',   ', style: TextStyle(color: color)),
-        _buildIconText(Icons.sports_basketball_outlined, 'NCAA', color),
+        const SizedBox(width: 8),
+        Text(
+          'Coming Soon',
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).primaryColor.withOpacity(0.5),
+          ),
+        ),
       ],
     );
   }

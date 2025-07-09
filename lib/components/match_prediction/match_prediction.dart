@@ -12,7 +12,6 @@ import 'package:smore_mobile_app/utils/string_utils.dart';
 
 import '../../constants/constants.dart';
 import '../../models/sport/prediction.dart';
-import '../../providers/purchase_provider.dart'; // Adjust import based on your structure
 import '../../providers/user_provider.dart'; // Adjust import based on your structure
 import '../../screens/analysis_detail_screen.dart';
 import '../decoration/brand_gradient_line.dart';
@@ -29,7 +28,6 @@ class MatchPrediction extends StatelessWidget {
   Widget build(BuildContext context) {
     // Access providers
     final userProvider = Provider.of<UserProvider>(context);
-    final purchaseProvider = Provider.of<PurchaseProvider>(context);
 
     return Card(
       shape: RoundedRectangleBorder(
