@@ -3,3 +3,7 @@
 2. Remove payments referrences
 - Locked prediction page
 
+app_tester
+
+AppTester
+AppTester123!
