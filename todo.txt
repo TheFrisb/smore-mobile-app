@@ -1,9 +1,11 @@
-1. Login notification has extra padding
-
-2. Remove payments referrences
-- Locked prediction page
-
-app_tester
-
-AppTester
-AppTester123!
+---------------------------------
+1. Replace top-bar to list sports
+2. Refactor & improve code | refresh predictions
+3. User-less functionality
+4. Submit to Google & Apple stores
+---------------------------------
+1. Add tickets
+---------------------------------
+1. Apple/Google sign-in
+---------------------------------
+1. Notifications

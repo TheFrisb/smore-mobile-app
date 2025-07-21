@@ -7,16 +7,13 @@ import 'package:smore_mobile_app/providers/prediction_provider.dart';
 import 'match_prediction.dart';
 
 class PredictionsList extends StatelessWidget {
-  final DateTime selectedDate;
 
   const PredictionsList({
     super.key,
-    required this.selectedDate,
   });
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('EEEE d MMMM y').format(selectedDate);
 
     return Consumer<PredictionProvider>(
       builder: (context, predictionProvider, child) {
@@ -48,15 +45,6 @@ class PredictionsList extends StatelessWidget {
                     Icons.calendar_month_outlined,
                     size: 18,
                     color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  formattedDate,
-                  style: const TextStyle(
-                    color: Color(0xFFDBE4ED),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],

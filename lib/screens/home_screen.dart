@@ -20,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime _selectedDate = DateTime.now();
   ProductName? _selectedProductName;
 
   @override
@@ -28,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PredictionProvider>(context, listen: false)
-          .fetchPredictions(_selectedDate, _selectedProductName);
+          .fetchPredictions(_selectedProductName);
     });
   }
 
@@ -39,27 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: const DefaultAppBar(),
       body: Column(
         children: [
-          CustomDatePicker(
-            initialDate: _selectedDate,
-            onDateChanged: (date) {
-              setState(() {
-                HomeScreen.logger.i("Date changed to: $date");
-                _selectedDate = date;
-                Provider.of<PredictionProvider>(context, listen: false)
-                    .fetchPredictions(_selectedDate, _selectedProductName);
-              });
-            },
-          ),
           Center(
-            child: ProductDropdown(
+            child: SportSelectorBar(
               selectedProduct: _selectedProductName,
               onChanged: (newProduct) {
                 if (_selectedProductName == newProduct) return;
-                
                 setState(() {
                   _selectedProductName = newProduct;
                   Provider.of<PredictionProvider>(context, listen: false)
-                      .fetchPredictions(_selectedDate, newProduct);
+                      .fetchPredictions(newProduct);
                 });
               },
             ),
@@ -67,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: PredictionsList(selectedDate: _selectedDate),
+              child: PredictionsList(),
             ),
           ),
         ],

@@ -110,13 +110,12 @@ class PredictionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPredictions(DateTime date, ProductName? productName) async {
+  Future<void> fetchPredictions(ProductName? productName) async {
     _isLoadingUpcomingPredictions = true;
     _error = null;
     notifyListeners();
 
     Map<String, dynamic> queryParameters = {
-      'date': date.toIso8601String().split('T')[0],
     };
     if (productName != null) {
       queryParameters['product'] = productName.toQueryParameter();
@@ -124,7 +123,7 @@ class PredictionProvider with ChangeNotifier {
 
     try {
       logger.i(
-          'Fetching predictions for date: $date and product: ${productName?.displayName}');
+          'Fetching predictions for product: ${productName?.displayName}');
       final response = await _dioClient.dio
           .get('/predictions/', queryParameters: queryParameters);
       final data = response.data;

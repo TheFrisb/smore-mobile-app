@@ -38,7 +38,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: Column(
         children: [
           Center(
-            child: ProductDropdown(
+            child: SportSelectorBar(
               selectedProduct: _selectedProductName,
               onChanged: (newProduct) {
                 if (_selectedProductName == newProduct) return;

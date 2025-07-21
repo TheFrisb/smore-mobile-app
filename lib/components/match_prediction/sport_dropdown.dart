@@ -5,11 +5,12 @@ import 'package:smore_mobile_app/utils/string_utils.dart';
 
 import '../../app_colors.dart';
 
-class ProductDropdown extends StatelessWidget {
-  final ProductName? selectedProduct; // Changed to nullable
-  final ValueChanged<ProductName?> onChanged; // Changed to accept ProductName?
+// Rename ProductDropdown to SportSelectorBar and update all references
+class SportSelectorBar extends StatelessWidget {
+  final ProductName? selectedProduct;
+  final ValueChanged<ProductName?> onChanged;
 
-  const ProductDropdown({
+  const SportSelectorBar({
     super.key,
     required this.selectedProduct,
     required this.onChanged,
@@ -17,119 +18,133 @@ class ProductDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 12),
-        DropdownButtonHideUnderline(
-          child: DropdownButton2<ProductName?>(
-            alignment: Alignment.bottomLeft,
-            value: selectedProduct,
-            onChanged: (ProductName? newValue) {
-              onChanged(newValue); // Pass null or selected value directly
-            },
-            items: [
-              // Add "All Sports" option with null value
-              DropdownMenuItem<ProductName?>(
-                value: null,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.sports,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).appBarTheme.backgroundColor ?? const Color(0xFF1A394F),
+        border: const Border(
+          bottom: BorderSide(color: Color(0xFF223B54), width: 1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton2<ProductName?>(
+          isExpanded: true,
+          alignment: Alignment.centerLeft,
+          value: selectedProduct,
+          onChanged: (ProductName? newValue) {
+            onChanged(newValue);
+          },
+          customButton: _buildBarDisplay(context),
+          items: [
+            DropdownMenuItem<ProductName?>(
+              value: null,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.sports,
+                    color: selectedProduct == null
+                        ? Theme.of(context).primaryColor
+                        : Colors.white,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'All Sports',
+                    style: TextStyle(
+                      fontSize: 16,
                       color: selectedProduct == null
                           ? Theme.of(context).primaryColor
                           : Colors.white,
-                      size: 24,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'All Sports',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: selectedProduct == null
-                            ? Theme.of(context).primaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+            ...ProductName.values
+                .where((product) => product != ProductName.AI_ANALYST)
+                .map((product) => _buildDropdownMenuItem(context, product)),
+          ],
+          dropdownStyleData: DropdownStyleData(
+            offset: const Offset(0, 0),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+                topLeft: Radius.circular(0),
+                topRight: Radius.circular(0),
+              ),
+              color: const Color(0xFF223B54),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
                 ),
-              ),
-              // Existing product items
-              ...ProductName.values
-                  .where((product) => product != ProductName.AI_ANALYST)
-                  .map((product) => _buildDropdownMenuItem(context, product)),
-            ],
-            customButton: _buildSelectedDisplay(context),
-            // buttonStyleData: ButtonStyleData(
-            //   width: 300,
-            //   padding: const EdgeInsets.symmetric(horizontal: 16),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(16),
-            //     color: const Color(0xFF1A394F),
-            //     border: Border.all(color: Colors.grey.withOpacity(0.5)),
-            //   ),
-            // ),
-            dropdownStyleData: DropdownStyleData(
-              offset: const Offset(0, -8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: const Color(0xFF19374D),
-                border: Border.all(color: Colors.grey.withOpacity(0.5)),
-              ),
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              overlayColor: WidgetStateProperty.all(Colors.transparent),
-            ),
-            iconStyleData: const IconStyleData(
-              icon: Icon(Icons.arrow_drop_down),
-              iconEnabledColor: Colors.white,
-              iconSize: 24,
+              ],
+              border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.18)),
             ),
           ),
+          menuItemStyleData: MenuItemStyleData(
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.selected) || states.contains(WidgetState.hovered)) {
+                return Theme.of(context).primaryColor.withOpacity(0.18);
+              }
+              return Colors.transparent;
+            }),
+          ),
+          iconStyleData: const IconStyleData(
+            icon: Icon(Icons.arrow_drop_down),
+            iconEnabledColor: Colors.white,
+            iconSize: 24,
+          ),
         ),
-        const SizedBox(height: 12),
-      ],
+      ),
     );
   }
 
-  Widget _buildSelectedDisplay(BuildContext context) {
+  Widget _buildBarDisplay(BuildContext context) {
     return Container(
-      width: 300,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: const Color(0xFF1A394F),
-        border:
-            Border.all(color: AppColors.secondary.shade500.withOpacity(0.5)),
-      ),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: selectedProduct == null
-                ? Row(
-                    children: [
-                      Icon(
-                        Icons.sports,
-                        color: Theme.of(context).primaryColor,
-                        size: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'All Sports',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ],
-                  )
-                : _buildItemContent(context, selectedProduct!,
-                    isSelected: true),
+          Row(
+            children: [
+              if (selectedProduct == null)
+                Icon(
+                  Icons.sports,
+                  color: Theme.of(context).primaryColor,
+                  size: 24,
+                )
+              else
+                Icon(
+                  _getProductIcon(selectedProduct!.name),
+                  color: Theme.of(context).primaryColor,
+                  size: 24,
+                ),
+              const SizedBox(width: 8),
+              Text(
+                selectedProduct?.displayName ?? 'All Sports',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-          Icon(Icons.keyboard_arrow_down,
-              color: Theme.of(context).primaryColor),
+          Icon(Icons.keyboard_arrow_down, color: Theme.of(context).primaryColor, size: 28),
         ],
       ),
     );
@@ -139,7 +154,7 @@ class ProductDropdown extends StatelessWidget {
       BuildContext context, ProductName product) {
     return DropdownMenuItem<ProductName?>(
       value: product,
-      enabled: product != ProductName.TENNIS,
+      enabled: product != ProductName.TENNIS && product != ProductName.NFL_NHL,
       child: _buildItemContent(context, product),
     );
   }
@@ -178,6 +193,8 @@ class ProductDropdown extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             color: color,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.2,
           ),
         ),
         if (product == ProductName.TENNIS) ...[
@@ -187,6 +204,7 @@ class ProductDropdown extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).primaryColor.withOpacity(0.5),
+              fontWeight: FontWeight.w400,
             ),
           ),
         ]
