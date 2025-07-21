@@ -1,11 +1,20 @@
----------------------------------
-1. Replace top-bar to list sports
-2. Refactor & improve code | refresh predictions
-3. User-less functionality
-4. Submit to Google & Apple stores
----------------------------------
 1. Add tickets
+2. Detect daily offer
 ---------------------------------
 1. Apple/Google sign-in
 ---------------------------------
 1. Notifications
+
+
+
+
+
+
+
+
+
+--------------------------------
+3. Add user-less functionality
+4. Fix upcoming and history endpoints
+5. Add fake predictions for testers
+6. Submit to Google & Apple stores for review

@@ -175,6 +175,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
   }
 
   Widget _buildLockedSection(BuildContext context) {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    bool isGuest = userProvider.isGuest;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -241,7 +245,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
           // ),
           // const SizedBox(height: 8),
           Text(
-            'You can obtain AI access from our website',
+            isGuest
+                ? 'You need to sign up to access AI features'
+                : 'You can obtain AI access from our website',
             style: TextStyle(
               color: AppColors.secondary.shade100,
               fontSize: 14,

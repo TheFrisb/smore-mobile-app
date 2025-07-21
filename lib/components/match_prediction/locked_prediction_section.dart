@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 
 class LockedPredictionSection extends StatelessWidget {
   static final Logger logger = Logger();
@@ -9,6 +11,8 @@ class LockedPredictionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isGuest = userProvider.isGuest;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -56,7 +60,9 @@ class LockedPredictionSection extends StatelessWidget {
         // ),
         // const SizedBox(height: 8),
         Text(
-          'You can obtain prediction access from our website',
+          isGuest
+              ? 'You can sign up through the app or our website'
+              : 'You can obtain prediction access from our website',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).primaryColor,

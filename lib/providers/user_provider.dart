@@ -18,7 +18,9 @@ class UserProvider with ChangeNotifier {
   User? _user;
   bool _isLoading = false;
   bool _isInitialized = false;
+  bool _isGuest = false;
   String? _userTimezone;
+  ProductName? _selectedProductName;
 
   User? get user => _user;
 
@@ -27,6 +29,13 @@ class UserProvider with ChangeNotifier {
   bool get isInitialized => _isInitialized;
 
   bool get isAuthenticated => _user != null;
+
+  bool get isGuest => _isGuest;
+
+  set isGuest(bool value) {
+    _isGuest = value;
+    notifyListeners();
+  }
 
   bool hasAccessToProduct(ProductName productName) {
     if (_user == null) {
@@ -48,6 +57,18 @@ class UserProvider with ChangeNotifier {
     return _user?.canViewPrediction(prediction) ?? false;
   }
 
+  ProductName? get selectedProductName => _selectedProductName;
+
+  Future<void> setSelectedProductName(ProductName? productName) async {
+    _selectedProductName = productName;
+    if (productName != null) {
+      await _storage.write(key: 'selectedProductName', value: productName.name);
+    } else {
+      await _storage.delete(key: 'selectedProductName');
+    }
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
     logger.i('Initializing user provider');
     _isLoading = true;
@@ -58,6 +79,7 @@ class UserProvider with ChangeNotifier {
       if (accessToken != null) {
         await getUserDetails();
         await _setInitialTimezone();
+        await _restoreSelectedProductName();
       }
     } catch (e) {
       logger.e('Error initializing user provider: $e');
@@ -119,8 +141,10 @@ class UserProvider with ChangeNotifier {
     await _storage.delete(key: 'accessToken');
     await _storage.delete(key: 'refreshToken');
     await _storage.delete(key: 'userTimezone');
+    await _storage.delete(key: 'selectedProductName');
     _user = null;
     _userTimezone = null;
+    _selectedProductName = null;
     notifyListeners();
   }
 
@@ -139,6 +163,23 @@ class UserProvider with ChangeNotifier {
     _userTimezone = timezone;
     await _storage.write(key: 'userTimezone', value: timezone);
     notifyListeners();
+  }
+
+  Future<void> _restoreSelectedProductName() async {
+    final stored = await _storage.read(key: 'selectedProductName');
+    if (stored != null) {
+      try {
+        _selectedProductName = ProductName.values.firstWhere((e) => e.name == stored);
+      } catch (_) {
+        _selectedProductName = null;
+      }
+    }
+    notifyListeners();
+  }
+
+  // Add this public method for guests
+  Future<void> setInitialTimezoneForGuest() async {
+    await _setInitialTimezone();
   }
 
   String _handleDioError(DioException e) {

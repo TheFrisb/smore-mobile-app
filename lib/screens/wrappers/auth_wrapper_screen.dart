@@ -20,7 +20,7 @@ class AuthWrapperScreen extends StatelessWidget {
               ));
         }
 
-        if (userProvider.user == null) {
+        if (userProvider.user == null && !userProvider.isGuest) {
           return const LoginScreen();
         }
 

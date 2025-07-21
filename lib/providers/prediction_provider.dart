@@ -36,7 +36,13 @@ class PredictionProvider with ChangeNotifier {
 
   bool get hasNextPage => _nextPageUrl != null;
 
-  Future<void> fetchPaginatedPredictions(ProductName? productName) async {
+  Future<void> fetchPaginatedPredictions(ProductName? productName, {bool updateIsLoading=true}) async {
+    if (_isLoadingHistoryPredictions) return;
+
+
+    if (updateIsLoading && _dateGroups.isNotEmpty) {
+      _isLoadingHistoryPredictions = true;
+    }
     logger.i(
         'Fetching paginated predictions, isLoading: $_isLoadingHistoryPredictions');
 
@@ -46,7 +52,6 @@ class PredictionProvider with ChangeNotifier {
       _currentHistoryProduct = productName;
     }
 
-    if (_isLoadingHistoryPredictions) return;
 
     _isLoadingHistoryPredictions = true;
     _error = null;
@@ -110,8 +115,10 @@ class PredictionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPredictions(ProductName? productName) async {
-    _isLoadingUpcomingPredictions = true;
+  Future<void> fetchPredictions(ProductName? productName, {bool updateIsLoading=true}) async {
+    if (updateIsLoading) {
+      _isLoadingUpcomingPredictions = true;
+    }
     _error = null;
     notifyListeners();
 

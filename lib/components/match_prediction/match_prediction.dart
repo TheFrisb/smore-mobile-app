@@ -9,6 +9,8 @@ import 'package:smore_mobile_app/components/match_prediction/prediction_text.dar
 import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
 import 'package:smore_mobile_app/models/sport/sport_type.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:intl/intl.dart';
 
 import '../../constants/constants.dart';
 import '../../models/sport/prediction.dart';
@@ -87,28 +89,40 @@ class MatchPrediction extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Date, Time: ",
-                              style: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontSize: 12,
-                              ),
+                      Builder(
+                        builder: (context) {
+                          final userProvider = Provider.of<UserProvider>(context);
+                          final userTz = userProvider.userTimezone;
+                          DateTime kickoff = prediction.match.kickoffDateTime;
+                          String formatted;
+                          if (userTz != null && tz.timeZoneDatabase.locations.containsKey(userTz)) {
+                            final location = tz.getLocation(userTz);
+                            final tzDateTime = tz.TZDateTime.from(kickoff, location);
+                            formatted = DateFormat('yyyy-MM-dd HH:mm').format(tzDateTime);
+                          } else {
+                            formatted = DateFormat('yyyy-MM-dd HH:mm').format(kickoff.toLocal());
+                          }
+                          return RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Date, Time: ",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: formatted,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade100,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
-                            TextSpan(
-                              text: prediction.match.kickoffDateTime
-                                  .toLocal()
-                                  .toString()
-                                  .substring(0, 16),
-                              style: TextStyle(
-                                color: Colors.grey.shade100,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),

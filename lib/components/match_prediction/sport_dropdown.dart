@@ -1,12 +1,13 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
 
 import '../../app_colors.dart';
 
 // Rename ProductDropdown to SportSelectorBar and update all references
-class SportSelectorBar extends StatelessWidget {
+class SportSelectorBar extends StatefulWidget {
   final ProductName? selectedProduct;
   final ValueChanged<ProductName?> onChanged;
 
@@ -15,6 +16,57 @@ class SportSelectorBar extends StatelessWidget {
     required this.selectedProduct,
     required this.onChanged,
   });
+
+  @override
+  State<SportSelectorBar> createState() => _SportSelectorBarState();
+}
+
+class _SportSelectorBarState extends State<SportSelectorBar> with TickerProviderStateMixin {
+  bool _isDropdownOpen = false;
+  late AnimationController _arrowController;
+  late Animation<double> _arrowAnimation;
+  late AnimationController _iconController;
+  late Animation<double> _iconScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _arrowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _arrowAnimation = Tween<double>(begin: 0, end: 0.5).animate(CurvedAnimation(
+      parent: _arrowController,
+      curve: Curves.easeInOut,
+    ));
+    _iconController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+      lowerBound: 1.0,
+      upperBound: 1.15,
+    );
+    _iconScale = _iconController.drive(Tween<double>(begin: 1.0, end: 1.15));
+  }
+
+  @override
+  void dispose() {
+    _arrowController.dispose();
+    _iconController.dispose();
+    super.dispose();
+  }
+
+  void _onDropdownStateChanged(bool isOpen) {
+    setState(() {
+      _isDropdownOpen = isOpen;
+      if (isOpen) {
+        _arrowController.forward();
+        _iconController.forward();
+      } else {
+        _arrowController.reverse();
+        _iconController.reverse();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +87,13 @@ class SportSelectorBar extends StatelessWidget {
         ],
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton2<ProductName?>(
+        child: DropdownButton2<ProductName?>
+        (
           isExpanded: true,
           alignment: Alignment.centerLeft,
-          value: selectedProduct,
+          value: widget.selectedProduct,
           onChanged: (ProductName? newValue) {
-            onChanged(newValue);
+            widget.onChanged(newValue);
           },
           customButton: _buildBarDisplay(context),
           items: [
@@ -50,7 +103,7 @@ class SportSelectorBar extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.sports,
-                    color: selectedProduct == null
+                    color: widget.selectedProduct == null
                         ? Theme.of(context).primaryColor
                         : Colors.white,
                     size: 24,
@@ -60,7 +113,7 @@ class SportSelectorBar extends StatelessWidget {
                     'All Sports',
                     style: TextStyle(
                       fontSize: 16,
-                      color: selectedProduct == null
+                      color: widget.selectedProduct == null
                           ? Theme.of(context).primaryColor
                           : Colors.white,
                     ),
@@ -103,10 +156,9 @@ class SportSelectorBar extends StatelessWidget {
             }),
           ),
           iconStyleData: const IconStyleData(
-            icon: Icon(Icons.arrow_drop_down),
-            iconEnabledColor: Colors.white,
-            iconSize: 24,
+            icon: SizedBox.shrink(), // Hide default icon
           ),
+          onMenuStateChange: _onDropdownStateChanged,
         ),
       ),
     );
@@ -121,21 +173,23 @@ class SportSelectorBar extends StatelessWidget {
         children: [
           Row(
             children: [
-              if (selectedProduct == null)
-                Icon(
-                  Icons.sports,
-                  color: Theme.of(context).primaryColor,
-                  size: 24,
-                )
-              else
-                Icon(
-                  _getProductIcon(selectedProduct!.name),
-                  color: Theme.of(context).primaryColor,
-                  size: 24,
-                ),
+              ScaleTransition(
+                scale: _iconScale,
+                child: widget.selectedProduct == null
+                    ? Icon(
+                        Icons.sports,
+                        color: Theme.of(context).primaryColor,
+                        size: 24,
+                      )
+                    : Icon(
+                        _getProductIcon(widget.selectedProduct!.name),
+                        color: Theme.of(context).primaryColor,
+                        size: 24,
+                      ),
+              ),
               const SizedBox(width: 8),
               Text(
-                selectedProduct?.displayName ?? 'All Sports',
+                widget.selectedProduct?.displayName ?? 'All Sports',
                 style: TextStyle(
                   fontSize: 18,
                   color: Theme.of(context).primaryColor,
@@ -144,7 +198,10 @@ class SportSelectorBar extends StatelessWidget {
               ),
             ],
           ),
-          Icon(Icons.keyboard_arrow_down, color: Theme.of(context).primaryColor, size: 28),
+          RotationTransition(
+            turns: _arrowAnimation,
+            child: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).primaryColor, size: 28),
+          ),
         ],
       ),
     );
@@ -164,7 +221,7 @@ class SportSelectorBar extends StatelessWidget {
     final isEnabled =
         product != ProductName.TENNIS && product != ProductName.NFL_NHL;
     Color color = isEnabled
-        ? (product == selectedProduct || isSelected
+        ? (product == widget.selectedProduct || isSelected
             ? Theme.of(context).primaryColor
             : Colors.white)
         : Colors.white.withOpacity(0.5);

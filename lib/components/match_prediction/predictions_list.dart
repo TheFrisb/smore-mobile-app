@@ -32,24 +32,8 @@ class PredictionsList extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(8.0),
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    Icons.calendar_month_outlined,
-                    size: 18,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+
+            const SizedBox(height: 16),
             ...predictionProvider.predictions.map((prediction) => Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: MatchPrediction(

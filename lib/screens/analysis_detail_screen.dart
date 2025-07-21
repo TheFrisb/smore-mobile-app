@@ -210,6 +210,10 @@ class AnalysisDetailScreen extends StatelessWidget {
   }
 
   Widget _buildPredictionLocked(BuildContext context) {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    bool isGuest = userProvider.isGuest;
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -248,7 +252,9 @@ class AnalysisDetailScreen extends StatelessWidget {
             ),
             Text(
               textAlign: TextAlign.center,
-              "Subscribe to access our expert predictions for upcoming matches, featuring detailed analysis and insights.",
+              isGuest
+                  ? "You need an account to access our expert predictions for upcoming matches, featuring detailed analysis and insights."
+                  : "You need a subscription to access our expert predictions for upcoming matches, featuring detailed analysis and insights.",
               style: TextStyle(fontSize: 14, color: Colors.grey.shade200),
             ),
             const SizedBox(
@@ -323,6 +329,10 @@ class AnalysisDetailScreen extends StatelessWidget {
   }
 
   Widget _buildPredictionLockedSection(BuildContext context) {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    bool isGuest = userProvider.isGuest;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -365,7 +375,9 @@ class AnalysisDetailScreen extends StatelessWidget {
         const SizedBox(height: 8),
         // Access text
         Text(
-          'You can obtain access to our Premium Predictions from our website',
+          isGuest
+              ? 'You can sign up through the app or our website'
+              : 'You can obtain access to our Premium Predictions from our website',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).primaryColor,
