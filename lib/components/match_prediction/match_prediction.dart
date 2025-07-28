@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/match_prediction/locked_prediction_section.dart';
@@ -9,8 +10,6 @@ import 'package:smore_mobile_app/components/match_prediction/prediction_text.dar
 import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
 import 'package:smore_mobile_app/models/sport/sport_type.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:intl/intl.dart';
 
 import '../../constants/constants.dart';
 import '../../models/sport/prediction.dart';
@@ -70,7 +69,7 @@ class MatchPrediction extends StatelessWidget {
                         fadeDuration: const Duration(milliseconds: 50),
                         placeholder:
                             const CircularProgressIndicator(strokeWidth: 2),
-                        errorWidget: const Icon(Icons.error),
+                        errorWidget: const Icon(LucideIcons.shieldAlert),
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 8),
@@ -91,7 +90,8 @@ class MatchPrediction extends StatelessWidget {
                     children: [
                       Builder(
                         builder: (context) {
-                          final userProvider = Provider.of<UserProvider>(context);
+                          final userProvider =
+                              Provider.of<UserProvider>(context);
                           return RichText(
                             text: TextSpan(
                               children: [
@@ -103,7 +103,9 @@ class MatchPrediction extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: userProvider.formatDateTimeForDetailedDisplay(prediction.match.kickoffDateTime),
+                                  text: userProvider
+                                      .formatDateTimeForDetailedDisplay(
+                                          prediction.match.kickoffDateTime),
                                   style: TextStyle(
                                     color: Colors.grey.shade100,
                                     fontSize: 12,
@@ -210,7 +212,7 @@ class MatchPrediction extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Icon(
-              Icons.arrow_drop_up,
+              LucideIcons.chevronUp,
               color: Color(0xFF00DEA2),
             ),
             const Text("Odds"),
@@ -257,7 +259,7 @@ class MatchPrediction extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.lock_outline,
+            LucideIcons.lock,
             color: Colors.red,
           ),
           SizedBox(width: 8),
@@ -275,8 +277,8 @@ class MatchPrediction extends StatelessWidget {
     Color color = _getPredictionColor(context) ?? Colors.white;
     Icon icon = Icon(
       prediction.status == PredictionStatus.WON
-          ? Icons.check_circle
-          : Icons.cancel,
+          ? LucideIcons.circleCheck
+          : LucideIcons.circleX,
       color: color,
     );
     return Row(
@@ -416,7 +418,7 @@ class MatchPrediction extends StatelessWidget {
       case SportType.NHL:
         return Icons.sports_hockey;
       default:
-        return Icons.sports;
+        return LucideIcons.trophy;
     }
   }
 }

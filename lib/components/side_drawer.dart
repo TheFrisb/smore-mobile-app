@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/screens/contact_us_screen.dart';
 import 'package:smore_mobile_app/screens/faq_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/services.dart';
-import 'dart:io';
 
 import '../providers/user_provider.dart';
 import '../screens/my_account_screen.dart';
-import '../screens/auth/login_screen.dart';
 
 class DrawerDestinationLink {
   const DrawerDestinationLink(this.label, this.icon, this.destination);
@@ -22,12 +20,13 @@ class DrawerDestinationLink {
 
 const List<DrawerDestinationLink> destinations = <DrawerDestinationLink>[
   DrawerDestinationLink(
-      'My Account', Icon(Icons.account_circle_outlined), MyAccountScreen()),
+      'My Account', Icon(LucideIcons.user), MyAccountScreen()),
   // DrawerDestinationLink(
   //     'Manage Plan', Icon(Icons.manage_history_outlined), ManagePlanScreen()),
   DrawerDestinationLink(
-      'Contact Us', Icon(Icons.question_answer_outlined), ContactUsScreen()),
-  DrawerDestinationLink('FAQ', Icon(Icons.help_outline), FaqScreen()),
+      'Contact Us', Icon(LucideIcons.messageSquare), ContactUsScreen()),
+  DrawerDestinationLink(
+      'FAQ', Icon(LucideIcons.circleQuestionMark), FaqScreen()),
 ];
 
 class SideDrawer extends StatelessWidget {
@@ -90,7 +89,8 @@ class SideDrawer extends StatelessWidget {
                       children: [
                         Text(destination.label),
                         const SizedBox(width: 8),
-                        const Icon(Icons.lock_outline, size: 18, color: Colors.grey),
+                        const Icon(LucideIcons.lock,
+                            size: 18, color: Colors.grey),
                       ],
                     ),
                     leading: destination.icon,
@@ -130,7 +130,7 @@ class SideDrawer extends StatelessWidget {
               minLeadingWidth: 24,
               title: Text(
                   'Timezone: ${context.watch<UserProvider>().userTimezone ?? 'Not set'}'),
-              leading: const Icon(Icons.access_time),
+              leading: const Icon(LucideIcons.clock9),
               onTap: () async {
                 final selected = await showDialog<String>(
                   context: context,
@@ -180,7 +180,8 @@ class SideDrawer extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     minLeadingWidth: 24,
                     title: const Text('Sign in'),
-                    leading: Icon(Icons.login, color: Theme.of(context).primaryColor),
+                    leading: Icon(LucideIcons.logIn,
+                        color: Theme.of(context).primaryColor),
                     onTap: () {
                       userProvider.isGuest = false; // Set guest to false
                     },
@@ -190,7 +191,8 @@ class SideDrawer extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     minLeadingWidth: 24,
                     title: const Text('Logout'),
-                    leading: Icon(Icons.logout, color: Colors.red.withOpacity(0.6)),
+                    leading: Icon(LucideIcons.logOut,
+                        color: Colors.red.withOpacity(0.6)),
                     onTap: () {
                       context.read<UserProvider>().logout();
                     },
@@ -229,12 +231,14 @@ class SideDrawer extends StatelessWidget {
 // Custom slide+fade transition
 class SlideFadePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
+
   SlideFadePageRoute({required this.page})
       : super(
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final offsetTween = Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeInOutCubic));
+            final offsetTween =
+                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeInOutCubic));
             final fadeTween = Tween<double>(begin: 0.0, end: 1.0)
                 .chain(CurveTween(curve: Curves.easeInOutCubic));
             return SlideTransition(
@@ -251,6 +255,7 @@ class SlideFadePageRoute<T> extends PageRouteBuilder<T> {
 // Timezone picker dialog
 class _TimezonePickerDialog extends StatefulWidget {
   final String? initialValue;
+
   const _TimezonePickerDialog({this.initialValue});
 
   @override
@@ -321,13 +326,14 @@ class _TimezonePickerDialogState extends State<_TimezonePickerDialog> {
                 autofocus: true,
                 decoration: InputDecoration(
                   labelText: 'Search Timezone',
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const Icon(LucideIcons.search),
                   filled: true,
                   fillColor: theme.cardColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                 ),
                 onChanged: _onSearchChanged,
               ),
@@ -341,26 +347,36 @@ class _TimezonePickerDialogState extends State<_TimezonePickerDialog> {
                         final tzName = _filteredTimezones[i];
                         final isSelected = tzName == _selected;
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           child: Card(
-                            color: isSelected ? theme.primaryColor.withOpacity(0.15) : theme.cardColor,
+                            color: isSelected
+                                ? theme.primaryColor.withOpacity(0.15)
+                                : theme.cardColor,
                             elevation: isSelected ? 2 : 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: isSelected
-                                  ? BorderSide(color: theme.primaryColor, width: 2)
-                                  : BorderSide(color: Colors.transparent, width: 1),
+                                  ? BorderSide(
+                                      color: theme.primaryColor, width: 2)
+                                  : BorderSide(
+                                      color: Colors.transparent, width: 1),
                             ),
                             child: ListTile(
                               title: Text(
                                 tzName,
                                 style: TextStyle(
-                                  color: isSelected ? theme.primaryColor : theme.textTheme.bodyLarge?.color,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : theme.textTheme.bodyLarge?.color,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                 ),
                               ),
                               trailing: isSelected
-                                  ? Icon(Icons.check_circle, color: theme.primaryColor)
+                                  ? Icon(LucideIcons.check,
+                                      color: theme.primaryColor)
                                   : null,
                               onTap: () {
                                 setState(() => _selected = tzName);

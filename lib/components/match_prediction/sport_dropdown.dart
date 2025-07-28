@@ -1,10 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
-
-import '../../app_colors.dart';
 
 // Rename ProductDropdown to SportSelectorBar and update all references
 class SportSelectorBar extends StatefulWidget {
@@ -21,7 +19,8 @@ class SportSelectorBar extends StatefulWidget {
   State<SportSelectorBar> createState() => _SportSelectorBarState();
 }
 
-class _SportSelectorBarState extends State<SportSelectorBar> with TickerProviderStateMixin {
+class _SportSelectorBarState extends State<SportSelectorBar>
+    with TickerProviderStateMixin {
   bool _isDropdownOpen = false;
   late AnimationController _arrowController;
   late Animation<double> _arrowAnimation;
@@ -74,7 +73,8 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       decoration: BoxDecoration(
-        color: Theme.of(context).appBarTheme.backgroundColor ?? const Color(0xFF1A394F),
+        color: Theme.of(context).appBarTheme.backgroundColor ??
+            const Color(0xFF1A394F),
         border: const Border(
           bottom: BorderSide(color: Color(0xFF223B54), width: 1),
         ),
@@ -87,8 +87,7 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
         ],
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton2<ProductName?>
-        (
+        child: DropdownButton2<ProductName?>(
           isExpanded: true,
           alignment: Alignment.centerLeft,
           value: widget.selectedProduct,
@@ -102,7 +101,7 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
               child: Row(
                 children: [
                   Icon(
-                    Icons.sports,
+                    LucideIcons.trophy,
                     color: widget.selectedProduct == null
                         ? Theme.of(context).primaryColor
                         : Colors.white,
@@ -142,14 +141,16 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
                   offset: const Offset(0, 8),
                 ),
               ],
-              border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.18)),
+              border: Border.all(
+                  color: Theme.of(context).primaryColor.withOpacity(0.18)),
             ),
           ),
           menuItemStyleData: MenuItemStyleData(
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
-              if (states.contains(WidgetState.selected) || states.contains(WidgetState.hovered)) {
+              if (states.contains(WidgetState.selected) ||
+                  states.contains(WidgetState.hovered)) {
                 return Theme.of(context).primaryColor.withOpacity(0.18);
               }
               return Colors.transparent;
@@ -177,7 +178,7 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
                 scale: _iconScale,
                 child: widget.selectedProduct == null
                     ? Icon(
-                        Icons.sports,
+                        LucideIcons.trophy,
                         color: Theme.of(context).primaryColor,
                         size: 24,
                       )
@@ -200,7 +201,8 @@ class _SportSelectorBarState extends State<SportSelectorBar> with TickerProvider
           ),
           RotationTransition(
             turns: _arrowAnimation,
-            child: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).primaryColor, size: 28),
+            child: Icon(Icons.keyboard_arrow_down,
+                color: Theme.of(context).primaryColor, size: 28),
           ),
         ],
       ),

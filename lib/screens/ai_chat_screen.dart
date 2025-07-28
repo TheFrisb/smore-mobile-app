@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/chat/chat_message.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
@@ -163,7 +164,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
               ),
               const SizedBox(width: 8),
               IconButton(
-                icon: const Icon(Icons.send),
+                icon: const Icon(LucideIcons.send),
                 onPressed: _sendMessage,
                 color: const Color(0xFF1B97F3),
               ),

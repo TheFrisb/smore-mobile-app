@@ -1,5 +1,6 @@
 // coming_soon_card.dart
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ComingSoonCard extends StatelessWidget {
   const ComingSoonCard({super.key, required this.sportName});
@@ -18,7 +19,7 @@ class ComingSoonCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.hourglass_empty,
+              Icon(LucideIcons.hourglass,
                   size: 48, color: Theme.of(context).primaryColor),
               const SizedBox(height: 16),
               Text(

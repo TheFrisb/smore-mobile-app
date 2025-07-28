@@ -1,5 +1,3 @@
-1. Fix History
-2. Add Lucide Icons
 3. Fix AI
 -- Checkpoint
 1. Add locked sections to predictions
@@ -8,3 +6,10 @@
 4. Add plans page
 -- Checkpoint
 1. Add Purchases
+---
+
+
+1. Add Locked sections to predictions
+2. Add locked sections to tickets
+3. Add plans page
+4.

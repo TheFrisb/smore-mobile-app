@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -38,8 +39,8 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: CircleAvatar(
               backgroundColor: Color(0xB50D151E),
               child: Icon(
-                Icons.account_circle_outlined,
-                size: 32,
+                LucideIcons.user,
+                size: 24,
                 color: Color(0xFFB7C9DB),
               ),
             ),

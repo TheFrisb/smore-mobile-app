@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class FilterBar extends StatelessWidget {
   final int selectedIndex;
@@ -16,17 +17,18 @@ class FilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          _buildFilterItem(context, 0, 'All', Icons.list),
+          _buildFilterItem(context, 0, 'All', LucideIcons.list),
           const SizedBox(width: 16),
-          _buildFilterItem(context, 1, 'Predictions', Icons.grading),
+          _buildFilterItem(context, 1, 'Predictions', LucideIcons.listCheck),
           const SizedBox(width: 16),
-          _buildFilterItem(context, 2, 'Parlays', Icons.description),
+          _buildFilterItem(context, 2, 'Parlays', LucideIcons.scrollText),
         ],
       ),
     );
   }
 
-  Widget _buildFilterItem(BuildContext context, int index, String label, IconData icon) {
+  Widget _buildFilterItem(
+      BuildContext context, int index, String label, IconData icon) {
     final isSelected = selectedIndex == index;
     return Expanded(
       child: GestureDetector(
@@ -34,12 +36,12 @@ class FilterBar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
           decoration: BoxDecoration(
-            color: isSelected 
+            color: isSelected
                 ? Theme.of(context).primaryColor.withOpacity(0.2)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected 
+              color: isSelected
                   ? Theme.of(context).primaryColor
                   : Colors.transparent,
               width: 1,
@@ -51,7 +53,7 @@ class FilterBar extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: isSelected 
+                color: isSelected
                     ? Theme.of(context).primaryColor
                     : const Color(0xFFdbe4ed),
               ),
@@ -59,7 +61,7 @@ class FilterBar extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected 
+                  color: isSelected
                       ? Theme.of(context).primaryColor
                       : const Color(0xFFdbe4ed),
                   fontSize: 14,
@@ -72,4 +74,4 @@ class FilterBar extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -1,5 +1,6 @@
 // components/match_prediction/predictions_list.dart
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_prediction.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
@@ -39,16 +40,17 @@ class PredictionsList extends StatelessWidget {
   IconData _getEmptyIcon(PredictionObjectFilter? filter) {
     switch (filter) {
       case PredictionObjectFilter.predictions:
-        return Icons.grading_outlined;
+        return LucideIcons.listCheck;
       case PredictionObjectFilter.tickets:
-        return Icons.description_outlined;
+        return LucideIcons.scrollText;
       case null:
       default:
-        return Icons.inbox_outlined;
+        return LucideIcons.list;
     }
   }
 
-  Widget _buildEmptyState(BuildContext context, PredictionObjectFilter? filter) {
+  Widget _buildEmptyState(
+      BuildContext context, PredictionObjectFilter? filter) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -162,14 +164,15 @@ class PredictionsList extends StatelessWidget {
 
         // Filter content based on selection
         List<Widget> content = [];
-        
+
         switch (filter) {
           case PredictionObjectFilter.predictions:
             // Show only predictions
             content.addAll(predictions.map((prediction) => Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: MatchPrediction(
-                      prediction: prediction, key: ValueKey('prediction_${prediction.id}')),
+                      prediction: prediction,
+                      key: ValueKey('prediction_${prediction.id}')),
                 )));
             break;
           case PredictionObjectFilter.tickets:
@@ -191,7 +194,8 @@ class PredictionsList extends StatelessWidget {
             content.addAll(predictions.map((prediction) => Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: MatchPrediction(
-                      prediction: prediction, key: ValueKey('prediction_${prediction.id}')),
+                      prediction: prediction,
+                      key: ValueKey('prediction_${prediction.id}')),
                 )));
             break;
         }

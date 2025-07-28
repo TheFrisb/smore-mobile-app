@@ -2,6 +2,7 @@ import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/match_prediction/prediction_text.dart';
@@ -51,7 +52,7 @@ class AnalysisDetailScreen extends StatelessWidget {
                             placeholder: const CircularProgressIndicator(
                               strokeWidth: 2,
                             ),
-                            errorWidget: const Icon(Icons.error),
+                            errorWidget: const Icon(LucideIcons.triangleAlert),
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 8),

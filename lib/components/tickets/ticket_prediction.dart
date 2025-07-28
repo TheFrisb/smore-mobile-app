@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/models/product.dart';
@@ -120,9 +121,10 @@ class TicketPrediction extends StatelessWidget {
         bool hasConnectingLine = index < ticket.betLines.length - 1;
         bool isPending = betLine.status == BetLineStatus.PENDING;
         bool hasScores = !isPending &&
-            (betLine.match.homeTeamScore.isNotEmpty ||
-                betLine.match.awayTeamScore.isNotEmpty);
-
+            (betLine.match.homeTeamScore != null &&
+                    betLine.match.homeTeamScore.isNotEmpty ||
+                betLine.match.awayTeamScore != null &&
+                    betLine.match.awayTeamScore.isNotEmpty);
         return _buildBetLine(
             context,
             betLine.bet,
@@ -153,11 +155,8 @@ class TicketPrediction extends StatelessWidget {
         if (hasConnectingLine)
           Positioned(
             left: 15,
-            // Center of the 32px icon (32/2 - 2/2 = 15)
             top: 16,
-            // Start 10% down from the top of the icon (32 * 0.1 = 3.2, but using 16 for better visual)
             bottom: 16,
-            // End 10% up from the bottom (32 * 0.1 = 3.2, but using 16 for better visual)
             child: Container(
               width: 2,
               decoration: BoxDecoration(
@@ -269,6 +268,7 @@ class TicketPrediction extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
                 children: [
                   Container(
                     width: 16,
@@ -281,15 +281,14 @@ class TicketPrediction extends StatelessWidget {
                         Icon(_getProductIcon(), size: 12, color: Colors.black),
                   ),
                   const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      betLine.match.homeTeam.name,
-                      style: const TextStyle(
-                        color: Color(0xFFdbe4ed),
-                        fontSize: 14,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  // Fix: Remove Flexible, just use Text
+                  Text(
+                    betLine.match.homeTeam.name,
+                    style: const TextStyle(
+                      color: Color(0xFFdbe4ed),
+                      fontSize: 14,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -297,7 +296,8 @@ class TicketPrediction extends StatelessWidget {
                 Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     return Text(
-                      userProvider.formatDateTimeForDisplay(betLine.match.kickoffDateTime),
+                      userProvider.formatDateTimeForDisplay(
+                          betLine.match.kickoffDateTime),
                       style: const TextStyle(
                         color: Color(0xFFdbe4ed),
                         fontSize: 12,
@@ -330,6 +330,7 @@ class TicketPrediction extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
                 children: [
                   Container(
                     width: 16,
@@ -342,15 +343,14 @@ class TicketPrediction extends StatelessWidget {
                         Icon(_getProductIcon(), size: 12, color: Colors.black),
                   ),
                   const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      betLine.match.awayTeam.name,
-                      style: const TextStyle(
-                        color: Color(0xFFdbe4ed),
-                        fontSize: 14,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  // Fix: Remove Flexible, just use Text
+                  Text(
+                    betLine.match.awayTeam.name,
+                    style: const TextStyle(
+                      color: Color(0xFFdbe4ed),
+                      fontSize: 14,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -450,7 +450,7 @@ class TicketPrediction extends StatelessWidget {
         return Icons.sports_basketball;
 
       default:
-        return Icons.sports;
+        return LucideIcons.trophy;
     }
   }
 

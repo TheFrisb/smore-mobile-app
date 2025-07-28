@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/models/faq_item.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
@@ -142,7 +143,7 @@ class _FaqItemState extends State<FaqItem> with SingleTickerProviderStateMixin {
               child: Row(
                 children: [
                   Icon(
-                    Icons.shield_outlined,
+                    LucideIcons.shieldCheck,
                     color: Theme.of(context).primaryColor,
                   ),
                   const SizedBox(width: 12),

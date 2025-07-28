@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/match_prediction/match_prediction.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_prediction.dart';
@@ -75,12 +76,12 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   IconData _getEmptyIcon(PredictionObjectFilter? filter) {
     switch (filter) {
       case PredictionObjectFilter.predictions:
-        return Icons.history;
+        return LucideIcons.listCheck;
       case PredictionObjectFilter.tickets:
-        return Icons.description_outlined;
+        return LucideIcons.scrollText;
       case null:
       default:
-        return Icons.history;
+        return LucideIcons.list;
     }
   }
 

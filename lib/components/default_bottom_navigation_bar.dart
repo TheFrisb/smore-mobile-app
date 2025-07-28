@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'decoration/brand_gradient_line.dart';
 
@@ -33,11 +34,11 @@ class DefaultBottomNavigationBar extends StatelessWidget {
               ),
               BottomNavigationBarItem(
                 label: 'History',
-                icon: Icon(Icons.history_outlined),
+                icon: Icon(LucideIcons.history),
               ),
               BottomNavigationBarItem(
                 label: 'AI Analyst',
-                icon: Icon(Icons.chat_bubble_outline),
+                icon: Icon(LucideIcons.bot),
               ),
             ],
             onTap: onTap,

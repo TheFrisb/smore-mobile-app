@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
 import '../../service/user_service.dart';
@@ -96,7 +97,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   fillColor: const Color(0xFF15212E),
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.email, color: Colors.white70),
+                  prefixIcon:
+                      const Icon(LucideIcons.mail, color: Colors.white70),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(color: Color(0xFF223548)),
@@ -133,7 +135,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Icon(Icons.send, size: 20),
+                    : const Icon(LucideIcons.send, size: 20),
                 label: Text(
                   _isLoading ? 'Sending...' : 'Send Reset Instructions',
                   style: const TextStyle(fontSize: 16),

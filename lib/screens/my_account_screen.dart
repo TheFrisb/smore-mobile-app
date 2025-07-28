@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/products/product_display_name.dart';
@@ -55,7 +56,7 @@ class MyAccountScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.account_circle_outlined,
+                        Icon(LucideIcons.user,
                             color: Theme.of(context).primaryColor),
                         const SizedBox(width: 8),
                         Text("Username",
@@ -82,7 +83,7 @@ class MyAccountScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.email_outlined,
+                        Icon(LucideIcons.mail,
                             color: Theme.of(context).primaryColor),
                         const SizedBox(width: 8),
                         Text("Email",
@@ -109,7 +110,7 @@ class MyAccountScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.person_outline,
+                        Icon(LucideIcons.userLock,
                             color: Theme.of(context).primaryColor),
                         const SizedBox(width: 8),
                         Text("Full Name",
@@ -195,10 +196,12 @@ class MyAccountScreen extends StatelessWidget {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (context) => Dialog(
-                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+                          side: BorderSide(
+                              color: Theme.of(context).primaryColor, width: 1),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(24.0),
@@ -206,7 +209,9 @@ class MyAccountScreen extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error, size: 48),
+                              Icon(LucideIcons.triangleAlert,
+                                  color: Theme.of(context).colorScheme.error,
+                                  size: 48),
                               const SizedBox(height: 16),
                               Text(
                                 'Delete Account',
@@ -222,22 +227,34 @@ class MyAccountScreen extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground
+                                      .withOpacity(0.7),
                                 ),
                               ),
                               const SizedBox(height: 24),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () => Navigator.of(context).pop(false),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: Theme.of(context).colorScheme.primary,
-                                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        side: BorderSide(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
                                       child: const Text('Cancel'),
@@ -246,16 +263,21 @@ class MyAccountScreen extends StatelessWidget {
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: ElevatedButton(
-                                      onPressed: () => Navigator.of(context).pop(true),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red,
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
-                                      child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                      child: const Text('Delete',
+                                          style:
+                                              TextStyle(color: Colors.white)),
                                     ),
                                   ),
                                 ],
@@ -269,8 +291,11 @@ class MyAccountScreen extends StatelessWidget {
                       try {
                         await UserService().deleteAccount();
                         if (context.mounted) {
-                          await Provider.of<UserProvider>(context, listen: false).logout();
-                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          await Provider.of<UserProvider>(context,
+                                  listen: false)
+                              .logout();
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Account deleted successfully.'),
