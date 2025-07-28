@@ -11,7 +11,6 @@ class Ticket {
   final String label;
   final double totalOdds;
   final List<BetLine> betLines;
-  final DateTime createdAt;
 
   Ticket({
     required this.id,
@@ -21,27 +20,32 @@ class Ticket {
     required this.label,
     required this.totalOdds,
     required this.betLines,
-    required this.createdAt,
   });
 
   @override
   String toString() {
-    return 'Ticket(id: $id, status: $status, product: $product, startsAt: $startsAt, label: $label, totalOdds: $totalOdds, betLines: $betLines, createdAt: $createdAt)';
+    return 'Ticket(id: $id, status: $status, product: $product, startsAt: $startsAt, label: $label, totalOdds: $totalOdds, betLines: $betLines';
   }
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
-    return Ticket(
-      id: json['id'],
-      status: TicketStatus.values
-          .firstWhere((e) => e.toString() == 'TicketStatus.${json['status']}'),
-      product: Product.fromJson(json['product']),
-      startsAt: DateTime.parse(json['starts_at']),
-      label: json['label'],
-      totalOdds: (json['total_odds'] as num).toDouble(),
-      betLines: (json['bet_lines'] as List)
-          .map((betLine) => BetLine.fromJson(betLine))
-          .toList(),
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    print('Parsing Ticket JSON: ${json.keys}');
+    try {
+      return Ticket(
+        id: json['id'],
+        status: TicketStatus.values
+            .firstWhere((e) => e.toString() == 'TicketStatus.${json['status']}'),
+        product: Product.fromJson(json['product']),
+        startsAt: DateTime.parse(json['starts_at']),
+        label: json['label'] ?? '', // Provide default empty string if label is missing
+        totalOdds: double.parse(json['total_odds'].toString()),
+        betLines: (json['bet_lines'] as List)
+            .map((betLine) => BetLine.fromJson(betLine))
+            .toList(),
+      );
+    } catch (e) {
+      print('Error parsing Ticket JSON: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
   }
 }

@@ -2,7 +2,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
-import 'package:smore_mobile_app/providers/prediction_provider.dart';
+import 'package:smore_mobile_app/providers/history_predictions_provider.dart';
+import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
@@ -16,7 +17,8 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()..initialize()),
-        ChangeNotifierProvider(create: (_) => PredictionProvider()),
+        ChangeNotifierProvider(create: (_) => UpcomingPredictionsProvider()),
+        ChangeNotifierProvider(create: (_) => HistoryPredictionsProvider()),
         // ChangeNotifierProvider(
         //   create: (context) => PurchaseProvider(
         //       Provider.of<UserProvider>(context, listen: false)),

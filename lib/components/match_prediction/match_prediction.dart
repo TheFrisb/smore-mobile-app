@@ -92,16 +92,6 @@ class MatchPrediction extends StatelessWidget {
                       Builder(
                         builder: (context) {
                           final userProvider = Provider.of<UserProvider>(context);
-                          final userTz = userProvider.userTimezone;
-                          DateTime kickoff = prediction.match.kickoffDateTime;
-                          String formatted;
-                          if (userTz != null && tz.timeZoneDatabase.locations.containsKey(userTz)) {
-                            final location = tz.getLocation(userTz);
-                            final tzDateTime = tz.TZDateTime.from(kickoff, location);
-                            formatted = DateFormat('yyyy-MM-dd HH:mm').format(tzDateTime);
-                          } else {
-                            formatted = DateFormat('yyyy-MM-dd HH:mm').format(kickoff.toLocal());
-                          }
                           return RichText(
                             text: TextSpan(
                               children: [
@@ -113,7 +103,7 @@ class MatchPrediction extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: formatted,
+                                  text: userProvider.formatDateTimeForDetailedDisplay(prediction.match.kickoffDateTime),
                                   style: TextStyle(
                                     color: Colors.grey.shade100,
                                     fontSize: 12,

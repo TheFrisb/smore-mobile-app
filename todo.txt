@@ -1,20 +1,10 @@
-1. Add tickets
-2. Detect daily offer
----------------------------------
-1. Apple/Google sign-in
----------------------------------
-1. Notifications
-
-
-
-
-
-
-
-
-
---------------------------------
-3. Add user-less functionality
-4. Fix upcoming and history endpoints
-5. Add fake predictions for testers
-6. Submit to Google & Apple stores for review
+1. Fix History
+2. Add Lucide Icons
+3. Fix AI
+-- Checkpoint
+1. Add locked sections to predictions
+2. Add locked sections to tickets
+3. Add daily offer
+4. Add plans page
+-- Checkpoint
+1. Add Purchases

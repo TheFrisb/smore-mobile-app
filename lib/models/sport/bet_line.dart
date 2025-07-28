@@ -1,12 +1,18 @@
 import 'package:smore_mobile_app/models/sport/sport_match.dart';
 
+enum BetLineStatus {
+  PENDING,
+  WON,
+  LOST,
+}
+
 class BetLine {
   final int id;
   final SportMatch match;
   final String bet;
   final String betType;
   final double odds;
-  final DateTime createdAt;
+  final BetLineStatus status;
 
   BetLine({
     required this.id,
@@ -14,22 +20,30 @@ class BetLine {
     required this.bet,
     required this.betType,
     required this.odds,
-    required this.createdAt,
+    required this.status,
   });
 
   @override
   String toString() {
-    return 'BetLine(id: $id, match: $match, bet: $bet, betType: $betType, odds: $odds, createdAt: $createdAt)';
+    return 'BetLine(id: $id, match: $match, bet: $bet, betType: $betType, odds: $odds, status: $status)';
   }
 
   factory BetLine.fromJson(Map<String, dynamic> json) {
-    return BetLine(
-      id: json['id'],
-      match: SportMatch.fromJson(json['match']),
-      bet: json['bet'],
-      betType: json['bet_type'],
-      odds: (json['odds'] as num).toDouble(),
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    print('Parsing BetLine JSON: ${json.keys}');
+    try {
+      return BetLine(
+        id: json['id'],
+        match: SportMatch.fromJson(json['match']),
+        bet: json['bet'],
+        betType: json['bet_type'], // This should match the JSON field name
+        odds: double.parse(json['odds'].toString()),
+        status: BetLineStatus.values
+            .firstWhere((e) => e.toString() == 'BetLineStatus.${json['status']}'),
+      );
+    } catch (e) {
+      print('Error parsing BetLine JSON: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
   }
 }

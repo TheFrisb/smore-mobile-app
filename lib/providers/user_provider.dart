@@ -10,6 +10,11 @@ import 'package:timezone/timezone.dart' as tz;
 import '../models/user.dart';
 import '../service/dio_client.dart';
 
+enum PredictionObjectFilter {
+  predictions,
+  tickets,
+}
+
 class UserProvider with ChangeNotifier {
   final DioClient _dioClient = DioClient();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -21,6 +26,7 @@ class UserProvider with ChangeNotifier {
   bool _isGuest = false;
   String? _userTimezone;
   ProductName? _selectedProductName;
+  PredictionObjectFilter? _predictionObjectFilter;
 
   User? get user => _user;
 
@@ -31,6 +37,8 @@ class UserProvider with ChangeNotifier {
   bool get isAuthenticated => _user != null;
 
   bool get isGuest => _isGuest;
+
+  PredictionObjectFilter? get predictionObjectFilter => _predictionObjectFilter;
 
   set isGuest(bool value) {
     _isGuest = value;
@@ -69,6 +77,20 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setPredictionObjectFilter(PredictionObjectFilter? filter) async {
+    if (_predictionObjectFilter == filter) return;
+
+    if (filter != null) {
+      _predictionObjectFilter = filter;
+      await _storage.write(key: 'predictionObjectFilter', value: filter.name);
+    } else {
+      _predictionObjectFilter = null;
+      await _storage.delete(key: 'predictionObjectFilter');
+    }
+
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
     logger.i('Initializing user provider');
     _isLoading = true;
@@ -80,6 +102,11 @@ class UserProvider with ChangeNotifier {
         await getUserDetails();
         await _setInitialTimezone();
         await _restoreSelectedProductName();
+        await _restorePredictionObjectFilter();
+      } else {
+        // For guests or unauthenticated users, still restore preferences
+        await _restoreSelectedProductName();
+        await _restorePredictionObjectFilter();
       }
     } catch (e) {
       logger.e('Error initializing user provider: $e');
@@ -142,36 +169,102 @@ class UserProvider with ChangeNotifier {
     await _storage.delete(key: 'refreshToken');
     await _storage.delete(key: 'userTimezone');
     await _storage.delete(key: 'selectedProductName');
+    await _storage.delete(key: 'predictionObjectFilter');
     _user = null;
     _userTimezone = null;
     _selectedProductName = null;
+    _predictionObjectFilter = null;
+    _isGuest = false;
     notifyListeners();
   }
 
   Future<void> _setInitialTimezone() async {
-    _userTimezone = await _storage.read(key: 'userTimezone');
-    if (_userTimezone == null) {
-      // Get the device's current timezone
-      final localLocation = tz.local;
-      _userTimezone = localLocation.name;
+    try {
+      _userTimezone = await _storage.read(key: 'userTimezone');
+      if (_userTimezone == null) {
+        // Get the device's current timezone
+        final localLocation = tz.local;
+        _userTimezone = localLocation.name;
+        logger.i('Setting initial timezone to: $_userTimezone');
+        await _storage.write(key: 'userTimezone', value: _userTimezone);
+      } else {
+        logger.i('Restored timezone from storage: $_userTimezone');
+      }
+    } catch (e) {
+      logger.e('Error setting timezone: $e');
+      // Fallback to UTC if there's an error
+      _userTimezone = 'UTC';
       await _storage.write(key: 'userTimezone', value: _userTimezone);
     }
     notifyListeners();
   }
 
   Future<void> setUserTimezone(String timezone) async {
-    _userTimezone = timezone;
-    await _storage.write(key: 'userTimezone', value: timezone);
-    notifyListeners();
+    try {
+      _userTimezone = timezone;
+      logger.i('Setting user timezone to: $timezone');
+      await _storage.write(key: 'userTimezone', value: timezone);
+      notifyListeners();
+    } catch (e) {
+      logger.e('Error setting user timezone: $e');
+    }
+  }
+
+  // Helper method to convert UTC datetime to user's timezone
+  DateTime convertToUserTimezone(DateTime utcDateTime) {
+    if (_userTimezone == null) {
+      logger.w('No user timezone set, returning UTC datetime as-is');
+      return utcDateTime; // Return as-is if no timezone set
+    }
+    
+    try {
+      final userLocation = tz.getLocation(_userTimezone!);
+      final convertedDateTime = tz.TZDateTime.from(utcDateTime, userLocation);
+      logger.d('Converted UTC datetime $utcDateTime to $_userTimezone: $convertedDateTime');
+      return convertedDateTime;
+    } catch (e) {
+      logger.e('Error converting to user timezone $_userTimezone: $e');
+      return utcDateTime; // Return as-is if conversion fails
+    }
+  }
+
+  // Helper method to format datetime for display
+  String formatDateTimeForDisplay(DateTime utcDateTime) {
+    final localDateTime = convertToUserTimezone(utcDateTime);
+    final formatted = '${localDateTime.day}/${localDateTime.month} ${localDateTime.hour}:${localDateTime.minute.toString().padLeft(2, '0')}';
+    logger.d('Formatted datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
+    return formatted;
+  }
+
+  // Helper method to format datetime for detailed display (with year)
+  String formatDateTimeForDetailedDisplay(DateTime utcDateTime) {
+    final localDateTime = convertToUserTimezone(utcDateTime);
+    final formatted = '${localDateTime.year}-${localDateTime.month.toString().padLeft(2, '0')}-${localDateTime.day.toString().padLeft(2, '0')} ${localDateTime.hour.toString().padLeft(2, '0')}:${localDateTime.minute.toString().padLeft(2, '0')}';
+    logger.d('Formatted detailed datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
+    return formatted;
   }
 
   Future<void> _restoreSelectedProductName() async {
     final stored = await _storage.read(key: 'selectedProductName');
     if (stored != null) {
       try {
-        _selectedProductName = ProductName.values.firstWhere((e) => e.name == stored);
+        _selectedProductName =
+            ProductName.values.firstWhere((e) => e.name == stored);
       } catch (_) {
         _selectedProductName = null;
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> _restorePredictionObjectFilter() async {
+    final stored = await _storage.read(key: 'predictionObjectFilter');
+    if (stored != null) {
+      try {
+        _predictionObjectFilter =
+            PredictionObjectFilter.values.firstWhere((e) => e.name == stored);
+      } catch (_) {
+        _predictionObjectFilter = null;
       }
     }
     notifyListeners();
