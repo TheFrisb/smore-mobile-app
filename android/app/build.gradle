@@ -11,7 +11,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.smore.smore_mobile_app"
+    namespace = "com.smore"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "25.1.8937393"
 

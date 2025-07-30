@@ -8,8 +8,6 @@ class SummarySection extends StatelessWidget {
   final List<Product> selectedProducts;
   final bool isYearly;
   final VoidCallback onSubscribe;
-  final bool useDiscountedPrices;
-  final int? firstSelectedProductId;
   static final Logger _logger = Logger();
 
   const SummarySection({
@@ -17,21 +15,11 @@ class SummarySection extends StatelessWidget {
     required this.selectedProducts,
     required this.isYearly,
     required this.onSubscribe,
-    required this.useDiscountedPrices,
-    required this.firstSelectedProductId,
   });
 
   double _getProductSalePrice(Product product) {
-    bool useDiscount = false;
-
-    if (selectedProducts.length > 1 && product.id != firstSelectedProductId) {
-      useDiscount = true;
-    }
-
     bool isMonthly = !isYearly;
-
-    double salePrice = product.getSalePrice(isMonthly, useDiscount);
-
+    double salePrice = product.getSalePrice(isMonthly, false);
     return salePrice;
   }
 

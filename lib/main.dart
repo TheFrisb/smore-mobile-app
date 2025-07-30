@@ -6,13 +6,24 @@ import 'package:smore_mobile_app/providers/history_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
+import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
+
+  // Initialize RevenueCat before running the app
+  try {
+    await RevenueCatService().initialize();
+    print('RevenueCat initialized successfully');
+  } catch (e) {
+    print('Failed to initialize RevenueCat: $e');
+    // Don't throw here - let the app continue without RevenueCat
+  }
+
   runApp(
     MultiProvider(
       providers: [

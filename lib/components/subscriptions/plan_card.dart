@@ -14,7 +14,6 @@ class PlanCard extends StatelessWidget {
   final bool isYearly;
   final bool isSelected;
   final ValueChanged<bool?> onSelected;
-  final bool showDiscount;
 
   const PlanCard({
     super.key,
@@ -22,7 +21,6 @@ class PlanCard extends StatelessWidget {
     required this.isYearly,
     required this.isSelected,
     required this.onSelected,
-    required this.showDiscount,
   });
 
   @override
@@ -83,13 +81,12 @@ class PlanCard extends StatelessWidget {
               const SizedBox(height: 16),
               if (product.type == ProductType.ADDON) ...[
                 _buildCurrentPlan(context),
-                if (showDiscount) _buildDiscount(),
                 const SizedBox(height: 16),
               ],
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (isYearly || showDiscount) ...[
+                  if (isYearly) ...[
                     Text(
                       '\$${product.monthlyPrice.toStringAsFixed(2)}',
                       style: TextStyle(
@@ -102,7 +99,7 @@ class PlanCard extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                   Text(
-                    '\$${product.getSalePrice(!isYearly, showDiscount).toStringAsFixed(2)}',
+                    '\$${product.getSalePrice(!isYearly, false).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -131,12 +128,6 @@ class PlanCard extends StatelessWidget {
                   ),
                 ),
                 _buildCurrentPlan(context),
-                if (showDiscount) ...[
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  _buildDiscount(),
-                ],
                 const SizedBox(height: 16),
                 const BrandGradientLine(
                   height: 1,

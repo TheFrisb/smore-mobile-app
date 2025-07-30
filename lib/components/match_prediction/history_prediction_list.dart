@@ -80,7 +80,6 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
       case PredictionObjectFilter.tickets:
         return LucideIcons.scrollText;
       case null:
-      default:
         return LucideIcons.list;
     }
   }

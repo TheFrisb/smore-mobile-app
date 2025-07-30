@@ -1,5 +1,5 @@
-package com.smore.smore_mobile_app
+package com.smore
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity: FlutterActivity()
+class MainActivity : FlutterActivity()

@@ -123,12 +123,12 @@ class MyAccountScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // const SizedBox(height: 32),
-              // const BrandGradientLine(
-              //   height: 2,
-              // ),
-              // const SizedBox(height: 32),
-              // _build_plans_section(context),
+              const SizedBox(height: 32),
+              const BrandGradientLine(
+                height: 2,
+              ),
+              const SizedBox(height: 32),
+              _build_plans_section(context),
               const SizedBox(height: 32),
               const BrandGradientLine(
                 height: 2,
@@ -229,7 +229,7 @@ class MyAccountScreen extends StatelessWidget {
                                   fontSize: 15,
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .onBackground
+                                      .onSurface
                                       .withOpacity(0.7),
                                 ),
                               ),

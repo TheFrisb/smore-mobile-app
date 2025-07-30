@@ -3,6 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/bet_line.dart';
 import 'package:smore_mobile_app/models/sport/ticket.dart';
@@ -16,6 +17,9 @@ class TicketPrediction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final canViewTicket = userProvider.canViewTicket(ticket);
+
     return Card(
         shape: RoundedRectangleBorder(
           side: _getBorderColor(context),
@@ -26,60 +30,88 @@ class TicketPrediction extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(children: [
-            _buildTicketLabel(context),
+            _buildTopRow(context, canViewTicket),
             const SizedBox(height: 24),
-            _buildTopRow(context),
-            const SizedBox(height: 24),
+            if (ticket.status == TicketStatus.PENDING) ...[
+              _buildTicketLabel(context),
+              const SizedBox(height: 24),
+            ],
             const BrandGradientLine(),
             const SizedBox(height: 24),
-            _buildBetLines(context),
+            if (canViewTicket)
+              _buildBetLines(context)
+            else
+              TicketLockedSection(ticketId: ticket.id),
           ]),
         ));
   }
 
-  Widget _buildTopRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xB50D151E),
-                borderRadius: BorderRadius.circular(16),
+  Widget _buildTopRow(BuildContext context, bool canViewTicket) {
+    if (canViewTicket) {
+      // Original layout with odds when user has access
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xB50D151E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(5),
+                child: Icon(_getProductIcon()),
               ),
-              padding: const EdgeInsets.all(5),
-              child: Icon(_getProductIcon()),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              ticket.product.name.displayName,
-              style: const TextStyle(color: Color(0xFFdbe4ed)),
-            ),
-          ],
-        ),
-        // container with Total odds on top, and odds below
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              'Total Odds',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor.withOpacity(0.5),
+              const SizedBox(width: 10),
+              Text(
+                ticket.product.name.displayName,
+                style: const TextStyle(color: Color(0xFFdbe4ed)),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              ticket.totalOdds.toStringAsFixed(2),
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
+            ],
+          ),
+          // container with Total odds on top, and odds below
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'Total Odds',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor.withOpacity(0.5),
+                ),
               ),
+              const SizedBox(height: 5),
+              Text(
+                ticket.totalOdds.toStringAsFixed(2),
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      // Centered layout without odds when user doesn't have access
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xB50D151E),
+              borderRadius: BorderRadius.circular(16),
             ),
-          ],
-        ),
-      ],
-    );
+            padding: const EdgeInsets.all(5),
+            child: Icon(_getProductIcon()),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            ticket.product.name.displayName,
+            style: const TextStyle(color: Color(0xFFdbe4ed)),
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildTicketLabel(BuildContext context) {
@@ -102,8 +134,8 @@ class TicketPrediction extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             ticket.label,
-            style: TextStyle(
-              color: const Color(0xFFdbe4ed),
+            style: const TextStyle(
+              color: Color(0xFFdbe4ed),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -121,10 +153,8 @@ class TicketPrediction extends StatelessWidget {
         bool hasConnectingLine = index < ticket.betLines.length - 1;
         bool isPending = betLine.status == BetLineStatus.PENDING;
         bool hasScores = !isPending &&
-            (betLine.match.homeTeamScore != null &&
-                    betLine.match.homeTeamScore.isNotEmpty ||
-                betLine.match.awayTeamScore != null &&
-                    betLine.match.awayTeamScore.isNotEmpty);
+            (betLine.match.homeTeamScore.isNotEmpty ||
+                betLine.match.awayTeamScore.isNotEmpty);
         return _buildBetLine(
             context,
             betLine.bet,

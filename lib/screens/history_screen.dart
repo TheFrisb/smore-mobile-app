@@ -93,9 +93,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             },
           ),
           const BrandGradientLine(),
-          Expanded(
+          const Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: HistoryPredictionsList(),
             ),
           ),

@@ -359,7 +359,7 @@ class _TimezonePickerDialogState extends State<_TimezonePickerDialog> {
                               side: isSelected
                                   ? BorderSide(
                                       color: theme.primaryColor, width: 2)
-                                  : BorderSide(
+                                  : const BorderSide(
                                       color: Colors.transparent, width: 1),
                             ),
                             child: ListTile(

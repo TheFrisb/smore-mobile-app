@@ -143,15 +143,6 @@ class MatchPrediction extends StatelessWidget {
                       fontSize: 16,
                       color: _getPredictionColor(context),
                       textAlign: TextAlign.center),
-                  // Text(
-                  //   prediction.prediction,
-                  //   style: TextStyle(
-                  //     color: _getPredictionColor(context),
-                  //     fontSize: 16,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  //   textAlign: TextAlign.center,
-                  // ),
                 ],
               )
             else

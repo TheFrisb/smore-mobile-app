@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.9"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.7"
   fake_async:
     dependency: transitive
     description:
@@ -472,22 +480,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.4"
-  in_app_purchase:
-    dependency: "direct main"
-    description:
-      name: in_app_purchase
-      sha256: "5cddd7f463f3bddb1d37a72b95066e840d5822d66291331d7f8f05ce32c24b6c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.3"
-  in_app_purchase_android:
-    dependency: transitive
-    description:
-      name: in_app_purchase_android
-      sha256: fd76e5612da6facadcfe8a3477da092908227260a9f6ec7db9a66dd989c69b02
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0+2"
   in_app_purchase_platform_interface:
     dependency: "direct dev"
     description:
@@ -496,14 +488,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  in_app_purchase_storekit:
-    dependency: transitive
-    description:
-      name: in_app_purchase_storekit
-      sha256: a9bc29f5e67701192cc6ea2c4dc99efc1f25fcdc63e052af9b271d479626319b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.3"
   infinite_scroll_pagination:
     dependency: "direct main"
     description:
@@ -752,6 +736,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5"
+  purchases_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_flutter
+      sha256: "4f1252889958695744c3d024abd2b233530fde63c75307bc0a3607bf66ea4476"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.1.0"
   rxdart:
     dependency: transitive
     description:

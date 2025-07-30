@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onChanged: (index) {
               // Set the prediction object filter based on selected index
               PredictionObjectFilter? filter;
-              
+
               switch (index) {
                 case 0: // All
                   filter = null;
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   filter = PredictionObjectFilter.tickets;
                   break;
               }
-              
+
               userProvider.setPredictionObjectFilter(filter);
               fetchUpcomingPredictions(true);
             },

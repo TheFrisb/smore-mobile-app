@@ -6,6 +6,7 @@ import 'package:smore_mobile_app/components/tickets/ticket_prediction.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 
+import '../daily_offer.dart';
 import 'match_prediction.dart';
 
 class PredictionsList extends StatelessWidget {
@@ -143,6 +144,25 @@ class PredictionsList extends StatelessWidget {
         final predictions = predictionProvider.orderedUpcomingPredictionsOnly;
         final filter = userProvider.predictionObjectFilter;
 
+        // Check if user has access to all tickets and predictions
+        bool hasFullAccess = true;
+        
+        // Check all predictions
+        for (final prediction in predictions) {
+          if (!userProvider.canViewPrediction(prediction)) {
+            hasFullAccess = false;
+            break;
+          }
+        }
+        
+        // Check all tickets
+        for (final ticket in tickets) {
+          if (!userProvider.canViewTicket(ticket)) {
+            hasFullAccess = false;
+            break;
+          }
+        }
+
         // Check if empty based on filter
         bool isEmpty = false;
         switch (filter) {
@@ -203,7 +223,7 @@ class PredictionsList extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(8.0),
           children: [
-            const SizedBox(height: 16),
+            if (!hasFullAccess) ...[const DailyOffer(), const SizedBox(height: 16)],
             ...content,
           ],
         );

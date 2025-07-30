@@ -5,8 +5,10 @@ import 'package:logger/logger.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
+import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../models/sport/ticket.dart';
 import '../models/user.dart';
 import '../service/dio_client.dart';
 
@@ -63,6 +65,14 @@ class UserProvider with ChangeNotifier {
     }
 
     return _user?.canViewPrediction(prediction) ?? false;
+  }
+
+  bool canViewTicket(Ticket ticket) {
+    if (ticket.status != TicketStatus.PENDING) {
+      return true;
+    }
+
+    return _user?.canViewTicket(ticket) ?? false;
   }
 
   ProductName? get selectedProductName => _selectedProductName;
@@ -134,6 +144,8 @@ class UserProvider with ChangeNotifier {
           key: 'refreshToken', value: response.data['refresh']);
       await getUserDetails();
       await _setInitialTimezone();
+
+      RevenueCatService().setUserId(_user!.id);
     } on DioException catch (e) {
       int? statusCode = e.response?.statusCode;
       logger.e(statusCode);
@@ -216,11 +228,12 @@ class UserProvider with ChangeNotifier {
       logger.w('No user timezone set, returning UTC datetime as-is');
       return utcDateTime; // Return as-is if no timezone set
     }
-    
+
     try {
       final userLocation = tz.getLocation(_userTimezone!);
       final convertedDateTime = tz.TZDateTime.from(utcDateTime, userLocation);
-      logger.d('Converted UTC datetime $utcDateTime to $_userTimezone: $convertedDateTime');
+      logger.d(
+          'Converted UTC datetime $utcDateTime to $_userTimezone: $convertedDateTime');
       return convertedDateTime;
     } catch (e) {
       logger.e('Error converting to user timezone $_userTimezone: $e');
@@ -231,16 +244,20 @@ class UserProvider with ChangeNotifier {
   // Helper method to format datetime for display
   String formatDateTimeForDisplay(DateTime utcDateTime) {
     final localDateTime = convertToUserTimezone(utcDateTime);
-    final formatted = '${localDateTime.day}/${localDateTime.month} ${localDateTime.hour}:${localDateTime.minute.toString().padLeft(2, '0')}';
-    logger.d('Formatted datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
+    final formatted =
+        '${localDateTime.day}/${localDateTime.month} ${localDateTime.hour}:${localDateTime.minute.toString().padLeft(2, '0')}';
+    logger.d(
+        'Formatted datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
     return formatted;
   }
 
   // Helper method to format datetime for detailed display (with year)
   String formatDateTimeForDetailedDisplay(DateTime utcDateTime) {
     final localDateTime = convertToUserTimezone(utcDateTime);
-    final formatted = '${localDateTime.year}-${localDateTime.month.toString().padLeft(2, '0')}-${localDateTime.day.toString().padLeft(2, '0')} ${localDateTime.hour.toString().padLeft(2, '0')}:${localDateTime.minute.toString().padLeft(2, '0')}';
-    logger.d('Formatted detailed datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
+    final formatted =
+        '${localDateTime.year}-${localDateTime.month.toString().padLeft(2, '0')}-${localDateTime.day.toString().padLeft(2, '0')} ${localDateTime.hour.toString().padLeft(2, '0')}:${localDateTime.minute.toString().padLeft(2, '0')}';
+    logger.d(
+        'Formatted detailed datetime: $utcDateTime -> $formatted (timezone: $_userTimezone)');
     return formatted;
   }
 

@@ -1,6 +1,7 @@
 // user.dart
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
+import 'package:smore_mobile_app/models/sport/ticket.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 
 class User {
@@ -12,6 +13,7 @@ class User {
   final bool _isEmailVerified;
   final UserSubscription? _userSubscription;
   final List<int> _purchasedPredictionIds;
+  final List<int> _purchasedTicketIds;
 
   User({
     required int id,
@@ -21,6 +23,7 @@ class User {
     required String firstName,
     required String lastName,
     required List<int> purchasedPredictionIds,
+    required List<int> purchasedTicketIds,
     UserSubscription? userSubscription,
   })  : _id = id,
         _username = username,
@@ -29,6 +32,7 @@ class User {
         _firstName = firstName,
         _lastName = lastName,
         _purchasedPredictionIds = purchasedPredictionIds,
+        _purchasedTicketIds = purchasedTicketIds,
         _userSubscription = userSubscription;
 
   // Getter methods for external access
@@ -55,6 +59,7 @@ class User {
       lastName: json['last_name'],
       isEmailVerified: json['is_email_verified'],
       purchasedPredictionIds: List<int>.from(json['purchased_prediction_ids']),
+      purchasedTicketIds: List<int>.from(json['purchased_ticket_ids']),
       userSubscription: json['user_subscription'] != null
           ? UserSubscription.fromJson(json['user_subscription'])
           : null,
@@ -68,8 +73,15 @@ class User {
     return hasAccessToProduct(predictionProduct.name);
   }
 
+  bool canViewTicket(Ticket ticket) {
+    if (_purchasedPredictionIds.contains(ticket.id)) return true;
+
+    Product ticketProduct = ticket.product;
+    return hasAccessToProduct(ticketProduct.name);
+  }
+
   bool hasAccessToProduct(ProductName productName) {
-    if (userSubscription == null || !hasActiveSubscription()) {
+    if (!hasActiveSubscription()) {
       return false;
     }
 
