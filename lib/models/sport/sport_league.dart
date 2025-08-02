@@ -2,7 +2,7 @@ import 'package:smore_mobile_app/models/sport/Country.dart';
 
 class SportLeague {
   final String name;
-  final String logoUrl;
+  final String? logoUrl;
   final SportCountry country;
 
   SportLeague({

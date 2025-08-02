@@ -15,6 +15,25 @@ enum ConsumableIdentifiers {
   const ConsumableIdentifiers(this.value);
 }
 
+enum SubscriptionIdentifiers {
+  soccer("soccer_subscription"),
+  basketball("basketball_subscription"),
+  aiAnalyst("ai_subscription");
+
+  final String value;
+
+  const SubscriptionIdentifiers(this.value);
+}
+
+enum EntitlementPeriod {
+  monthly("monthly"),
+  yearly("yearly");
+
+  final String value;
+
+  const EntitlementPeriod(this.value);
+}
+
 class RevenueCatService {
   static final RevenueCatService _instance = RevenueCatService._internal();
 
@@ -91,6 +110,55 @@ class RevenueCatService {
     }
   }
 
+  Future<Offering?> getOffering(String offeringId) async {
+    final offerings = await getOfferings();
+    if (offerings == null || offerings.current == null) {
+      logger.e('No offerings available');
+      return null;
+    }
+
+    final offering = offerings.getOffering(offeringId);
+    if (offering == null) {
+      logger.e('Offering "$offeringId" not found');
+      return null;
+    }
+
+    return offering;
+  }
+
+  Future<ConsumablePurchaseResult> purchaseSubscription(Package package) async {
+    try {
+      final purchaseResult = await Purchases.purchasePackage(package);
+      final txnId = purchaseResult.storeTransaction.transactionIdentifier ?? '';
+      logger
+          .i('Subscription purchase successful for ID: ${package.identifier}');
+
+      return ConsumablePurchaseResult(
+        success: true,
+        transactionId: txnId,
+      );
+    } on PlatformException catch (e, st) {
+      final msg = e.message ?? 'Unknown platform error';
+      logger.e(
+          'Subscription purchase failed for ID: ${package.identifier}: $msg',
+          stackTrace: st,
+          error: e);
+      return ConsumablePurchaseResult(
+        success: false,
+        errorMessage: msg,
+        errorCode: e.code,
+      );
+    } catch (e, st) {
+      final msg = e.toString();
+      logger.e('Unexpected error purchasing ${package.identifier}: $msg',
+          stackTrace: st, error: e);
+      return ConsumablePurchaseResult(
+        success: false,
+        errorMessage: msg,
+      );
+    }
+  }
+
   Future<ConsumablePurchaseResult> purchaseConsumable(
       ConsumableIdentifiers consumableId) async {
     logger.i('Initiating consumable purchase for ID: ${consumableId.value}');
@@ -144,6 +212,77 @@ class RevenueCatService {
         errorMessage: msg,
       );
     }
+  }
+
+  bool customerInfoHasActiveEntitlement(CustomerInfo customerInfo,
+      Package package, EntitlementPeriod entitlementPeriod) {
+    if (!_isInitialized) {
+      logger.w('RevenueCat not initialized, cannot check subscription');
+      return false;
+    }
+
+    String productId = package.storeProduct.identifier.split(':')[0];
+    String queriedEntitlementId = '${entitlementPeriod.value}_$productId';
+    for (var entry in customerInfo.entitlements.active.entries) {
+      final key = entry.key;
+      final EntitlementInfo entitlement = entry.value;
+      logger.i('Active entitlement: $key - ${entitlement.identifier}');
+      logger.i('Product ID: ${entitlement.productIdentifier}');
+
+      if (entitlement.identifier == queriedEntitlementId) {
+        logger.i(
+            'User has active entitlement for subscription "${package.identifier}" with period "${entitlementPeriod.value}"');
+        return true;
+      }
+    }
+
+    logger.i(
+        'User does not have active entitlement for queried entitlement ID "$queriedEntitlementId"');
+    return false;
+  }
+
+  Future<bool> userHasActiveEntitlement(SubscriptionIdentifiers subscriptionId,
+      EntitlementPeriod entitlementPeriod) async {
+    if (!_isInitialized) {
+      logger.w('RevenueCat not initialized, cannot check subscription');
+      return false;
+    }
+
+    final Offering? offering = await getOffering(subscriptionId.value);
+    if (offering == null) {
+      logger.e('Offering for subscription "${subscriptionId.value}" not found');
+      return false;
+    }
+
+    final Package? package = entitlementPeriod == EntitlementPeriod.monthly
+        ? offering.monthly
+        : offering.annual;
+
+    if (package == null) {
+      logger.e(
+          'No package found for subscription "${subscriptionId.value}" with period "${entitlementPeriod.value}"');
+      return false;
+    }
+
+    String productId = package.storeProduct.identifier.split(':')[0];
+    String queriedEntitlementId = '${entitlementPeriod.value}_$productId';
+    final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+    for (var entry in customerInfo.entitlements.active.entries) {
+      final key = entry.key;
+      final EntitlementInfo entitlement = entry.value;
+      logger.i('Active entitlement: $key - ${entitlement.identifier}');
+      logger.i('Product ID: ${entitlement.productIdentifier}');
+
+      if (entitlement.identifier == queriedEntitlementId) {
+        logger.i(
+            'User has active entitlement for subscription "${subscriptionId.value}" with period "${entitlementPeriod.value}"');
+        return true;
+      }
+    }
+
+    logger.i(
+        'User does not have active entitlement for subscription "${subscriptionId.value}" with period "${entitlementPeriod.value}"');
+    return false;
   }
 }
 

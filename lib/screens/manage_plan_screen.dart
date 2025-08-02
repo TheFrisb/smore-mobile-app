@@ -5,104 +5,19 @@ import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../components/subscriptions/billing_toggle.dart';
-import '../components/subscriptions/plan_card.dart';
-import '../components/subscriptions/summary_section.dart';
-import '../models/product.dart';
+import '../components/tabbed_plan_view.dart';
 import '../models/user.dart';
 import '../providers/user_provider.dart';
-import '../service/dio_client.dart';
 
-class ManagePlanScreen extends StatefulWidget {
+class ManagePlanScreen extends StatelessWidget {
   const ManagePlanScreen({super.key});
 
-  @override
-  State<ManagePlanScreen> createState() => _ManagePlanScreenState();
-}
-
-class _ManagePlanScreenState extends State<ManagePlanScreen> {
   static final Logger _logger = Logger();
 
-  bool _isYearly = false;
-  bool _isLoading = true;
-  List<Product> _products = [];
-  Set<int> _selectedProductIds = {};
-
-  Future<void> _launchManagePlanUrl() async {
-    const url = 'https://smoreltd.com/accounts/manage-plan/';
+  Future<void> _launchUrl(String url) async {
     Uri uriResource = Uri.parse(url);
     if (!await launchUrl(uriResource, mode: LaunchMode.externalApplication)) {
       _logger.e("Failed to launch url: $url");
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchProducts();
-    _setInitialState();
-  }
-
-  void _setInitialState() {
-    UserSubscription? userSubscription =
-        Provider.of<UserProvider>(context, listen: false)
-            .user
-            ?.userSubscription;
-
-    if (userSubscription == null) {
-      _logger.i('No user subscription found.');
-      return;
-    }
-
-    _isYearly = !userSubscription.isMonthly;
-
-    _selectedProductIds =
-        userSubscription.products.map((product) => product.id).toSet();
-
-    _logger.i(
-      'Initial state set: isYearly: $_isYearly, selectedProductIds: $_selectedProductIds',
-    );
-  }
-
-  double _getProductSalePrice(Product product) {
-    bool isMonthly = !_isYearly;
-
-    double salePrice = product.getSalePrice(isMonthly, false);
-    _logger.i(
-      'Product ID: ${product.id}, Sale Price: $salePrice, Is Monthly: $isMonthly',
-    );
-
-    if (isMonthly) {
-      return salePrice;
-    } else {
-      return salePrice / 12;
-    }
-  }
-
-  Future<void> _fetchProducts() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final dio = DioClient().dio;
-      final response = await dio.get('/products');
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data as List<dynamic>;
-        setState(() {
-          _products = data.map((json) => Product.fromJson(json)).toList();
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -234,15 +149,19 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
                   ),
                   const SizedBox(height: 12),
                   InkWell(
-                    onTap: _launchManagePlanUrl,
+                    onTap: () async {
+                      await _launchUrl('https://smoreapp.com/manage-subscription');
+                    },
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Theme.of(context).primaryColor.withOpacity(0.3),
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.3),
                           width: 1,
                         ),
                       ),
@@ -294,82 +213,8 @@ class _ManagePlanScreenState extends State<ManagePlanScreen> {
             return _buildStripeSubscriptionMessage(context);
           }
 
-          return Stack(
-            children: [
-              CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 24),
-                        BillingToggle(
-                          isYearly: _isYearly,
-                          onChanged: (value) {
-                            setState(() {
-                              _isYearly = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final product = _products[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: PlanCard(
-                            key: ValueKey(product.id),
-                            // Unique key for each PlanCard
-                            product: product,
-                            isYearly: _isYearly,
-                            isSelected:
-                                _selectedProductIds.contains(product.id),
-                            onSelected: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  _selectedProductIds.add(product.id);
-                                } else {
-                                  _selectedProductIds.remove(product.id);
-                                }
-                              });
-                            },
-                          ),
-                        );
-                      },
-                      childCount: _products.length,
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 24),
-                        // Replaced SliverToBoxAdapter
-                        SummarySection(
-                          selectedProducts: _products
-                              .where((p) => _selectedProductIds.contains(p.id))
-                              .toList(),
-                          isYearly: _isYearly,
-                          onSubscribe: () {
-                            _logger.i(
-                              'Subscribe to ${_selectedProductIds.map((id) => _products.firstWhere((p) => p.id == id).name).join(', ')}',
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (_isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
-            ],
-          );
+          // Show tabbed interface for non-Stripe users
+          return const TabbedPlanView();
         },
       ),
     );

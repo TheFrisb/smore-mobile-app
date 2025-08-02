@@ -27,34 +27,20 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      UserProvider userProvider =
-          Provider.of<UserProvider>(context, listen: false);
       UpcomingPredictionsProvider upcomingPredictionsProvider =
           Provider.of<UpcomingPredictionsProvider>(context, listen: false);
 
-      final selectedProduct = userProvider.selectedProductName;
-      final selectedPredictionObjectFilter =
-          userProvider.predictionObjectFilter;
-
       upcomingPredictionsProvider.fetchUpcomingPredictions(
-        selectedProduct,
-        selectedPredictionObjectFilter,
         updateIsLoading: true,
       );
     });
   }
 
   void fetchUpcomingPredictions(bool updateIsLoading) {
-    UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
     UpcomingPredictionsProvider upcomingPredictionsProvider =
         Provider.of<UpcomingPredictionsProvider>(context, listen: false);
 
-    final selectedProduct = userProvider.selectedProductName;
-    final selectedPredictionObjectFilter = userProvider.predictionObjectFilter;
-
     upcomingPredictionsProvider.fetchUpcomingPredictions(
-        selectedProduct, selectedPredictionObjectFilter,
         updateIsLoading: updateIsLoading);
   }
 
@@ -83,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (userProvider.selectedProductName == newProduct) return;
               userProvider.setSelectedProductName(newProduct);
 
-              fetchUpcomingPredictions(true);
+              fetchUpcomingPredictions(false);
             },
           ),
           FilterBar(
@@ -105,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               userProvider.setPredictionObjectFilter(filter);
-              fetchUpcomingPredictions(true);
+              fetchUpcomingPredictions(false);
             },
           ),
           const BrandGradientLine(),

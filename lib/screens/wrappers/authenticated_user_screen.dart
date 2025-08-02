@@ -8,6 +8,8 @@ import 'package:smore_mobile_app/screens/ai_chat_screen.dart';
 import 'package:smore_mobile_app/screens/history_screen.dart';
 import 'package:smore_mobile_app/screens/home_screen.dart';
 
+import '../../providers/history_predictions_provider.dart';
+
 class AuthenticatedUserScreen extends StatefulWidget {
   const AuthenticatedUserScreen({super.key});
 
@@ -42,6 +44,8 @@ class _AuthenticatedUserScreenState extends State<AuthenticatedUserScreen> {
               Provider.of<UserProvider>(context, listen: false);
           final upcomingPredictionsProvider =
               Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+          final historyPredictionsProvider =
+              Provider.of<HistoryPredictionsProvider>(context, listen: false);
 
           final selectedProduct = userProvider.selectedProductName;
           final selectedPredictionObjectFilter =
@@ -49,9 +53,18 @@ class _AuthenticatedUserScreenState extends State<AuthenticatedUserScreen> {
 
           if (index == 0) {
             upcomingPredictionsProvider.fetchUpcomingPredictions(
-                selectedProduct, selectedPredictionObjectFilter,
                 updateIsLoading: false);
           }
+
+          if (index == 1) {
+            historyPredictionsProvider.fetchPaginatedHistoryPredictions(
+              selectedProduct,
+              selectedPredictionObjectFilter,
+              updateIsLoading: true,
+              forceRefresh: true,
+            );
+          }
+
           setState(() => _currentIndex = index);
         },
       ),

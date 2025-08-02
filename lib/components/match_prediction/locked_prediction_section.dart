@@ -4,6 +4,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../app_colors.dart';
 import '../../screens/manage_plan_screen.dart';
+import '../../service/revenuecat_service.dart';
+import '../purchases/unlock_button.dart';
 
 class LockedPredictionSection extends StatelessWidget {
   static final Logger logger = Logger();
@@ -94,41 +96,11 @@ class LockedPredictionSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xB50D151E),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withOpacity(0.5),
-              width: 1,
-            ),
-          ),
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              width: 200,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Unlock',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.lock_open,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        UnlockButton(
+            onSuccess: null,
+            onError: null,
+            objectId: predictionId,
+            consumableIdentifier: ConsumableIdentifiers.singlePrediction),
         const SizedBox(height: 8),
         RichText(
           text: TextSpan(

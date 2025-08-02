@@ -63,15 +63,22 @@ class MatchPrediction extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CachedNetworkSVGImage(
-                        prediction.match.league.country.logoUrl,
-                        height: 16,
-                        fadeDuration: const Duration(milliseconds: 50),
-                        placeholder:
-                            const CircularProgressIndicator(strokeWidth: 2),
-                        errorWidget: const Icon(LucideIcons.shieldAlert),
-                        fit: BoxFit.contain,
-                      ),
+                      if (prediction.match.league.country.logoUrl != null)
+                        CachedNetworkSVGImage(
+                          prediction.match.league.country.logoUrl!,
+                          height: 16,
+                          fadeDuration: const Duration(milliseconds: 50),
+                          placeholder:
+                              const CircularProgressIndicator(strokeWidth: 2),
+                          errorWidget: const Icon(LucideIcons.shieldAlert),
+                          fit: BoxFit.contain,
+                        )
+                      else
+                        const Icon(
+                          LucideIcons.shieldAlert,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
                       const SizedBox(width: 8),
                       Text(
                         prediction.match.league.name,

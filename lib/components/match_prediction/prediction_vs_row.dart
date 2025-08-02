@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 
 import '../../app_colors.dart';
@@ -30,10 +31,17 @@ class PredictionVsRow extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                CachedNetworkImage(
-                  imageUrl: prediction.match.homeTeam.logoUrl,
-                  height: teamLogoHeight,
-                ),
+                if (prediction.match.league.logoUrl != null)
+                  CachedNetworkImage(
+                    imageUrl: prediction.match.homeTeam.logoUrl!,
+                    height: teamLogoHeight,
+                  )
+                else
+                  Icon(
+                    LucideIcons.shieldAlert,
+                    size: teamLogoHeight,
+                    color: Colors.grey,
+                  ),
                 const SizedBox(height: 8),
                 Text(
                   prediction.match.homeTeam.name,
@@ -50,10 +58,17 @@ class PredictionVsRow extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                CachedNetworkImage(
-                  imageUrl: prediction.match.awayTeam.logoUrl,
-                  height: teamLogoHeight,
-                ),
+                if (prediction.match.awayTeam.logoUrl != null)
+                  CachedNetworkImage(
+                    imageUrl: prediction.match.awayTeam.logoUrl!,
+                    height: teamLogoHeight,
+                  )
+                else
+                  Icon(
+                    LucideIcons.shieldAlert,
+                    size: teamLogoHeight,
+                    color: Colors.grey,
+                  ),
                 const SizedBox(height: 8),
                 Text(
                   prediction.match.awayTeam.name,

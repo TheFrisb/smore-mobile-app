@@ -17,30 +17,25 @@ class UpcomingPredictionsProvider with ChangeNotifier {
   bool _isFetchingUpcomingPredictions = false;
   String? _errorMessage;
 
-  Future<void> fetchUpcomingPredictions(ProductName? productFilter,
-      PredictionObjectFilter? predictionObjectFilter,
-      {bool updateIsLoading = false}) async {
+  Future<void> fetchUpcomingPredictions({bool updateIsLoading = false}) async {
     logger.i(
-        'Fetch upcoming predictions called with updateIsLoading=$updateIsLoading, productFilter=$productFilter, predictionObjectFilter=$predictionObjectFilter');
+        'Fetch upcoming predictions called with updateIsLoading=$updateIsLoading');
 
     if (_isFetchingUpcomingPredictions) {
       logger.i('Already fetching upcoming predictions, skipping this request.');
       return;
     }
     _errorMessage = null;
+
     if (updateIsLoading) {
       logger.i('Setting isFetchingUpcomingPredictions to true');
       _isFetchingUpcomingPredictions = true;
       notifyListeners();
     }
 
-    Map<String, dynamic> queryParameters =
-        _buildQueryParameters(productFilter, predictionObjectFilter);
-
     try {
       final response = await _dioClient.dio.get(
         '/upcoming',
-        queryParameters: queryParameters,
       );
       final data = response.data;
 
@@ -65,12 +60,9 @@ class UpcomingPredictionsProvider with ChangeNotifier {
     }
   }
 
-  Map<String, dynamic> _buildQueryParameters(ProductName? productFilter,
+  Map<String, dynamic> _buildQueryParameters(
       PredictionObjectFilter? predictionObjectFilter) {
     final Map<String, dynamic> queryParameters = {};
-    if (productFilter != null) {
-      queryParameters['product'] = productFilter.name;
-    }
     if (predictionObjectFilter != null) {
       queryParameters['obj'] = predictionObjectFilter.name;
     }
@@ -82,19 +74,24 @@ class UpcomingPredictionsProvider with ChangeNotifier {
       ..sort((a, b) => a.datetime.compareTo(b.datetime));
   }
 
-  List<Prediction> get orderedUpcomingPredictionsOnly {
+  List<Prediction> getOrderedUpcomingPredictionsOnly(
+      ProductName? productFilter) {
     logger.i(_upcomingPredictions);
 
     return orderedUpcomingPredictions
         .where((prediction) => prediction.objectType == ObjectType.prediction)
         .map((e) => e.prediction!)
+        .where((prediction) =>
+            productFilter == null || prediction.product.name == productFilter)
         .toList();
   }
 
-  List<Ticket> get orderedUpcomingTicketsOnly {
+  List<Ticket> getOrderedUpcomingTicketsOnly(ProductName? productFilter) {
     return orderedUpcomingPredictions
         .where((prediction) => prediction.objectType == ObjectType.ticket)
         .map((e) => e.ticket!)
+        .where((ticket) =>
+            productFilter == null || ticket.product.name == productFilter)
         .toList();
   }
 

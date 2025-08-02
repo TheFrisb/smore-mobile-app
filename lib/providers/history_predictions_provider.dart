@@ -21,6 +21,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
   int _totalCount = 0;
   int _pageSize = 20;
   bool _hasMorePages = false;
+  bool _isLoadingMore = false; // Add this field
 
   List<PredictionResponse> get historyPredictions => _historyPredictions;
 
@@ -40,12 +41,15 @@ class HistoryPredictionsProvider with ChangeNotifier {
 
   bool get hasData => _historyPredictions.isNotEmpty;
 
+  bool get isLoadingMore => _isLoadingMore; // Add this getter
+
   // Reset pagination state
   void _resetPagination() {
     _currentPage = 1;
     _totalPages = 0;
     _totalCount = 0;
     _hasMorePages = false;
+    _isLoadingMore = false; // Add this
   }
 
   // Clear all data and reset pagination
@@ -106,7 +110,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
             'Expected a paginated response -- invalid response format');
       }
 
-      // Parse pagination metadata
+      // Parse pagination metadata from API response
       _totalCount = data['count'] as int? ?? 0;
       _totalPages = data['total_pages'] as int? ?? 0;
       _currentPage = data['current_page'] as int? ?? 1;
@@ -142,6 +146,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
       }
     } finally {
       _isFetchingHistoryPredictions = false;
+      _isLoadingMore = false; // Add this
       notifyListeners();
     }
   }
@@ -149,13 +154,23 @@ class HistoryPredictionsProvider with ChangeNotifier {
   // Fetch next page
   Future<void> fetchNextPage(ProductName? productFilter,
       PredictionObjectFilter? predictionObjectFilter) async {
-    if (!_hasMorePages || _isFetchingHistoryPredictions) {
-      logger.i('No more pages to fetch or already fetching');
+    if (!_hasMorePages || _isFetchingHistoryPredictions || _isLoadingMore) {
+      logger.i('No more pages to fetch, already fetching, or loading more');
       return;
     }
 
-    _currentPage++;
-    logger.i('Fetching next page: $_currentPage');
+    // Check if we're trying to fetch beyond the total pages
+    if (_currentPage >= _totalPages) {
+      logger.i(
+          'Already at or beyond total pages ($_currentPage >= $_totalPages)');
+      _hasMorePages = false;
+      return;
+    }
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    logger.i('Fetching next page: ${_currentPage + 1}');
 
     await fetchPaginatedHistoryPredictions(
       productFilter,
@@ -179,7 +194,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
   // Load more data (fetch next page)
   Future<void> loadMoreData(ProductName? productFilter,
       PredictionObjectFilter? predictionObjectFilter) async {
-    if (_hasMorePages && !_isFetchingHistoryPredictions) {
+    if (_hasMorePages && !_isFetchingHistoryPredictions && !_isLoadingMore) {
       await fetchNextPage(productFilter, predictionObjectFilter);
     }
   }

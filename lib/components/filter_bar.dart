@@ -13,14 +13,19 @@ class FilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width to make spacing responsive
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding:
+          EdgeInsets.symmetric(horizontal: isSmallScreen ? 8 : 16, vertical: 8),
       child: Row(
         children: [
           _buildFilterItem(context, 0, 'All', LucideIcons.list),
-          const SizedBox(width: 16),
+          SizedBox(width: isSmallScreen ? 4 : 16),
           _buildFilterItem(context, 1, 'Predictions', LucideIcons.listCheck),
-          const SizedBox(width: 16),
+          SizedBox(width: isSmallScreen ? 4 : 16),
           _buildFilterItem(context, 2, 'Parlays', LucideIcons.scrollText),
         ],
       ),
@@ -30,11 +35,15 @@ class FilterBar extends StatelessWidget {
   Widget _buildFilterItem(
       BuildContext context, int index, String label, IconData icon) {
     final isSelected = selectedIndex == index;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+
     return Expanded(
       child: GestureDetector(
         onTap: () => onChanged(index),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+          padding: EdgeInsets.symmetric(
+              vertical: 12, horizontal: isSmallScreen ? 4 : 0),
           decoration: BoxDecoration(
             color: isSelected
                 ? Theme.of(context).primaryColor.withOpacity(0.2)
@@ -52,19 +61,19 @@ class FilterBar extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 20,
+                size: isSmallScreen ? 16 : 20,
                 color: isSelected
                     ? Theme.of(context).primaryColor
                     : const Color(0xFFdbe4ed),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: isSmallScreen ? 4 : 8),
               Text(
                 label,
                 style: TextStyle(
                   color: isSelected
                       ? Theme.of(context).primaryColor
                       : const Color(0xFFdbe4ed),
-                  fontSize: 14,
+                  fontSize: isSmallScreen ? 12 : 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

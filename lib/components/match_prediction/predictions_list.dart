@@ -140,13 +140,16 @@ class PredictionsList extends StatelessWidget {
           );
         }
 
-        final tickets = predictionProvider.orderedUpcomingTicketsOnly;
-        final predictions = predictionProvider.orderedUpcomingPredictionsOnly;
+        final tickets = predictionProvider
+            .getOrderedUpcomingTicketsOnly(userProvider.selectedProductName);
+        final predictions =
+            predictionProvider.getOrderedUpcomingPredictionsOnly(
+                userProvider.selectedProductName);
         final filter = userProvider.predictionObjectFilter;
 
         // Check if user has access to all tickets and predictions
         bool hasFullAccess = true;
-        
+
         // Check all predictions
         for (final prediction in predictions) {
           if (!userProvider.canViewPrediction(prediction)) {
@@ -154,7 +157,7 @@ class PredictionsList extends StatelessWidget {
             break;
           }
         }
-        
+
         // Check all tickets
         for (final ticket in tickets) {
           if (!userProvider.canViewTicket(ticket)) {
@@ -223,7 +226,10 @@ class PredictionsList extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(8.0),
           children: [
-            if (!hasFullAccess) ...[const DailyOffer(), const SizedBox(height: 16)],
+            if (!hasFullAccess) ...[
+              const DailyOffer(),
+              const SizedBox(height: 16)
+            ],
             ...content,
           ],
         );

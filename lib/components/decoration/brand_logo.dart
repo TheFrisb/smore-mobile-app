@@ -37,7 +37,7 @@ class BrandLogo extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: fontSize ?? 24,
-              height: 1.1, // Adjust line height
+              height: 1.2, // Increased line height to prevent clipping
               color: Colors.white, // Required for gradient
             ),
           ),

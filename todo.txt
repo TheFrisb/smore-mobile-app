@@ -1,7 +1,10 @@
-1. Add onetime consumable purchases
-2. Add subscription purchases
-3. Fix AI
-4. Iron out application logic
-5. Submit application
+1. Overall
+- Ensure prediction access for mobile subscriptions
+2. My account
+- Show active plans
+- Update customer info state
 
-- Total 6 hours
+
+3. AI analyst
+- Enable 3 free queries
+4. Subscription webhook

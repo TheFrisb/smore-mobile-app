@@ -45,16 +45,24 @@ class AnalysisDetailScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CachedNetworkSVGImage(
-                            prediction.match.league.country.logoUrl,
-                            width: 16,
-                            fadeDuration: const Duration(milliseconds: 0),
-                            placeholder: const CircularProgressIndicator(
-                              strokeWidth: 2,
+                          if (prediction.match.league.country.logoUrl != null)
+                            CachedNetworkSVGImage(
+                              prediction.match.league.country.logoUrl!,
+                              width: 16,
+                              fadeDuration: const Duration(milliseconds: 0),
+                              placeholder: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                              errorWidget:
+                                  const Icon(LucideIcons.triangleAlert),
+                              fit: BoxFit.contain,
+                            )
+                          else
+                            const Icon(
+                              LucideIcons.shieldAlert,
+                              size: 16,
+                              color: Colors.grey,
                             ),
-                            errorWidget: const Icon(LucideIcons.triangleAlert),
-                            fit: BoxFit.contain,
-                          ),
                           const SizedBox(width: 8),
                           Text(
                             prediction.match.league.name,

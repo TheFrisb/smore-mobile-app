@@ -31,7 +31,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _fetchHistoryPredictions(bool updateIsLoading) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final historyProvider = Provider.of<HistoryPredictionsProvider>(context, listen: false);
+    final historyProvider =
+        Provider.of<HistoryPredictionsProvider>(context, listen: false);
 
     final selectedProduct = userProvider.selectedProductName;
     final selectedPredictionObjectFilter = userProvider.predictionObjectFilter;
@@ -75,7 +76,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             onChanged: (index) {
               // Set the prediction object filter based on selected index
               PredictionObjectFilter? filter;
-              
+
               switch (index) {
                 case 0: // All
                   filter = null;
@@ -87,7 +88,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   filter = PredictionObjectFilter.tickets;
                   break;
               }
-              
+
               userProvider.setPredictionObjectFilter(filter);
               _fetchHistoryPredictions(true);
             },

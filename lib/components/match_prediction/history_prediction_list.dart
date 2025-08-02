@@ -19,6 +19,7 @@ class HistoryPredictionsList extends StatefulWidget {
 
 class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   final ScrollController _scrollController = ScrollController();
+  DateTime? _lastScrollTime; // Add debouncing
 
   @override
   void initState() {
@@ -33,13 +34,22 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   }
 
   void _onScroll() {
+    final now = DateTime.now();
     final historyProvider =
         Provider.of<HistoryPredictionsProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    // Debounce rapid scroll events (500ms)
+    if (_lastScrollTime != null &&
+        now.difference(_lastScrollTime!).inMilliseconds < 500) {
+      return;
+    }
+    _lastScrollTime = now;
+
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 500 &&
         !historyProvider.isFetchingHistoryPredictions &&
+        !historyProvider.isLoadingMore && // Add this check
         historyProvider.hasMorePages) {
       // Eager fetching - don't show loading indicator
       historyProvider.loadMoreData(
@@ -219,6 +229,12 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
             // Show loading indicator only when fetching more data and we already have data
             if (historyProvider.isFetchingHistoryPredictions &&
                 historyProvider.historyPredictions.isNotEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            // Show loading indicator for "load more" operations
+            if (historyProvider.isLoadingMore)
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Center(child: CircularProgressIndicator()),

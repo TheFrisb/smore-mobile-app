@@ -1,6 +1,6 @@
 class SportCountry {
   final String name;
-  final String logoUrl;
+  final String? logoUrl;
 
   SportCountry({
     required this.name,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:smore_mobile_app/components/purchases/unlock_button.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 
 import '../app_colors.dart';
@@ -76,62 +77,11 @@ class DailyOffer extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Unlock button
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.secondary.shade500,
-                            AppColors.secondary.shade600,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                AppColors.secondary.shade500.withOpacity(0.4),
-                            blurRadius: 8,
-                            spreadRadius: 0,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            RevenueCatService().purchaseConsumable(
-                                ConsumableIdentifiers.dailyOffer);
-                          },
-                          borderRadius: BorderRadius.circular(8),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Unlock Now',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(
-                                  LucideIcons.lock,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    const UnlockButton(
+                        onSuccess: null,
+                        onError: null,
+                        objectId: 0,
+                        consumableIdentifier: ConsumableIdentifiers.dailyOffer)
                   ],
                 ),
               ),

@@ -74,7 +74,7 @@ class User {
   }
 
   bool canViewTicket(Ticket ticket) {
-    if (_purchasedPredictionIds.contains(ticket.id)) return true;
+    if (_purchasedTicketIds.contains(ticket.id)) return true;
 
     Product ticketProduct = ticket.product;
     return hasAccessToProduct(ticketProduct.name);
