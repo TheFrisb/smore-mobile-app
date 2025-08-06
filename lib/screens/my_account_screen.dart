@@ -302,11 +302,13 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                     ),
                     const SizedBox(height: 28),
                     // Actions
-                    Row(
+                    Column(
                       children: [
-                        Expanded(
+                        SizedBox(
+                          width: double.infinity,
                           child: ElevatedButton.icon(
-                            icon: const Icon(LucideIcons.key, size: 20),
+                            icon: const Icon(LucideIcons.lock,
+                                size: 20, color: Colors.white),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -350,8 +352,9 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
                           child: OutlinedButton.icon(
                             icon: const Icon(LucideIcons.logOut,
                                 color: Colors.red, size: 20),
@@ -526,6 +529,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
   Widget _build_plans_section(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     UserSubscription? userSubscription = userProvider.userSubscription;
+    final activeEntitlements = userProvider.getActiveEntitlementNames();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,7 +580,54 @@ class _MyAccountScreenState extends State<MyAccountScreen>
               const SizedBox(height: 12),
             ]
           ]
+        ] else if (activeEntitlements.isNotEmpty) ...[
+          // Show active entitlements from RevenueCat
+          Row(
+            children: [
+              const Text("Active plans",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  )),
+              const Spacer(),
+              InkResponse(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManagePlanScreen()));
+                },
+                child: Text("Manage Plan",
+                    style: TextStyle(
+                        fontSize: 14, color: Theme.of(context).primaryColor)),
+              )
+            ],
+          ),
+          const SizedBox(height: 16),
+          for (String entitlement in activeEntitlements) ...[
+            Row(
+              children: [
+                _buildEntitlementIcon(entitlement),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    entitlement,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (entitlement != activeEntitlements.last) ...[
+              const SizedBox(height: 12),
+            ]
+          ]
         ] else ...[
+          // No active plan or entitlements
           Row(
             children: [
               const Text("No active plan",
@@ -601,6 +652,31 @@ class _MyAccountScreenState extends State<MyAccountScreen>
           ),
         ]
       ],
+    );
+  }
+
+  Widget _buildEntitlementIcon(String entitlement) {
+    IconData iconData;
+    Color iconColor;
+
+    if (entitlement.toLowerCase().contains('soccer')) {
+      iconData = Icons.sports_soccer_outlined;
+      iconColor = Theme.of(context).primaryColor;
+    } else if (entitlement.toLowerCase().contains('basketball')) {
+      iconData = Icons.sports_basketball_outlined;
+      iconColor = Theme.of(context).primaryColor;
+    } else if (entitlement.toLowerCase().contains('ai analyst')) {
+      iconData = Icons.sports_football_outlined;
+      iconColor = Theme.of(context).primaryColor;
+    } else {
+      iconData = LucideIcons.crown;
+      iconColor = Theme.of(context).primaryColor;
+    }
+
+    return Icon(
+      iconData,
+      color: iconColor,
+      size: 24,
     );
   }
 }

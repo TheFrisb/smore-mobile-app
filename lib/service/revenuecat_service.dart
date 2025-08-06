@@ -73,6 +73,7 @@ class RevenueCatService {
       }
 
       await Purchases.configure(PurchasesConfiguration(apiKey));
+      Purchases.getCustomerInfo();
 
       _isInitialized = true;
       logger.i('RevenueCat initialized successfully');
@@ -124,6 +125,30 @@ class RevenueCatService {
     }
 
     return offering;
+  }
+
+  Future<Package?> getConsumablePackage(
+      ConsumableIdentifiers consumableId) async {
+    final offerings = await getOfferings();
+    if (offerings == null || offerings.current == null) {
+      logger.e('No offerings available');
+      return null;
+    }
+
+    final offering = offerings.getOffering(consumableId.value);
+    if (offering == null) {
+      logger.e('Offering "${consumableId.value}" not found');
+      return null;
+    }
+
+    final pkg = offering.getPackage('consumable');
+    if (pkg == null) {
+      logger.e(
+          'Package "consumable" not found for offering "${consumableId.value}"');
+      return null;
+    }
+
+    return pkg;
   }
 
   Future<ConsumablePurchaseResult> purchaseSubscription(Package package) async {
@@ -299,5 +324,17 @@ class ConsumablePurchaseResult {
     this.entitlementId,
     this.errorMessage,
     this.errorCode,
+  });
+}
+
+class SubscribedProduct {
+  final String productName;
+  final double price;
+  final String period;
+
+  SubscribedProduct({
+    required this.productName,
+    required this.price,
+    required this.period,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../components/purchases/subscription_button.dart';
 import '../components/purchases/subscription_option_card.dart';
 import '../models/product.dart';
+import '../providers/user_provider.dart';
 import '../service/dio_client.dart';
 
 class TabbedPlanView extends StatefulWidget {
@@ -26,7 +28,6 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
   String _selectedSubscription = 'yearly';
 
   late List<Product> _products;
-  CustomerInfo? _customerInfo;
 
   Offering? _soccerOfferings;
   Offering? _basketballOfferings;
@@ -115,10 +116,12 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
       _isLoading = true;
     });
 
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+
     try {
-      // Fetch CustomerInfo first
-      _customerInfo = await Purchases.getCustomerInfo();
-      _customerInfo!.entitlements.active.forEach((key, entitlement) {
+      userProvider.customerInfo!.entitlements.active
+          .forEach((key, entitlement) {
         _logger.i('Active entitlement: $key - ${entitlement.identifier}');
         _logger.i('Product ID: ${entitlement.productIdentifier}');
       });
@@ -139,23 +142,13 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
     }
   }
 
-  Future<void> _refreshCustomerInfo() async {
-    try {
-      _customerInfo = await Purchases.getCustomerInfo();
-      setState(() {});
-      _logger.i('CustomerInfo refreshed successfully');
-    } catch (e) {
-      _logger.e('Failed to refresh CustomerInfo: $e');
-    }
-  }
-
   bool _isPackageOwned(Package package, EntitlementPeriod entitlementPeriod) {
-    if (_customerInfo == null) return false;
-
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final customerInfo = userProvider.customerInfo;
+    if (customerInfo == null) return false;
     final revenueCatService = RevenueCatService();
-
     return revenueCatService.customerInfoHasActiveEntitlement(
-        _customerInfo!, package, entitlementPeriod);
+        customerInfo, package, entitlementPeriod);
   }
 
   Package? get _selectedPackage {
@@ -267,6 +260,8 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
 
     bool hasOfferings = monthlyPackage != null || yearlyPackage != null;
 
+    Provider.of<UserProvider>(context);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -337,8 +332,6 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
               selectedPackage: _selectedPackage,
               onSuccess: () {
                 _logger.i('Purchase completed successfully');
-                // Handle successful purchase - maybe refresh user data or navigate
-                _refreshCustomerInfo();
               },
               onError: () {
                 _logger.e('Purchase failed');
@@ -365,12 +358,11 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
                 TextButton(
                   onPressed: () async {
                     try {
-                      _customerInfo = await Purchases.restorePurchases();
+                      await Purchases.restorePurchases();
                       _logger.i('Purchases restored successfully');
                     } catch (e) {
                       _logger.e('Failed to restore purchases: $e');
                     }
-                    _refreshCustomerInfo();
                   },
                   child: Text(
                     'Restore Purchases',

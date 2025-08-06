@@ -80,7 +80,8 @@ class SideDrawer extends StatelessWidget {
           // List items with spacing
           ...destinations.map(
             (DrawerDestinationLink destination) {
-              if (destination.label == 'My Account' && isGuest) {
+              if ((destination.label == 'My Account' && isGuest) ||
+                  (destination.label == 'Manage Plan' && isGuest)) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: ListTile(
@@ -90,8 +91,8 @@ class SideDrawer extends StatelessWidget {
                       children: [
                         Text(destination.label),
                         const SizedBox(width: 8),
-                        const Icon(LucideIcons.lock,
-                            size: 18, color: Colors.grey),
+                        Icon(LucideIcons.lock,
+                            size: 18, color: Colors.red.withOpacity(0.5)),
                       ],
                     ),
                     leading: destination.icon,

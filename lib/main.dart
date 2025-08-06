@@ -1,7 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/providers/history_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
@@ -10,34 +13,36 @@ import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
+  Logger logger = Logger();
 
   // Initialize RevenueCat before running the app
   try {
     await RevenueCatService().initialize();
-    print('RevenueCat initialized successfully');
+    logger.i('RevenueCat initialized successfully');
   } catch (e) {
-    print('Failed to initialize RevenueCat: $e');
-    // Don't throw here - let the app continue without RevenueCat
+    logger.e('Failed to initialize RevenueCat: $e');
   }
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()..initialize()),
-        ChangeNotifierProvider(create: (_) => UpcomingPredictionsProvider()),
-        ChangeNotifierProvider(create: (_) => HistoryPredictionsProvider()),
-        // ChangeNotifierProvider(
-        //   create: (context) => PurchaseProvider(
-        //       Provider.of<UserProvider>(context, listen: false)),
-        // ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((onValue) => runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => UserProvider()..initialize()),
+            ChangeNotifierProvider(
+                create: (_) => UpcomingPredictionsProvider()),
+            ChangeNotifierProvider(create: (_) => HistoryPredictionsProvider()),
+          ],
+          child: const MyApp(),
+        ),
+      ));
 
   FlutterNativeSplash.remove();
 }
@@ -54,6 +59,7 @@ class _MyAppState extends State<MyApp> {
   SnackBar? _currentSnackBar;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
+  final Logger _logger = Logger();
 
   @override
   void initState() {
@@ -68,6 +74,16 @@ class _MyAppState extends State<MyApp> {
         // Internet connection restored
         _hideSnackBar();
       }
+    });
+
+    _setupRevenueCatListener();
+  }
+
+  void _setupRevenueCatListener() {
+    Purchases.addCustomerInfoUpdateListener((customerInfo) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateCustomerInfo();
+      _logger.i('Customer info updated successfully in context');
     });
   }
 

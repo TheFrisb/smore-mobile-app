@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
@@ -29,6 +30,7 @@ class UserProvider with ChangeNotifier {
   String? _userTimezone;
   ProductName? _selectedProductName;
   PredictionObjectFilter? _predictionObjectFilter;
+  CustomerInfo? _customerInfo;
 
   User? get user => _user;
 
@@ -40,7 +42,19 @@ class UserProvider with ChangeNotifier {
 
   bool get isGuest => _isGuest;
 
+  CustomerInfo? get customerInfo => _customerInfo;
+
   PredictionObjectFilter? get predictionObjectFilter => _predictionObjectFilter;
+
+  updateCustomerInfo() async {
+    try {
+      logger.i('Updating customer info');
+      _customerInfo = await Purchases.getCustomerInfo();
+      notifyListeners();
+    } catch (e) {
+      logger.e('Error updating customer info: $e');
+    }
+  }
 
   set isGuest(bool value) {
     _isGuest = value;
@@ -52,7 +66,8 @@ class UserProvider with ChangeNotifier {
       return false;
     }
 
-    return _user!.hasAccessToProduct(productName);
+    return _user!.hasAccessToProduct(productName) ||
+        hasAccessToEntitlement(productName);
   }
 
   String? get userTimezone => _userTimezone;
@@ -107,6 +122,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      updateCustomerInfo();
       final accessToken = await _storage.read(key: 'accessToken');
       if (accessToken != null) {
         await getUserDetails();
@@ -290,6 +306,55 @@ class UserProvider with ChangeNotifier {
   // Add this public method for guests
   Future<void> setInitialTimezoneForGuest() async {
     await _setInitialTimezone();
+  }
+
+  bool hasAccessToEntitlement(ProductName productName) {
+    if (_customerInfo == null) {
+      return false;
+    }
+
+    String normalizedName = productName.name.toLowerCase().replaceAll(' ', '_');
+
+    final entitlement = _customerInfo!.entitlements.active[normalizedName];
+
+    return entitlement != null;
+  }
+
+  List<String> getActiveEntitlementNames() {
+    if (customerInfo == null) return [];
+
+    return customerInfo!.entitlements.active.keys
+        .map((id) {
+          if (!id.startsWith('monthly_') && !id.startsWith('yearly_')) {
+            return null;
+          }
+
+          final parts = id.split('_');
+          final periodKey = parts.first;
+          final productKey = parts.sublist(1).join('_');
+
+          String? productName;
+          switch (productKey) {
+            case 'soccer':
+              productName = 'Soccer';
+              break;
+            case 'basketball':
+              productName = 'Basketball';
+              break;
+            case 'ai_analyst':
+              productName = 'AI Analyst';
+              break;
+            default:
+              productName = null;
+          }
+          if (productName == null) return null;
+
+          final periodName = periodKey == 'monthly' ? 'Monthly' : 'Yearly';
+
+          return '$productName $periodName';
+        })
+        .whereType<String>() // drop any nulls
+        .toList();
   }
 
   String _handleDioError(DioException e) {

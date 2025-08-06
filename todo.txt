@@ -1,10 +1,1 @@
-1. Overall
-- Ensure prediction access for mobile subscriptions
-2. My account
-- Show active plans
-- Update customer info state
-
-
-3. AI analyst
-- Enable 3 free queries
-4. Subscription webhook
+1. Show active price for buy prediction

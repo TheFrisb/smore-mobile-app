@@ -226,7 +226,7 @@ class PredictionsList extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(8.0),
           children: [
-            if (!hasFullAccess) ...[
+            if (!hasFullAccess && !userProvider.isGuest) ...[
               const DailyOffer(),
               const SizedBox(height: 16)
             ],

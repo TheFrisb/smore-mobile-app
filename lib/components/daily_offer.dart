@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/components/purchases/unlock_button.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 
@@ -67,14 +68,24 @@ class DailyOffer extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     // Price
-                    Text(
-                      '\$24.99',
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.secondary.shade400,
-                        letterSpacing: -1,
-                      ),
+                    FutureBuilder<Package?>(
+                      future: RevenueCatService().getConsumablePackage(
+                          ConsumableIdentifiers.dailyOffer),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          final price = snapshot.data!.storeProduct.price;
+                          return Text(
+                            '\$${price.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.secondary.shade400,
+                              letterSpacing: -1,
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
                     const SizedBox(height: 24),
                     const UnlockButton(

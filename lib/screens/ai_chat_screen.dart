@@ -7,7 +7,7 @@ import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart'
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/service/ai_chat_service.dart';
 
-import '../app_colors.dart';
+import '../models/ai/ai_can_send.dart';
 import '../models/ai/chat_message.dart';
 import '../models/product.dart';
 import 'base/base_app_bar_screen.dart';
@@ -33,11 +33,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  // AI message tracking
+  AiCanSend? _aiCanSend;
+  bool _hasCheckedCanSend = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
+      _checkCanSend();
     });
   }
 
@@ -49,10 +54,82 @@ class _AiChatScreenState extends State<AiChatScreen> {
     super.dispose();
   }
 
+  Future<void> _checkCanSend() async {
+    try {
+      logger.i("Checking AI can send status...");
+      _aiCanSend = await _aiChatService.getCanSend();
+      logger.i(
+          "AI can send response: count=${_aiCanSend?.count}, canSend=${_aiCanSend?.canSend}");
+      setState(() {
+        _hasCheckedCanSend = true;
+      });
+      logger.i("Updated hasCheckedCanSend to true");
+    } catch (e) {
+      logger.e("Error checking AI can send: $e");
+      setState(() {
+        _hasCheckedCanSend = true;
+      });
+    }
+  }
+
   void _sendMessage() {
     if (_isProcessing) return;
     final text = _textController.text.trim();
     if (text.isNotEmpty) {
+      // Check if user is a guest
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final isGuest = userProvider.isGuest;
+
+      if (isGuest) {
+        logger.i("Guest user trying to send message, showing login prompt");
+        setState(() {
+          _messages.add(ChatMessage(
+            message: "Log in to access the AI assistant and start chatting!",
+            direction: MessageDirection.INBOUND,
+          ));
+        });
+        _textController.clear();
+        _scrollToBottom();
+        return;
+      }
+
+      // Check if user has access to AI or has free messages remaining
+      final hasAccess = userProvider.hasAccessToProduct(ProductName.AI_ANALYST);
+
+      if (!hasAccess) {
+        // Check if user has used their free messages
+        if (_aiCanSend != null && _aiCanSend!.count >= 3) {
+          logger.i(
+              "User has used all free messages, showing subscription prompt");
+          setState(() {
+            _messages.add(ChatMessage(
+              message:
+                  "You've used your 3 free messages. Subscribe to continue chatting with the AI assistant!",
+              direction: MessageDirection.INBOUND,
+            ));
+          });
+          _textController.clear();
+          _scrollToBottom();
+          return;
+        }
+
+        // Check if user can send at all
+        if (_aiCanSend != null && !_aiCanSend!.canSend) {
+          logger.i("User cannot send messages, showing subscription prompt");
+          setState(() {
+            _messages.add(ChatMessage(
+              message:
+                  "You need to subscribe to access the AI assistant. Subscribe now to start chatting!",
+              direction: MessageDirection.INBOUND,
+            ));
+          });
+          _textController.clear();
+          _scrollToBottom();
+          return;
+        }
+      }
+
+      logger.i("Sending message: $text");
       setState(() {
         _messages.add(
             ChatMessage(message: text, direction: MessageDirection.OUTBOUND));
@@ -61,12 +138,18 @@ class _AiChatScreenState extends State<AiChatScreen> {
       _textController.clear();
       _scrollToBottom();
 
-      _aiChatService.sendMessage(text).then((response) {
+      final timezone = userProvider.userTimezone ?? 'UTC';
+      logger.i("Using timezone: $timezone");
+      _aiChatService.sendMessage(text, timezone).then((response) {
+        logger.i("AI response received successfully");
         setState(() {
           _messages.add(response);
           _isProcessing = false;
         });
         _scrollToBottom();
+        // Refresh can send status after sending message
+        logger.i("Refreshing can send status after message sent");
+        _checkCanSend();
       }).catchError((e) {
         logger.e("Error sending message: $e");
         setState(() {
@@ -97,18 +180,27 @@ class _AiChatScreenState extends State<AiChatScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    logger.i("Building AI chat screen");
+    logger.i(
+        "  - User has AI access: ${userProvider.hasAccessToProduct(ProductName.AI_ANALYST)}");
 
     return BaseAppBarScreen(
       title: "AI Chat",
       padding: const EdgeInsets.all(0),
       backgroundColor: const Color(0xFF0D151E),
-      body: userProvider.hasAccessToProduct(ProductName.AI_ANALYST)
-          ? _buildChatInterface()
-          : _buildLockedSection(context),
+      body: _buildChatInterface(),
     );
   }
 
   Widget _buildChatInterface() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final hasAccess = userProvider.hasAccessToProduct(ProductName.AI_ANALYST);
+    logger.i("Building chat interface:");
+    logger.i("  - User has AI access: $hasAccess");
+    logger.i("  - AI can send: $_aiCanSend");
+    logger.i("  - Count: ${_aiCanSend?.count}");
+    logger.i("  - Should show count: ${!hasAccess && _aiCanSend != null}");
+
     return Column(
       children: [
         Expanded(
@@ -117,6 +209,117 @@ class _AiChatScreenState extends State<AiChatScreen> {
             children: [
               const SizedBox(height: 16),
               ..._messages.map((chatMessage) {
+                // Check if this is a login prompt message
+                if (chatMessage.message.contains("Log in to access") &&
+                    chatMessage.direction == MessageDirection.INBOUND) {
+                  return Column(
+                    children: [
+                      AiChatMessage(chatMessage: chatMessage),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Container(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              userProvider.isGuest = false;
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Theme.of(context).primaryColor,
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.6),
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.logIn,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Log In',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                // Check if this is a subscription prompt message
+                if ((chatMessage.message.contains("Subscribe to continue") ||
+                        chatMessage.message
+                            .contains("Subscribe now to start")) &&
+                    chatMessage.direction == MessageDirection.INBOUND) {
+                  return Column(
+                    children: [
+                      AiChatMessage(chatMessage: chatMessage),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Container(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ManagePlanScreen(),
+                                ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Theme.of(context).primaryColor,
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.6),
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.crown,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'View Plans',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
                 return AiChatMessage(chatMessage: chatMessage);
               }),
               if (_isProcessing)
@@ -136,274 +339,85 @@ class _AiChatScreenState extends State<AiChatScreen> {
         Container(
           color: const Color(0xFF0D151E),
           padding: const EdgeInsets.all(8),
-          child: Row(
+          child: Column(
             children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _textController,
-                  enabled: !_isProcessing,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color(0xFF15212E),
-                    labelText: 'Enter your message here',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                      borderSide: const BorderSide(color: Color(0xFF223548)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                      borderSide: const BorderSide(color: Color(0xFF223548)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                      borderSide: const BorderSide(color: Color(0xFF10648C)),
+              // Show remaining messages count for users without AI access
+              if (!hasAccess && _aiCanSend != null)
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF15212E),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      width: 1,
                     ),
                   ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.messageCircle,
+                        size: 16,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${3 - _aiCanSend!.count} free messages remaining',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(LucideIcons.send),
-                onPressed: _sendMessage,
-                color: const Color(0xFF1B97F3),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _textController,
+                      enabled: !_isProcessing,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFF15212E),
+                        labelText: 'Enter your message here',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF223548)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF223548)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF10648C)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(LucideIcons.send),
+                    onPressed: _sendMessage,
+                    color: const Color(0xFF1B97F3),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildLockedSection(BuildContext context) {
-    UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    bool isGuest = userProvider.isGuest;
-
-    return SingleChildScrollView(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Enhanced icon container with better gradient and shadow
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.3),
-                      Theme.of(context).primaryColor.withOpacity(0.1),
-                      Theme.of(context).primaryColor.withOpacity(0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.4),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColor.withOpacity(0.2),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  LucideIcons.bot,
-                  size: 48,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Enhanced main title with gradient text
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Theme.of(context).primaryColor.withOpacity(0.8),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds),
-                    child: const Text(
-                      'AI Analyst Locked',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    LucideIcons.lock,
-                    color: Colors.red,
-                    size: 24,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Enhanced subtitle
-              Text(
-                isGuest
-                    ? 'You need to sign up to access AI features'
-                    : 'Subscribe to unlock AI-powered analysis',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFFdbe4ed),
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              // Enhanced description container with better styling
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF0D151E).withOpacity(0.8),
-                      const Color(0xFF0D151E).withOpacity(0.6),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 15,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.info_outline_rounded,
-                        size: 28,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Get AI-powered sports analysis and predictions',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFFdbe4ed),
-                        height: 1.5,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      width: 200,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Theme.of(context).primaryColor.withOpacity(0.2),
-                            Theme.of(context).primaryColor.withOpacity(0.1),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.4),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.1),
-                            blurRadius: 8,
-                            spreadRadius: 0,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const ManagePlanScreen(),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16, horizontal: 24),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                LucideIcons.crown,
-                                color: Theme.of(context).primaryColor,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Subscribe',
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                LucideIcons.arrowRight,
-                                color: Theme.of(context).primaryColor,
-                                size: 18,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'to access AI Analyst',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.secondary.shade100,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

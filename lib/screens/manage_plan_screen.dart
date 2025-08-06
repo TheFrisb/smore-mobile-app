@@ -150,7 +150,8 @@ class ManagePlanScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   InkWell(
                     onTap: () async {
-                      await _launchUrl('https://smoreapp.com/manage-subscription');
+                      await _launchUrl(
+                          'https://smoreltd.com/accounts/manage-plan/');
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
