@@ -27,7 +27,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
   bool _isLoading = true;
   String _selectedSubscription = 'yearly';
 
-  late List<Product> _products;
+  List<Product> _products = [];
 
   Offering? _soccerOfferings;
   Offering? _basketballOfferings;
@@ -44,8 +44,30 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
-    _fetchProducts();
-    _fetchOfferings();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Run both async operations in parallel
+      await Future.wait([
+        _fetchProducts(),
+        _fetchOfferings(),
+      ]);
+    } catch (e) {
+      _logger.e('Failed to initialize data: $e');
+    } finally {
+      // Always set loading to false, even on error
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -90,55 +112,46 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
   }
 
   Future<void> _fetchProducts() async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
-      List<Product> response = await DioClient().dio.get('/products').then(
-            (response) => (response.data as List)
-                .map((item) => Product.fromJson(item))
-                .toList(),
-          );
-      setState(() {
-        _products = response;
-      });
+      final response = await DioClient().dio.get('/products');
+      final products = (response.data as List)
+          .map((item) => Product.fromJson(item))
+          .toList();
+      _products = products;
+      _logger.i('Products fetched successfully: ${_products.length} items');
     } catch (e) {
       _logger.e('Failed to fetch products: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      _products = []; // Ensure always initialized
     }
   }
 
   Future<void> _fetchOfferings() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-
     try {
-      userProvider.customerInfo!.entitlements.active
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Log active entitlements
+      userProvider.customerInfo?.entitlements.active
           .forEach((key, entitlement) {
         _logger.i('Active entitlement: $key - ${entitlement.identifier}');
-        _logger.i('Product ID: ${entitlement.productIdentifier}');
       });
 
-      // Fetch offerings
-      _soccerOfferings = await RevenueCatService()
-          .getOffering(SubscriptionIdentifiers.soccer.value);
-      _basketballOfferings = await RevenueCatService()
-          .getOffering(SubscriptionIdentifiers.basketball.value);
-      _aiAnalystOfferings = await RevenueCatService()
-          .getOffering(SubscriptionIdentifiers.aiAnalyst.value);
+      // Fetch all offerings in parallel
+      final results = await Future.wait([
+        RevenueCatService().getOffering(SubscriptionIdentifiers.soccer.value),
+        RevenueCatService()
+            .getOffering(SubscriptionIdentifiers.basketball.value),
+        RevenueCatService()
+            .getOffering(SubscriptionIdentifiers.aiAnalyst.value),
+      ]);
+
+      _soccerOfferings = results[0];
+      _basketballOfferings = results[1];
+      _aiAnalystOfferings = results[2];
+
+      _logger.i('Offerings fetched successfully');
     } catch (e) {
       _logger.e('Failed to fetch offerings: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      // Offerings remain null, which is handled in UI
     }
   }
 
@@ -444,10 +457,8 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+    if (_isLoading || _products.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Column(
