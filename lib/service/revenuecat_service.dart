@@ -246,7 +246,8 @@ class RevenueCatService {
       return false;
     }
 
-    String productId = package.storeProduct.identifier.split(':')[0];
+    String productId = _getProductId(package);
+
     String queriedEntitlementId = '${entitlementPeriod.value}_$productId';
     for (var entry in customerInfo.entitlements.active.entries) {
       final key = entry.key;
@@ -289,7 +290,7 @@ class RevenueCatService {
       return false;
     }
 
-    String productId = package.storeProduct.identifier.split(':')[0];
+    String productId = _getProductId(package);
     String queriedEntitlementId = '${entitlementPeriod.value}_$productId';
     final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
     for (var entry in customerInfo.entitlements.active.entries) {
@@ -308,6 +309,20 @@ class RevenueCatService {
     logger.i(
         'User does not have active entitlement for subscription "${subscriptionId.value}" with period "${entitlementPeriod.value}"');
     return false;
+  }
+
+  String _getProductId(Package package) {
+    String storeProductId = package.storeProduct.identifier;
+
+    if (storeProductId.contains(':')) {
+      return storeProductId.split(':')[0];
+    }
+
+    if (storeProductId.contains('_')) {
+      return storeProductId.split('_').sublist(1).join('_');
+    }
+
+    return '';
   }
 }
 
