@@ -205,7 +205,7 @@ class TicketPrediction extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: const Color(0xff0B1F31),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: _getStatusColor(status),
@@ -215,7 +215,7 @@ class TicketPrediction extends StatelessWidget {
                 child: Icon(
                   _getStatusIcon(status),
                   color: _getStatusColor(status),
-                  size: 20,
+                  size: 16,
                 ),
               ),
               const SizedBox(width: 16),
@@ -419,9 +419,9 @@ class TicketPrediction extends StatelessWidget {
   IconData _getStatusIcon(String status) {
     switch (status) {
       case 'WON':
-        return Icons.check;
+        return LucideIcons.check;
       case 'LOST':
-        return Icons.close;
+        return LucideIcons.x;
       case 'PENDING':
       default:
         return Icons.radio_button_unchecked;

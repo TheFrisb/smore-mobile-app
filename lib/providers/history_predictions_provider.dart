@@ -43,6 +43,18 @@ class HistoryPredictionsProvider with ChangeNotifier {
 
   bool get isLoadingMore => _isLoadingMore; // Add this getter
 
+  // Helper methods for UI state
+  bool get shouldShowLoadingAtBottom => (isLoadingMore ||
+      (isFetchingHistoryPredictions && historyPredictions.isNotEmpty));
+
+  bool get shouldShowEndMessage =>
+      !hasMorePages &&
+      historyPredictions.isNotEmpty &&
+      !isFetchingHistoryPredictions;
+
+  bool get shouldShowScrollHint =>
+      hasMorePages && !isLoadingMore && !isFetchingHistoryPredictions;
+
   // Reset pagination state
   void _resetPagination() {
     _currentPage = 1;
@@ -61,10 +73,9 @@ class HistoryPredictionsProvider with ChangeNotifier {
   }
 
   // Check if we should restart from page 1
-  bool _shouldRestartFromPage1(ProductName? productFilter,
-      PredictionObjectFilter? predictionObjectFilter) {
-    // If this is the first fetch or if filters have changed, restart from page 1
-    return _historyPredictions.isEmpty || _currentPage == 1;
+  bool _shouldRestartFromPage1() {
+    // Only restart if this is the first fetch (empty list)
+    return _historyPredictions.isEmpty;
   }
 
   Future<void> fetchPaginatedHistoryPredictions(ProductName? productFilter,
@@ -79,8 +90,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
     }
 
     // Determine if we should restart from page 1
-    bool shouldRestart = forceRefresh ||
-        _shouldRestartFromPage1(productFilter, predictionObjectFilter);
+    bool shouldRestart = forceRefresh || _shouldRestartFromPage1();
 
     if (shouldRestart) {
       logger.i('Restarting from page 1');
@@ -113,9 +123,14 @@ class HistoryPredictionsProvider with ChangeNotifier {
       // Parse pagination metadata from API response
       _totalCount = data['count'] as int? ?? 0;
       _totalPages = data['total_pages'] as int? ?? 0;
-      _currentPage = data['current_page'] as int? ?? 1;
+      // Only update current page from server if we're starting fresh
+      if (shouldRestart) {
+        _currentPage = data['current_page'] as int? ?? 1;
+      }
       _pageSize = data['page_size'] as int? ?? 20;
       _hasMorePages = data['next'] != null;
+      logger.i(
+          'Pagination state: page=$_currentPage/$_totalPages, hasMore=$_hasMorePages, count=$_totalCount, next=${data['next']}');
 
       // Parse results
       final results = data['results'] as List<dynamic>? ?? [];
@@ -155,12 +170,13 @@ class HistoryPredictionsProvider with ChangeNotifier {
   Future<void> fetchNextPage(ProductName? productFilter,
       PredictionObjectFilter? predictionObjectFilter) async {
     if (!_hasMorePages || _isFetchingHistoryPredictions || _isLoadingMore) {
-      logger.i('No more pages to fetch, already fetching, or loading more');
+      logger.i(
+          'No more pages to fetch, already fetching, or loading more. hasMorePages=$_hasMorePages, isFetching=$_isFetchingHistoryPredictions, isLoadingMore=$_isLoadingMore');
       return;
     }
 
     // Check if we're trying to fetch beyond the total pages
-    if (_currentPage >= _totalPages) {
+    if (_currentPage >= _totalPages && _totalPages > 0) {
       logger.i(
           'Already at or beyond total pages ($_currentPage >= $_totalPages)');
       _hasMorePages = false;
@@ -170,13 +186,30 @@ class HistoryPredictionsProvider with ChangeNotifier {
     _isLoadingMore = true;
     notifyListeners();
 
-    logger.i('Fetching next page: ${_currentPage + 1}');
+    // Store the next page number but don't increment _currentPage yet
+    final nextPage = _currentPage + 1;
+    logger.i('Fetching next page: $nextPage (current: $_currentPage)');
 
-    await fetchPaginatedHistoryPredictions(
-      productFilter,
-      predictionObjectFilter,
-      updateIsLoading: false,
-    );
+    // Temporarily increment _currentPage for the API call
+    final originalPage = _currentPage;
+    _currentPage = nextPage;
+
+    try {
+      await fetchPaginatedHistoryPredictions(
+        productFilter,
+        predictionObjectFilter,
+        updateIsLoading: false,
+      );
+      // If successful, _currentPage is already updated
+      logger.i('Successfully fetched page $nextPage');
+    } catch (e) {
+      // If failed, restore original page
+      _currentPage = originalPage;
+      _isLoadingMore = false;
+      logger.e(
+          'Failed to fetch page $nextPage, restored to page $originalPage: $e');
+      rethrow;
+    }
   }
 
   // Refresh data (restart from page 1)
@@ -207,31 +240,16 @@ class HistoryPredictionsProvider with ChangeNotifier {
     };
 
     if (productFilter != null) {
-      queryParameters['product'] = productFilter.name;
+      queryParameters['filter'] = productFilter.name;
     }
     if (predictionObjectFilter != null) {
       queryParameters['obj'] = predictionObjectFilter.name;
     }
-    return queryParameters;
-  }
 
-  // Get filtered predictions based on object type
-  List<PredictionResponse> getFilteredPredictions(
-      PredictionObjectFilter? filter) {
-    switch (filter) {
-      case PredictionObjectFilter.predictions:
-        return _historyPredictions
-            .where(
-                (prediction) => prediction.objectType == ObjectType.prediction)
-            .toList();
-      case PredictionObjectFilter.tickets:
-        return _historyPredictions
-            .where((prediction) => prediction.objectType == ObjectType.ticket)
-            .toList();
-      case null:
-      default:
-        return _historyPredictions;
-    }
+    // log the query parameters
+    logger.i('Query parameters for history predictions: $queryParameters');
+
+    return queryParameters;
   }
 
   // Get predictions only

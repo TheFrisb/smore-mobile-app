@@ -19,12 +19,16 @@ class HistoryPredictionsList extends StatefulWidget {
 
 class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   final ScrollController _scrollController = ScrollController();
-  DateTime? _lastScrollTime; // Add debouncing
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+
+    // Check if we need to load more data after initial build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfContentFillsScreen();
+    });
   }
 
   @override
@@ -33,25 +37,65 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
     super.dispose();
   }
 
-  void _onScroll() {
-    final now = DateTime.now();
+  @override
+  void didUpdateWidget(HistoryPredictionsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfContentFillsScreen();
+    });
+  }
+
+  void _checkIfContentFillsScreen() {
+    if (!mounted || !_scrollController.hasClients) return;
+
     final historyProvider =
         Provider.of<HistoryPredictionsProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    // Debounce rapid scroll events (500ms)
-    if (_lastScrollTime != null &&
-        now.difference(_lastScrollTime!).inMilliseconds < 500) {
+    // If content doesn't fill screen and we have more pages, load more
+    if (_scrollController.position.maxScrollExtent <= 0 &&
+        historyProvider.historyPredictions.isNotEmpty &&
+        historyProvider.hasMorePages &&
+        !historyProvider.isFetchingHistoryPredictions &&
+        !historyProvider.isLoadingMore) {
+      historyProvider.loadMoreData(
+        userProvider.selectedProductName,
+        userProvider.predictionObjectFilter,
+      );
+    }
+  }
+
+  void _onScroll() {
+    final historyProvider =
+        Provider.of<HistoryPredictionsProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Don't proceed if already loading or no more pages
+    if (historyProvider.isFetchingHistoryPredictions ||
+        historyProvider.isLoadingMore ||
+        !historyProvider.hasMorePages) {
       return;
     }
-    _lastScrollTime = now;
 
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 500 &&
-        !historyProvider.isFetchingHistoryPredictions &&
-        !historyProvider.isLoadingMore && // Add this check
-        historyProvider.hasMorePages) {
-      // Eager fetching - don't show loading indicator
+    final position = _scrollController.position;
+
+    // Handle case where content doesn't fill screen
+    if (position.maxScrollExtent <= 0) {
+      // Content is too short, load more immediately if we have data
+      if (historyProvider.historyPredictions.isNotEmpty) {
+        historyProvider.loadMoreData(
+          userProvider.selectedProductName,
+          userProvider.predictionObjectFilter,
+        );
+      }
+      return;
+    }
+
+    // Calculate dynamic threshold - trigger when user is close to bottom
+    final threshold =
+        position.maxScrollExtent - (position.viewportDimension * 0.5);
+
+    if (position.pixels >= threshold) {
       historyProvider.loadMoreData(
         userProvider.selectedProductName,
         userProvider.predictionObjectFilter,
@@ -66,7 +110,6 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
       case PredictionObjectFilter.tickets:
         return 'No history parlays available';
       case null:
-      default:
         return 'No history predictions available';
     }
   }
@@ -78,7 +121,6 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
       case PredictionObjectFilter.tickets:
         return 'Check back later for historical parlays!';
       case null:
-      default:
         return 'Check back later for historical content!';
     }
   }
@@ -92,6 +134,89 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
       case null:
         return LucideIcons.list;
     }
+  }
+
+  Widget _buildFooterSection(HistoryPredictionsProvider historyProvider) {
+    if (historyProvider.shouldShowLoadingAtBottom) {
+      return _buildLoadingIndicator();
+    }
+
+    if (historyProvider.shouldShowEndMessage) {
+      return _buildEndMessage();
+    }
+
+    if (historyProvider.shouldShowScrollHint) {
+      return _buildScrollHint();
+    }
+
+    return const SizedBox(height: 20);
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      margin: const EdgeInsets.only(top: 8.0),
+      child: const Column(
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 8),
+          Text(
+            'Loading more...',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFFdbe4ed),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEndMessage() {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      margin: const EdgeInsets.only(top: 8.0),
+      child: const Column(
+        children: [
+          Icon(
+            Icons.check_circle_outline,
+            size: 24,
+            color: Color(0xFF4a9eff),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'End of results',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFFdbe4ed),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScrollHint() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(top: 8.0),
+      child: const Column(
+        children: [
+          Icon(
+            Icons.keyboard_arrow_down,
+            size: 20,
+            color: Color(0xFF6b7280),
+          ),
+          Text(
+            'Scroll for more',
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF6b7280),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildEmptyState(
@@ -186,10 +311,9 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
         }
 
         final filter = userProvider.predictionObjectFilter;
-        final filteredPredictions =
-            historyProvider.getFilteredPredictions(filter);
+        final allPredictions = historyProvider.historyPredictions;
 
-        if (filteredPredictions.isEmpty) {
+        if (allPredictions.isEmpty) {
           return _buildEmptyState(context, filter);
         }
 
@@ -198,7 +322,7 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
           padding: const EdgeInsets.all(8.0),
           children: [
             const SizedBox(height: 16),
-            ...filteredPredictions.map((predictionResponse) {
+            ...allPredictions.map((predictionResponse) {
               // Render tickets and predictions as they come in the list
               if (predictionResponse.objectType == ObjectType.ticket) {
                 final ticket = predictionResponse.ticket;
@@ -226,19 +350,8 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
                 );
               }
             }),
-            // Show loading indicator only when fetching more data and we already have data
-            if (historyProvider.isFetchingHistoryPredictions &&
-                historyProvider.historyPredictions.isNotEmpty)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            // Show loading indicator for "load more" operations
-            if (historyProvider.isLoadingMore)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            // Always show footer section with appropriate state
+            _buildFooterSection(historyProvider),
           ],
         );
       },

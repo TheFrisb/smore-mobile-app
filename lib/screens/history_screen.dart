@@ -29,7 +29,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  void _fetchHistoryPredictions(bool updateIsLoading) {
+  void _fetchHistoryPredictions(bool updateIsLoading,
+      {bool forceRefresh = false}) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final historyProvider =
         Provider.of<HistoryPredictionsProvider>(context, listen: false);
@@ -41,6 +42,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       selectedProduct,
       selectedPredictionObjectFilter,
       updateIsLoading: updateIsLoading,
+      forceRefresh: forceRefresh,
     );
   }
 
@@ -67,8 +69,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             selectedProduct: userProvider.selectedProductName,
             onChanged: (newProduct) {
               if (userProvider.selectedProductName == newProduct) return;
+
               userProvider.setSelectedProductName(newProduct);
-              _fetchHistoryPredictions(true);
+              _fetchHistoryPredictions(true, forceRefresh: true);
             },
           ),
           FilterBar(
@@ -90,7 +93,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               }
 
               userProvider.setPredictionObjectFilter(filter);
-              _fetchHistoryPredictions(true);
+              _fetchHistoryPredictions(true, forceRefresh: true);
             },
           ),
           const BrandGradientLine(),
