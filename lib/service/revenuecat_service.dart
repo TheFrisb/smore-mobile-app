@@ -66,7 +66,7 @@ class RevenueCatService {
         apiKey = Constants.revenueCatGooglePublicKey;
         logger.i('Using Android API key');
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        apiKey = '<PLACEHOLDER>';
+        apiKey = Constants.revenueCatApplePublicKey;
         logger.i('Using iOS API key');
       } else {
         throw UnsupportedError('Platform not supported');
