@@ -314,12 +314,13 @@ class RevenueCatService {
   String _getProductId(Package package) {
     String storeProductId = package.storeProduct.identifier;
 
-    if (storeProductId.contains(':')) {
-      return storeProductId.split(':')[0];
+    if (storeProductId.startsWith("com.smore.")) {
+      storeProductId = storeProductId.replaceFirst("com.smore.", "");
+      return storeProductId.split('_').sublist(1).join('_');
     }
 
-    if (storeProductId.contains('_')) {
-      return storeProductId.split('_').sublist(1).join('_');
+    if (storeProductId.contains(':')) {
+      return storeProductId.split(':')[0];
     }
 
     return '';
