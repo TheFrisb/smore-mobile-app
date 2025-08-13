@@ -21,7 +21,7 @@ class SubscriptionOptionCard extends StatelessWidget {
 
   String get _subtitle {
     if (isYearly) {
-      return '12 mo ● \$${offeringPackage.storeProduct.priceString}';
+      return '12 mo ● ${offeringPackage.storeProduct.priceString}';
     } else {
       return 'Flexible monthly access';
     }
