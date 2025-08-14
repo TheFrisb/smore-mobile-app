@@ -117,6 +117,12 @@ class _UnlockButtonState extends State<UnlockButton> {
       await userProvider.getUserDetails();
 
       widget.onSuccess?.call();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                '[${purchaseResult.errorCode}] Purchase failed: ${purchaseResult.errorMessage}')),
+      );
     }
 
     setState(() {
