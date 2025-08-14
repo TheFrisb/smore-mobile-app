@@ -84,7 +84,7 @@ class SubscriptionOptionCard extends StatelessWidget {
                     ),
                   ),
                   child: isSelected
-                      ? Icon(
+                      ? const Icon(
                           Icons.check,
                           color: Colors.white,
                           size: 16,
@@ -169,9 +169,9 @@ class SubscriptionOptionCard extends StatelessWidget {
                       width: 1,
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Current Plan',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

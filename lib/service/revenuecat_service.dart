@@ -60,20 +60,26 @@ class RevenueCatService {
       // Set up logging for debugging
       Purchases.setLogLevel(LogLevel.debug);
 
-      // Initialize with platform-specific API key
-      String apiKey;
+      PurchasesConfiguration configuration;
       if (defaultTargetPlatform == TargetPlatform.android) {
-        apiKey = Constants.revenueCatGooglePublicKey;
+        configuration =
+            PurchasesConfiguration(Constants.revenueCatGooglePublicKey);
         logger.i('Using Android API key');
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        apiKey = Constants.revenueCatApplePublicKey;
+        configuration =
+            PurchasesConfiguration(Constants.revenueCatApplePublicKey)
+              ..storeKitVersion = StoreKitVersion.defaultVersion;
         logger.i('Using iOS API key');
       } else {
         throw UnsupportedError('Platform not supported');
       }
 
-      await Purchases.configure(PurchasesConfiguration(apiKey));
+      await Purchases.configure(configuration);
       Purchases.getCustomerInfo();
+
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        await Purchases.enableAdServicesAttributionTokenCollection();
+      }
 
       _isInitialized = true;
       logger.i('RevenueCat initialized successfully');

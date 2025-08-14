@@ -218,7 +218,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
-                        child: Container(
+                        child: SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: () {
@@ -272,7 +272,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
-                        child: Container(
+                        child: SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: () {

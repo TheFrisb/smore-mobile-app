@@ -6,7 +6,6 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../app_colors.dart';
 import '../../providers/user_provider.dart';
-import '../../screens/auth/login_screen.dart';
 import '../../screens/manage_plan_screen.dart';
 import '../../service/revenuecat_service.dart';
 import '../purchases/unlock_button.dart';

@@ -7,7 +7,6 @@ import 'package:smore_mobile_app/service/revenuecat_service.dart';
 
 import '../../app_colors.dart';
 import '../../providers/user_provider.dart';
-import '../../screens/auth/login_screen.dart';
 import '../../screens/manage_plan_screen.dart';
 import '../purchases/unlock_button.dart';
 
