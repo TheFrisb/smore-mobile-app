@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/constants/constants.dart';
 import 'package:smore_mobile_app/utils/revenuecat_error_handler.dart';
+import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 enum ConsumableIdentifiers {
   dailyOffer("daily_offer"),
@@ -69,8 +70,7 @@ class RevenueCatService {
         logger.i('Using Android API key');
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         configuration =
-            PurchasesConfiguration(Constants.revenueCatApplePublicKey)
-              ..storeKitVersion = StoreKitVersion.defaultVersion;
+            PurchasesConfiguration(Constants.revenueCatApplePublicKey);
         logger.i('Using iOS API key');
       } else {
         throw UnsupportedError('Platform not supported');
@@ -81,6 +81,17 @@ class RevenueCatService {
 
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         await Purchases.enableAdServicesAttributionTokenCollection();
+      }
+
+      try {
+        _logOfferings();
+        _logProducts();
+      } catch (e, stackTrace) {
+        logger.w(
+          'Failed to log offerings or products: $e',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
 
       _isInitialized = true;
@@ -94,6 +105,40 @@ class RevenueCatService {
       );
       _errorHandler.logError(error);
       rethrow;
+    }
+  }
+
+  void _logProducts() async {
+    List<StoreProduct> products = await Purchases.getProducts(
+      ConsumableIdentifiers.values.map((e) => e.value).toList(),
+    );
+
+    RevenueCatLogger().info(
+      'Available products: ${products.map((p) => p.identifier).join(', ')}',
+    );
+  }
+
+  void _logOfferings() async {
+    RevenueCatLogger rLogger = RevenueCatLogger();
+    Offerings? offerings = await Purchases.getOfferings();
+    if (offerings == null) {
+      rLogger.warning('No offerings available');
+    }
+
+    if (offerings.current == null) {
+      rLogger.warning('No current offerings available');
+    }
+
+    rLogger
+        .info('Current offerings: ${offerings.current?.identifier ?? 'None'}');
+
+    for (var offering in offerings.all.values) {
+      rLogger.info('Offering: ${offering.identifier}');
+      for (var package in offering.availablePackages) {
+        rLogger.info(
+          'Package: ${package.identifier}, Product: ${package.storeProduct.identifier}',
+        );
+      }
     }
   }
 
@@ -202,7 +247,7 @@ class RevenueCatService {
         operation: 'subscription_purchase',
       );
       _errorHandler.logError(error);
-      
+
       return ConsumablePurchaseResult(
         success: false,
         errorMessage: error.message,
@@ -260,7 +305,7 @@ class RevenueCatService {
         operation: 'consumable_purchase',
       );
       _errorHandler.logError(error);
-      
+
       return ConsumablePurchaseResult(
         success: false,
         errorMessage: error.message,

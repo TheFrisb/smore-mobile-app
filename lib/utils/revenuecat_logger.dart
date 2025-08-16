@@ -3,14 +3,14 @@ import 'package:logger/logger.dart';
 import '../service/dio_client.dart';
 
 /// Log levels for backend
-enum LogLevel {
+enum InternalLogLevel {
   info('INFO'),
   warning('WARNING'),
   error('ERROR');
 
   final String value;
 
-  const LogLevel(this.value);
+  const InternalLogLevel(this.value);
 }
 
 /// Internal logging class for RevenueCat errors
@@ -28,19 +28,19 @@ class RevenueCatLogger {
   /// Log info message
   void info(String message, {Map<String, dynamic>? additionalData}) {
     _consoleLogger.i(message);
-    _sendToBackend(message, LogLevel.info, additionalData);
+    _sendToBackend(message, InternalLogLevel.info, additionalData);
   }
 
   /// Log warning message
   void warning(String message, {Map<String, dynamic>? additionalData}) {
     _consoleLogger.w(message);
-    _sendToBackend(message, LogLevel.warning, additionalData);
+    _sendToBackend(message, InternalLogLevel.warning, additionalData);
   }
 
   /// Log error message
   void error(String message, {Map<String, dynamic>? additionalData}) {
     _consoleLogger.e(message);
-    _sendToBackend(message, LogLevel.error, additionalData);
+    _sendToBackend(message, InternalLogLevel.error, additionalData);
   }
 
   /// Log error with exception details
@@ -58,13 +58,13 @@ class RevenueCatLogger {
       if (stackTrace != null) 'stackTrace': stackTrace.toString(),
     };
 
-    _sendToBackend(message, LogLevel.error, enhancedData);
+    _sendToBackend(message, InternalLogLevel.error, enhancedData);
   }
 
   /// Send log to backend (non-blocking)
   void _sendToBackend(
     String message,
-    LogLevel level,
+    InternalLogLevel level,
     Map<String, dynamic>? additionalData,
   ) {
     // Don't await - fire and forget
