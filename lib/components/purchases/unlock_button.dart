@@ -6,6 +6,7 @@ import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import '../../app_colors.dart';
 import '../../providers/user_provider.dart';
 import '../../service/consumable_purchases_verifier.dart';
+import '../../utils/revenuecat_error_mixin.dart';
 
 class UnlockButton extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -25,7 +26,8 @@ class UnlockButton extends StatefulWidget {
   State<UnlockButton> createState() => _UnlockButtonState();
 }
 
-class _UnlockButtonState extends State<UnlockButton> {
+class _UnlockButtonState extends State<UnlockButton>
+    with RevenueCatErrorMixin {
   bool _isLoading = false;
 
   UserProvider get userProvider =>
@@ -106,27 +108,40 @@ class _UnlockButtonState extends State<UnlockButton> {
       _isLoading = true;
     });
 
-    ConsumablePurchaseResult purchaseResult = await RevenueCatService()
-        .purchaseConsumable(widget.consumableIdentifier);
+    try {
+      ConsumablePurchaseResult purchaseResult = await RevenueCatService()
+          .purchaseConsumable(widget.consumableIdentifier);
 
-    if (purchaseResult.success) {
-      await consumablePurchasesVerifier.verifyConsumablePurchase(
-          widget.consumableIdentifier,
-          purchaseResult.transactionId!,
-          widget.objectId);
-      await userProvider.getUserDetails();
+      if (purchaseResult.success) {
+        logInfo('Consumable purchase successful: ${widget.consumableIdentifier.value}');
+        
+        await consumablePurchasesVerifier.verifyConsumablePurchase(
+            widget.consumableIdentifier,
+            purchaseResult.transactionId!,
+            widget.objectId);
+        await userProvider.getUserDetails();
 
-      widget.onSuccess?.call();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                '[${purchaseResult.errorCode}] Purchase failed: ${purchaseResult.errorMessage}')),
+        showSuccessMessage('Purchase successful!');
+        widget.onSuccess?.call();
+      } else {
+        logError('Consumable purchase failed: ${purchaseResult.errorMessage}');
+        showErrorMessage('Purchase failed: ${purchaseResult.errorMessage}');
+        widget.onError?.call();
+      }
+    } catch (e, stackTrace) {
+      handleRevenueCatError(
+        e,
+        stackTrace,
+        productId: widget.consumableIdentifier.value,
+        operation: 'consumable_purchase',
+        onError: widget.onError,
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 }

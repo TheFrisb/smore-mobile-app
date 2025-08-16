@@ -3,13 +3,14 @@ import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:smore_mobile_app/models/product.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
+import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../components/purchases/subscription_button.dart';
 import '../components/purchases/subscription_option_card.dart';
-import '../models/product.dart';
-import '../providers/user_provider.dart';
 import '../service/dio_client.dart';
 
 class TabbedPlanView extends StatefulWidget {
@@ -22,6 +23,7 @@ class TabbedPlanView extends StatefulWidget {
 class _TabbedPlanViewState extends State<TabbedPlanView>
     with SingleTickerProviderStateMixin {
   static final Logger _logger = Logger();
+  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
 
   late TabController _tabController;
   bool _isLoading = true;
@@ -371,10 +373,29 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
                 TextButton(
                   onPressed: () async {
                     try {
+                      _revenueCatLogger.logRevenueCatInfo(
+                        operation: 'restore_purchases',
+                        infoMessage: 'User initiated purchase restoration',
+                      );
+
                       await Purchases.restorePurchases();
+
+                      _revenueCatLogger.logRevenueCatSuccess(
+                        operation: 'restore_purchases',
+                        additionalData: {'userInitiated': true},
+                      );
+
                       _logger.i('Purchases restored successfully');
-                    } catch (e) {
+                    } catch (e, stackTrace) {
                       _logger.e('Failed to restore purchases: $e');
+                      _revenueCatLogger.logRevenueCatError(
+                        operation: 'restore_purchases',
+                        errorType: 'RESTORE_PURCHASES_ERROR',
+                        errorMessage:
+                            'Failed to restore purchases: ${e.toString()}',
+                        originalError: e,
+                        stackTrace: stackTrace,
+                      );
                     }
                   },
                   child: Text(

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/constants/constants.dart';
+import 'package:smore_mobile_app/utils/revenuecat_error_handler.dart';
 
 enum ConsumableIdentifiers {
   dailyOffer("daily_offer"),
@@ -42,6 +43,7 @@ class RevenueCatService {
   RevenueCatService._internal();
 
   static final Logger logger = Logger();
+  final RevenueCatErrorHandler _errorHandler = RevenueCatErrorHandler();
 
   bool _isInitialized = false;
 
@@ -83,8 +85,14 @@ class RevenueCatService {
 
       _isInitialized = true;
       logger.i('RevenueCat initialized successfully');
-    } catch (e) {
-      logger.e('Failed to initialize RevenueCat: $e');
+      _errorHandler.logSuccess('initialization');
+    } catch (e, stackTrace) {
+      final error = _errorHandler.handlePurchaseError(
+        e,
+        stackTrace,
+        operation: 'initialization',
+      );
+      _errorHandler.logError(error);
       rethrow;
     }
   }
@@ -99,8 +107,14 @@ class RevenueCatService {
       logger.i('Setting RevenueCat user ID: $userId');
       await Purchases.logIn(userId.toString());
       logger.i('User ID set successfully');
-    } catch (e) {
-      logger.e('Failed to set user ID: $e');
+      _errorHandler.logSuccess('setUserId', productId: userId.toString());
+    } catch (e, stackTrace) {
+      final error = _errorHandler.handlePurchaseError(
+        e,
+        stackTrace,
+        operation: 'setUserId',
+      );
+      _errorHandler.logError(error);
       rethrow;
     }
   }
@@ -110,9 +124,15 @@ class RevenueCatService {
       logger.i('Fetching RevenueCat offerings...');
       final offerings = await Purchases.getOfferings();
       logger.i('Offerings fetched successfully');
+      _errorHandler.logSuccess('getOfferings');
       return offerings;
-    } catch (e) {
-      logger.e('Failed to get offerings: $e');
+    } catch (e, stackTrace) {
+      final error = _errorHandler.handlePurchaseError(
+        e,
+        stackTrace,
+        operation: 'getOfferings',
+      );
+      _errorHandler.logError(error);
       return null;
     }
   }
@@ -164,28 +184,29 @@ class RevenueCatService {
       logger
           .i('Subscription purchase successful for ID: ${package.identifier}');
 
+      _errorHandler.logSuccess(
+        'subscription_purchase',
+        productId: package.identifier,
+        transactionId: txnId,
+      );
+
       return ConsumablePurchaseResult(
         success: true,
         transactionId: txnId,
       );
-    } on PlatformException catch (e, st) {
-      final msg = e.message ?? 'Unknown platform error';
-      logger.e(
-          'Subscription purchase failed for ID: ${package.identifier}: $msg',
-          stackTrace: st,
-          error: e);
-      return ConsumablePurchaseResult(
-        success: false,
-        errorMessage: msg,
-        errorCode: e.code,
+    } catch (e, stackTrace) {
+      final error = _errorHandler.handlePurchaseError(
+        e,
+        stackTrace,
+        productId: package.identifier,
+        operation: 'subscription_purchase',
       );
-    } catch (e, st) {
-      final msg = e.toString();
-      logger.e('Unexpected error purchasing ${package.identifier}: $msg',
-          stackTrace: st, error: e);
+      _errorHandler.logError(error);
+      
       return ConsumablePurchaseResult(
         success: false,
-        errorMessage: msg,
+        errorMessage: error.message,
+        errorCode: error.errorCode,
       );
     }
   }
@@ -221,26 +242,29 @@ class RevenueCatService {
       final txnId = purchaseResult.storeTransaction.transactionIdentifier ?? '';
       logger.i('Consumable purchase successful for ID: ${consumableId.value}');
 
+      _errorHandler.logSuccess(
+        'consumable_purchase',
+        productId: consumableId.value,
+        transactionId: txnId,
+      );
+
       return ConsumablePurchaseResult(
         success: true,
         transactionId: txnId,
       );
-    } on PlatformException catch (e, st) {
-      final msg = e.message ?? 'Unknown platform error';
-      logger.e('Consumable purchase failed for ID: ${consumableId.value}: $msg',
-          stackTrace: st, error: e);
-      return ConsumablePurchaseResult(
-        success: false,
-        errorMessage: msg,
-        errorCode: e.code,
+    } catch (e, stackTrace) {
+      final error = _errorHandler.handlePurchaseError(
+        e,
+        stackTrace,
+        productId: consumableId.value,
+        operation: 'consumable_purchase',
       );
-    } catch (e, st) {
-      final msg = e.toString();
-      logger.e('Unexpected error purchasing ${consumableId.value}: $msg',
-          stackTrace: st, error: e);
+      _errorHandler.logError(error);
+      
       return ConsumablePurchaseResult(
         success: false,
-        errorMessage: msg,
+        errorMessage: error.message,
+        errorCode: error.errorCode,
       );
     }
   }

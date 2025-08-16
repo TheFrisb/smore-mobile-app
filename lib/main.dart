@@ -12,6 +12,7 @@ import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -20,13 +21,25 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
   Logger logger = Logger();
+  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
 
   // Initialize RevenueCat before running the app
   try {
     await RevenueCatService().initialize();
     logger.i('RevenueCat initialized successfully');
-  } catch (e) {
+    _revenueCatLogger.logRevenueCatSuccess(
+      operation: 'app_initialization',
+      additionalData: {'component': 'main.dart'},
+    );
+  } catch (e, stackTrace) {
     logger.e('Failed to initialize RevenueCat: $e');
+    _revenueCatLogger.logRevenueCatError(
+      operation: 'app_initialization',
+      errorType: 'INITIALIZATION_ERROR',
+      errorMessage: 'Failed to initialize RevenueCat: ${e.toString()}',
+      originalError: e,
+      stackTrace: stackTrace,
+    );
   }
 
   SystemChrome.setPreferredOrientations([
@@ -84,6 +97,17 @@ class _MyAppState extends State<MyApp> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.updateCustomerInfo();
       _logger.i('Customer info updated successfully in context');
+      
+      // Log the customer info update
+      final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+      _revenueCatLogger.logRevenueCatInfo(
+        operation: 'customer_info_listener',
+        infoMessage: 'Customer info updated via listener',
+        additionalData: {
+          'entitlementsCount': customerInfo.entitlements.active.length,
+          'activeEntitlements': customerInfo.entitlements.active.keys.toList(),
+        },
+      );
     });
   }
 

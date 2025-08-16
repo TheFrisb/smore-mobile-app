@@ -12,6 +12,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../models/sport/ticket.dart';
 import '../models/user.dart';
 import '../service/dio_client.dart';
+import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 enum PredictionObjectFilter {
   predictions,
@@ -22,6 +23,7 @@ class UserProvider with ChangeNotifier {
   final DioClient _dioClient = DioClient();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   static final Logger logger = Logger();
+  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
 
   User? _user;
   bool _isLoading = false;
@@ -49,10 +51,31 @@ class UserProvider with ChangeNotifier {
   updateCustomerInfo() async {
     try {
       logger.i('Updating customer info');
+      _revenueCatLogger.logRevenueCatInfo(
+        operation: 'update_customer_info',
+        infoMessage: 'Starting customer info update',
+      );
+
       _customerInfo = await Purchases.getCustomerInfo();
+
+      _revenueCatLogger.logRevenueCatSuccess(
+        operation: 'update_customer_info',
+        additionalData: {
+          'entitlementsCount': _customerInfo?.entitlements.active.length ?? 0,
+          'activeEntitlements': _customerInfo?.entitlements.active.keys.toList() ?? [],
+        },
+      );
+
       notifyListeners();
-    } catch (e) {
+    } catch (e, stackTrace) {
       logger.e('Error updating customer info: $e');
+      _revenueCatLogger.logRevenueCatError(
+        operation: 'update_customer_info',
+        errorType: 'CUSTOMER_INFO_ERROR',
+        errorMessage: 'Failed to update customer info: ${e.toString()}',
+        originalError: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
