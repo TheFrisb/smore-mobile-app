@@ -3,7 +3,7 @@ class Constants {
 
   // static const String staticFilesBaseUrl = 'http://10.0.2.2:8000/static';
   static const String revenueCatGooglePublicKey =
-      'goog_kgByyfnMJEZRMzWIFAQXEzaaPJf';
+      'goog_kgByyfnMJEZRMzW IFAQXEzaaPJf';
   static const String revenueCatApplePublicKey =
       'appl_LyITJSFVjuIlbiRuXGHJPOZsBWE';
   static const String staticFilesBaseUrl = 'https://smoreltd.com/static';
