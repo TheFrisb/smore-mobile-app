@@ -21,8 +21,11 @@ class SubscriptionOptionCard extends StatelessWidget {
 
   String get _subtitle {
     if (isYearly) {
+      final currency = offeringPackage.storeProduct.priceString
+          .replaceAll(RegExp(r'[\d.,]'), '')
+          .trim();
       final monthlyPrice = offeringPackage.storeProduct.price / 12;
-      return '${monthlyPrice.toStringAsFixed(2)}/mo';
+      return '${currency}${monthlyPrice.toStringAsFixed(2)}/mo';
     } else {
       return 'Flexible monthly access';
     }
@@ -119,9 +122,9 @@ class SubscriptionOptionCard extends StatelessWidget {
                 ),
                 // Price
                 Text(
-                  isYearly 
-                    ? '\$${offeringPackage.storeProduct.price.toStringAsFixed(2)}/year'
-                    : '\$${_getMonthlyPrice().toStringAsFixed(2)}/mo',
+                  isYearly
+                      ? '\$${offeringPackage.storeProduct.price.toStringAsFixed(2)}/year'
+                      : '\$${_getMonthlyPrice().toStringAsFixed(2)}/mo',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
