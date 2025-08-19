@@ -414,7 +414,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
                     );
                   },
                   child: Text(
-                    'Terms',
+                    'Terms of Use',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[400],
@@ -430,7 +430,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
                     );
                   },
                   child: Text(
-                    'Privacy',
+                    'Privacy Policy',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[400],
