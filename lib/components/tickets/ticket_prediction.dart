@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
 import 'package:smore_mobile_app/models/product.dart';
@@ -30,12 +31,12 @@ class TicketPrediction extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(children: [
-            _buildTopRow(context, canViewTicket),
-            const SizedBox(height: 24),
             if (ticket.status == TicketStatus.PENDING) ...[
               _buildTicketLabel(context),
               const SizedBox(height: 24),
             ],
+            _buildTopRow(context, canViewTicket),
+            const SizedBox(height: 24),
             const BrandGradientLine(),
             const SizedBox(height: 24),
             if (canViewTicket)
@@ -184,9 +185,9 @@ class TicketPrediction extends StatelessWidget {
         // Connecting line (only if not the last bet line)
         if (hasConnectingLine)
           Positioned(
-            left: 15,
-            top: 16,
-            bottom: 16,
+            left: 11,
+            top: 24,
+            bottom: 0,
             child: Container(
               width: 2,
               decoration: BoxDecoration(
@@ -202,21 +203,29 @@ class TicketPrediction extends StatelessWidget {
             children: [
               // Status Icon with background
               Container(
-                width: 32,
-                height: 32,
+                width: 24,
+                height: 24,
                 decoration: BoxDecoration(
-                  color: const Color(0xff0B1F31),
-                  borderRadius: BorderRadius.circular(16),
+                  color: status == 'PENDING'
+                      ? const Color(0xFF0D151E)
+                          .withOpacity(0.5) // Faint blue background for pending
+                      : const Color(0xff0B1F31),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _getStatusColor(status),
+                    color: status == 'PENDING'
+                        ? Theme.of(context)
+                            .primaryColor // Blue border for pending (matches card border)
+                        : _getStatusColor(status),
                     width: 2,
                   ),
                 ),
-                child: Icon(
-                  _getStatusIcon(status),
-                  color: _getStatusColor(status),
-                  size: 16,
-                ),
+                child: status == 'PENDING'
+                    ? null // No icon for pending
+                    : Icon(
+                        _getStatusIcon(status),
+                        color: _getStatusColor(status),
+                        size: 12,
+                      ),
               ),
               const SizedBox(width: 16),
               // Bet Details
@@ -492,7 +501,7 @@ class TicketPrediction extends StatelessWidget {
         return Colors.red.withOpacity(0.3);
       case 'PENDING':
       default:
-        return const Color(0xFFdbe4ed).withOpacity(0.3);
+        return AppColors.secondary.shade400.withOpacity(0.3);
     }
   }
 }

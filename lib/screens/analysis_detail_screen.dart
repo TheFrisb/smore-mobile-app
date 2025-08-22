@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/match_prediction/prediction_text.dart';
 import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
+import 'package:smore_mobile_app/components/match_prediction/stake_display.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
 import '../app_colors.dart';
@@ -73,24 +74,27 @@ class AnalysisDetailScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        textAlign: TextAlign.center,
-                        prediction.match.kickoffDateTime
-                            .toLocal()
-                            .toString()
-                            .substring(0, 16),
-                        style: TextStyle(
-                          color: Colors.grey.shade400,
-                          fontSize: 10,
+                      if (prediction.status == PredictionStatus.PENDING)
+                        Text(
+                          textAlign: TextAlign.center,
+                          prediction.match.kickoffDateTime
+                              .toLocal()
+                              .toString()
+                              .substring(0, 16),
+                          style: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 10,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
+                      if (prediction.status == PredictionStatus.PENDING)
+                        const SizedBox(height: 24),
                       PredictionVsRow(
                         prediction: prediction,
                         teamFontSize: 14,
                         teamLogoHeight: 64,
                         vsImageHeight: 32,
                       ),
+
                     ],
                   ),
                 ),
@@ -105,14 +109,19 @@ class AnalysisDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Match Analysis",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  if (prediction.stake > 0.00)
+                    Center(
+                      child: StakeDisplay(stake: prediction.stake),
+                    )
+                  else
+                    Text(
+                      "Match Analysis",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 16),
                   const BrandGradientLine(),
                   const SizedBox(height: 16),

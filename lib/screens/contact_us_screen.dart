@@ -32,6 +32,12 @@ class ContactUsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ContactOption(
+            icon: FontAwesomeIcons.telegram,
+            title: "Contact us on Telegram",
+            onTap: () => _launchUrl("https://t.me/smoreinfo"),
+          ),
+          const SizedBox(height: 16),
+          ContactOption(
             icon: Icons.email_outlined,
             title: "Send us an email",
             onTap: () => _launchUrl("mailto:smore1x2@gmail.com"),

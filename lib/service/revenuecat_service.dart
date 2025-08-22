@@ -1,6 +1,5 @@
 // service/revenue_cat_service.dart
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/constants/constants.dart';
@@ -184,7 +183,7 @@ class RevenueCatService {
 
   Future<Offering?> getOffering(String offeringId) async {
     final offerings = await getOfferings();
-    if (offerings == null || offerings.current == null) {
+    if (offerings == null) {
       logger.e('No offerings available');
       return null;
     }
@@ -201,7 +200,7 @@ class RevenueCatService {
   Future<Package?> getConsumablePackage(
       ConsumableIdentifiers consumableId) async {
     final offerings = await getOfferings();
-    if (offerings == null || offerings.current == null) {
+    if (offerings == null) {
       logger.e('No offerings available');
       return null;
     }
@@ -261,7 +260,7 @@ class RevenueCatService {
     logger.i('Initiating consumable purchase for ID: ${consumableId.value}');
 
     final offerings = await getOfferings();
-    if (offerings == null || offerings.current == null) {
+    if (offerings == null) {
       const msg = 'No offerings available';
       logger.e(msg);
       return ConsumablePurchaseResult(success: false, errorMessage: msg);

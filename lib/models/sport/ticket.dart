@@ -11,6 +11,7 @@ class Ticket {
   final String label;
   final double totalOdds;
   final List<BetLine> betLines;
+  final double? stake; // Nullable stake field
 
   Ticket({
     required this.id,
@@ -20,6 +21,7 @@ class Ticket {
     required this.label,
     required this.totalOdds,
     required this.betLines,
+    required this.stake,
   });
 
   @override
@@ -32,15 +34,19 @@ class Ticket {
     try {
       return Ticket(
         id: json['id'],
-        status: TicketStatus.values
-            .firstWhere((e) => e.toString() == 'TicketStatus.${json['status']}'),
+        status: TicketStatus.values.firstWhere(
+            (e) => e.toString() == 'TicketStatus.${json['status']}'),
         product: Product.fromJson(json['product']),
         startsAt: DateTime.parse(json['starts_at']),
-        label: json['label'] ?? '', // Provide default empty string if label is missing
+        label: json['label'] ?? '',
+        // Provide default empty string if label is missing
         totalOdds: double.parse(json['total_odds'].toString()),
         betLines: (json['bet_lines'] as List)
             .map((betLine) => BetLine.fromJson(betLine))
             .toList(),
+        stake: json['stake'] != null
+            ? double.parse(json['stake'].toString())
+            : null,
       );
     } catch (e) {
       print('Error parsing Ticket JSON: $e');

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
+import 'package:smore_mobile_app/screens/wrappers/authenticated_user_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -15,7 +18,23 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const BrandLogo(),
+      title: GestureDetector(
+        onTap: () {
+          // Reset filters to ALL
+          final userProvider = Provider.of<UserProvider>(context, listen: false);
+          userProvider.setSelectedProductName(null); // ALL sport types
+          userProvider.setPredictionObjectFilter(null); // ALL object types
+          
+          // Navigate to the authenticated user screen (which shows home screen at index 0)
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const AuthenticatedUserScreen(),
+            ),
+            (route) => false,
+          );
+        },
+        child: const BrandLogo(),
+      ),
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(FontAwesomeIcons.telegram,

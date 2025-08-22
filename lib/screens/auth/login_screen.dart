@@ -59,8 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: const TitleAppBar(title: 'Login'),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Main scrollable content
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -79,6 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Username Field
                         TextFormField(
                           controller: _usernameController,
+                          textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xFF15212E),
@@ -206,49 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                         ),
 
-                        // Sign in with google
-                        // const SizedBox(height: 20),
-                        // FilledButton(
-                        //   onPressed: provider.isLoading ? null : _submitForm,
-                        //   style: ElevatedButton.styleFrom(
-                        //     side: BorderSide(
-                        //       color: Theme.of(context).primaryColor.withOpacity(0.5),
-                        //       width: 1,
-                        //     ),
-                        //     padding: const EdgeInsets.symmetric(
-                        //         horizontal: 16, vertical: 16),
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(10),
-                        //     ),
-                        //     backgroundColor: const Color(0xFF14202D),
-                        //   ),
-                        //   child: Stack(
-                        //     children: [
-                        //       // Center the text in the button
-                        //       const Center(
-                        //         child: Text(
-                        //           'Sign in with Google',
-                        //           style: TextStyle(
-                        //             fontSize: 16,
-                        //             fontWeight: FontWeight.bold,
-                        //             color: Colors.white,
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       // Align the image to the left, vertically centered
-                        //       Align(
-                        //         alignment: Alignment.centerLeft,
-                        //         child: Image.asset(
-                        //           'assets/google_logo.png',
-                        //           width: 24,
-                        //           height: 24,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // End sign in with google
-
                         const SizedBox(height: 20),
 
                         // Register Button
@@ -270,13 +228,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
+                        
+                        // Add extra space at bottom to ensure content doesn't get hidden by keyboard
+                        const SizedBox(height: 100),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-            Padding(
+            
+            // Continue as guest button - fixed at bottom
+            Container(
               padding: const EdgeInsets.only(
                   top: 16.0, bottom: 24.0, left: 24.0, right: 24.0),
               child: SizedBox(

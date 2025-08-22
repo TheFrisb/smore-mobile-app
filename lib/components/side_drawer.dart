@@ -43,7 +43,7 @@ class SideDrawer extends StatelessWidget {
         children: <Widget>[
           // User info section
           Padding(
-            padding: const EdgeInsets.fromLTRB(28, 48, 28, 20),
+            padding: const EdgeInsets.fromLTRB(28, 80, 28, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

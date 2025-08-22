@@ -1,1 +1,2 @@
-1. Show active price for buy prediction
+1. logoto da se proba kak izglede so krugceto
+6. Da se dodade stake na analizata i ka ke klikne da izleva objasnenieto so e stake i kolko e stake-o

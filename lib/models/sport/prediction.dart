@@ -12,6 +12,7 @@ class Prediction {
   final double odds;
   final String result;
   final Product product;
+  final double stake;
 
   Prediction({
     required this.id,
@@ -22,6 +23,7 @@ class Prediction {
     required this.odds,
     required this.result,
     required this.product,
+    required this.stake,
   });
 
   bool get hasDetailedAnalysis => detailedAnalysis.isNotEmpty;
@@ -38,6 +40,7 @@ class Prediction {
       odds: double.parse(json['odds'].toString()),
       result: json['result'],
       product: Product.fromJson(json['product']),
+      stake: double.parse(json['stake']?.toString() ?? '0.0'),
     );
   }
 

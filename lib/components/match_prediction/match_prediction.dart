@@ -92,40 +92,42 @@ class MatchPrediction extends StatelessWidget {
                   const SizedBox(height: 12),
                   const BrandGradientLine(),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Builder(
-                        builder: (context) {
-                          final userProvider =
-                              Provider.of<UserProvider>(context);
-                          return RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "Date, Time: ",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontSize: 12,
+                  if (prediction.status == PredictionStatus.PENDING)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final userProvider =
+                                Provider.of<UserProvider>(context);
+                            return RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Date, Time: ",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                TextSpan(
-                                  text: userProvider
-                                      .formatDateTimeForDetailedDisplay(
-                                          prediction.match.kickoffDateTime),
-                                  style: TextStyle(
-                                    color: Colors.grey.shade100,
-                                    fontSize: 12,
+                                  TextSpan(
+                                    text: userProvider
+                                        .formatDateTimeForDetailedDisplay(
+                                            prediction.match.kickoffDateTime),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade100,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  if (prediction.status == PredictionStatus.PENDING)
+                    const SizedBox(height: 12),
                   PredictionVsRow(prediction: prediction),
                   if (userProvider.canViewPrediction(prediction)) _buildOdds()
                 ],
