@@ -35,7 +35,7 @@ class BillingToggle extends StatelessWidget {
           thumbColor: WidgetStateProperty.all(AppColors.secondary),
           value: isYearly,
           onChanged: onChanged,
-          activeColor: Colors.blue,
+          activeThumbColor: Colors.blue,
         ),
         const SizedBox(width: 8),
         Text(

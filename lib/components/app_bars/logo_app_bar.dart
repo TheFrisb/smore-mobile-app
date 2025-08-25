@@ -16,8 +16,8 @@ class LogoAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Function(int)? onNavigateToIndex;
 
   const LogoAppBar({
-    super.key, 
-    this.showGradient = false, 
+    super.key,
+    this.showGradient = false,
     this.currentScreenIndex,
     this.onNavigateToIndex,
   });
@@ -58,10 +58,8 @@ class _LogoAppBarState extends State<LogoAppBar>
     logger.i("Logo tapped");
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    // Check if we're on the predictions screen (index 0) with no filters
-    if (widget.currentScreenIndex == 0 &&
-        userProvider.selectedProductName == null &&
-        userProvider.predictionObjectFilter == null) {
+    // If we're already on the predictions screen (index 0), just shake the logo
+    if (widget.currentScreenIndex == 0) {
       logger.i("Already on predictions screen, shaking logo");
       _shakeController.forward().then((_) {
         _shakeController.reverse();
@@ -73,7 +71,8 @@ class _LogoAppBarState extends State<LogoAppBar>
     }
 
     logger.i("Navigating to predictions screen");
-    logger.d("Current screen index: ${widget.currentScreenIndex}, Filters - Product: ${userProvider.selectedProductName}, Filter: ${userProvider.predictionObjectFilter}");
+    logger.d(
+        "Current screen index: ${widget.currentScreenIndex}, Filters - Product: ${userProvider.selectedProductName}, Filter: ${userProvider.predictionObjectFilter}");
 
     userProvider.setSelectedProductName(null); // ALL sport types
     userProvider.setPredictionObjectFilter(null); // ALL object types

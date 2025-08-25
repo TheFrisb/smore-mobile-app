@@ -91,12 +91,12 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog>
             width: 400,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1e2f42),
-                  const Color(0xFF0D151E),
+                  Color(0xFF1e2f42),
+                  Color(0xFF0D151E),
                 ],
               ),
               border: Border.all(

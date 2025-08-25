@@ -55,15 +55,11 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
       }
 
       _logger.i('Authenticating with Google');
-      final GoogleSignInAccount? user = await signIn.authenticate();
-      if (user == null) {
-        _logger.i('Google Sign-In cancelled by user');
-        return;
-      }
+      final GoogleSignInAccount user = await signIn.authenticate();
 
       _logger.i('Google authentication successful for user: ${user.email}');
       _logger.i('Getting ID token');
-      final GoogleSignInAuthentication auth = await user.authentication;
+      final GoogleSignInAuthentication auth = user.authentication;
       final String? idToken = auth.idToken;
 
       if (idToken == null) {

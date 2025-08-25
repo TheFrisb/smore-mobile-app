@@ -98,12 +98,12 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
             height: 600,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1e2f42),
-                  const Color(0xFF0D151E),
+                  Color(0xFF1e2f42),
+                  Color(0xFF0D151E),
                 ],
               ),
               border: Border.all(
@@ -195,10 +195,10 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [
-                          const Color(0xFF1a2a3a),
-                          const Color(0xFF223548),
+                          Color(0xFF1a2a3a),
+                          Color(0xFF223548),
                         ],
                       ),
                       border: Border.all(
@@ -289,20 +289,20 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                       ),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             LucideIcons.clock9,
                             size: 16,
-                            color: const Color(0xFF0BA5EC),
+                            color: Color(0xFF0BA5EC),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Current Timezone',
                                   style: TextStyle(
-                                    color: const Color(0xFF0BA5EC),
+                                    color: Color(0xFF0BA5EC),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.5,

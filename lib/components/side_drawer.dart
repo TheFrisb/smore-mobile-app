@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/screens/contact_us_screen.dart';
 import 'package:smore_mobile_app/screens/faq_screen.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 import '../providers/user_provider.dart';
 import '../screens/manage_plan_screen.dart';

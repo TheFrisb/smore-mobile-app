@@ -129,10 +129,10 @@ class StakeDisplay extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             'Your Smartest Betting Strategy!',
                             style: TextStyle(
                               color: Color(0xFF00DEA2),
@@ -142,10 +142,10 @@ class StakeDisplay extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Icon(
                             LucideIcons.target,
-                            color: const Color(0xFF00DEA2),
+                            color: Color(0xFF00DEA2),
                             size: 20,
                           ),
                         ],

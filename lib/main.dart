@@ -21,19 +21,19 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
   Logger logger = Logger();
-  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+  final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
 
   // Initialize RevenueCat before running the app
   try {
     await RevenueCatService().initialize();
     logger.i('RevenueCat initialized successfully');
-    _revenueCatLogger.logRevenueCatSuccess(
+    revenueCatLogger.logRevenueCatSuccess(
       operation: 'app_initialization',
       additionalData: {'component': 'main.dart'},
     );
   } catch (e, stackTrace) {
     logger.e('Failed to initialize RevenueCat: $e');
-    _revenueCatLogger.logRevenueCatError(
+    revenueCatLogger.logRevenueCatError(
       operation: 'app_initialization',
       errorType: 'INITIALIZATION_ERROR',
       errorMessage: 'Failed to initialize RevenueCat: ${e.toString()}',
@@ -99,8 +99,8 @@ class _MyAppState extends State<MyApp> {
       _logger.i('Customer info updated successfully in context');
       
       // Log the customer info update
-      final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
-      _revenueCatLogger.logRevenueCatInfo(
+      final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
+      revenueCatLogger.logRevenueCatInfo(
         operation: 'customer_info_listener',
         infoMessage: 'Customer info updated via listener',
         additionalData: {

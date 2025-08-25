@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'revenuecat_logger.dart';
 import 'revenuecat_error_mixin.dart';
 
 /// Example widget demonstrating the new RevenueCat logging system
@@ -50,8 +49,8 @@ class _LoggingExampleWidgetState extends State<LoggingExampleWidget>
             const SizedBox(height: 16),
             
             // Information card
-            Card(
-              child: const Padding(
+            const Card(
+              child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

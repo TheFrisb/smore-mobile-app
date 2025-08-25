@@ -25,7 +25,7 @@ class SubscriptionOptionCard extends StatelessWidget {
           .replaceAll(RegExp(r'[\d.,]'), '')
           .trim();
       final monthlyPrice = offeringPackage.storeProduct.price / 12;
-      return '${currency}${monthlyPrice.toStringAsFixed(2)}/mo';
+      return '$currency${monthlyPrice.toStringAsFixed(2)}/mo';
     } else {
       return 'Flexible monthly access';
     }

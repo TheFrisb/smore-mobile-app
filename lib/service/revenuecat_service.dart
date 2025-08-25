@@ -120,9 +120,6 @@ class RevenueCatService {
   void _logOfferings() async {
     RevenueCatLogger rLogger = RevenueCatLogger();
     Offerings? offerings = await Purchases.getOfferings();
-    if (offerings == null) {
-      rLogger.warning('No offerings available');
-    }
 
     if (offerings.current == null) {
       rLogger.warning('No current offerings available');
