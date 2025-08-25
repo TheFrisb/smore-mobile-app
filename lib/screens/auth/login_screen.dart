@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/app_bars/title_app_bar.dart';
+import 'package:smore_mobile_app/components/auth/google_sign_in_button.dart';
+import 'package:smore_mobile_app/components/auth/apple_sign_in_button.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/auth/register_screen.dart';
@@ -208,6 +210,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
 
                         const SizedBox(height: 20),
+                        const GoogleSignInButton(),
+                        const SizedBox(height: 20),
+                        const AppleSignInButton(),
+                        const SizedBox(height: 20),
 
                         // Register Button
                         Row(
@@ -228,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        
+
                         // Add extra space at bottom to ensure content doesn't get hidden by keyboard
                         const SizedBox(height: 100),
                       ],
@@ -237,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            
+
             // Continue as guest button - fixed at bottom
             Container(
               padding: const EdgeInsets.only(

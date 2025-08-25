@@ -14,7 +14,9 @@ import 'base/base_app_bar_screen.dart';
 import 'manage_plan_screen.dart';
 
 class AiChatScreen extends StatefulWidget {
-  const AiChatScreen({super.key});
+  final Function(int)? onNavigateToIndex;
+  
+  const AiChatScreen({super.key, this.onNavigateToIndex});
 
   @override
   _AiChatScreenState createState() => _AiChatScreenState();
@@ -189,6 +191,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
       padding: const EdgeInsets.all(0),
       backgroundColor: const Color(0xFF0D151E),
       body: _buildChatInterface(),
+      currentScreenIndex: 2,
+      onNavigateToIndex: widget.onNavigateToIndex,
     );
   }
 

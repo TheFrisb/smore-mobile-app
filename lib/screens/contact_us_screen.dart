@@ -34,7 +34,7 @@ class ContactUsScreen extends StatelessWidget {
           ContactOption(
             icon: FontAwesomeIcons.telegram,
             title: "Contact us on Telegram",
-            onTap: () => _launchUrl("https://t.me/smoreinfo"),
+            onTap: () => _launchUrl("https://t.me/smoreltd"),
           ),
           const SizedBox(height: 16),
           ContactOption(

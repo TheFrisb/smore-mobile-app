@@ -7,12 +7,12 @@ import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
+import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/sport/ticket.dart';
 import '../models/user.dart';
 import '../service/dio_client.dart';
-import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 enum PredictionObjectFilter {
   predictions,
@@ -62,7 +62,8 @@ class UserProvider with ChangeNotifier {
         operation: 'update_customer_info',
         additionalData: {
           'entitlementsCount': _customerInfo?.entitlements.active.length ?? 0,
-          'activeEntitlements': _customerInfo?.entitlements.active.keys.toList() ?? [],
+          'activeEntitlements':
+              _customerInfo?.entitlements.active.keys.toList() ?? [],
         },
       );
 
@@ -196,6 +197,82 @@ class UserProvider with ChangeNotifier {
         logger.e('Error logging in user: $e');
         throw _handleDioError(e);
       }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> signInWithGoogle(String idToken) async {
+    logger.i('Signing in with Google');
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response =
+          await _dioClient.dio.post('/auth/google-receiver/', data: {
+        'credentials': idToken,
+      });
+
+      await _storage.write(key: 'accessToken', value: response.data['access']);
+      await _storage.write(
+          key: 'refreshToken', value: response.data['refresh']);
+      await getUserDetails();
+      await _setInitialTimezone();
+
+      RevenueCatService().setUserId(_user!.id);
+    } on DioException catch (e) {
+      int? statusCode = e.response?.statusCode;
+      logger.e('Google sign in error: $statusCode');
+
+      if (statusCode == 401) {
+        logger.e('Invalid Google credentials');
+        throw 'Invalid Google credentials';
+      } else {
+        logger.e('Error signing in with Google: $e');
+        throw _handleDioError(e);
+      }
+    } catch (e) {
+      logger.e('Error during Google sign in: $e');
+      throw e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> signInWithApple(String idToken) async {
+    logger.i('Signing in with Apple');
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response =
+          await _dioClient.dio.post('/auth/apple-receiver/', data: {
+        'credentials': idToken,
+      });
+
+      await _storage.write(key: 'accessToken', value: response.data['access']);
+      await _storage.write(
+          key: 'refreshToken', value: response.data['refresh']);
+      await getUserDetails();
+      await _setInitialTimezone();
+
+      RevenueCatService().setUserId(_user!.id);
+    } on DioException catch (e) {
+      int? statusCode = e.response?.statusCode;
+      logger.e('Apple sign in error: $statusCode');
+
+      if (statusCode == 401) {
+        logger.e('Invalid Apple credentials');
+        throw 'Invalid Apple credentials';
+      } else {
+        logger.e('Error signing in with Apple: $e');
+        throw _handleDioError(e);
+      }
+    } catch (e) {
+      logger.e('Error during Apple sign in: $e');
+      throw e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();

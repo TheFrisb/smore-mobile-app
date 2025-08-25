@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
-import 'package:smore_mobile_app/components/app_bars/default_app_bar.dart';
+import 'package:smore_mobile_app/components/app_bars/logo_app_bar.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/filter_bar.dart';
 import 'package:smore_mobile_app/components/side_drawer.dart';
@@ -12,7 +12,9 @@ import '../components/match_prediction/predictions_list.dart';
 import '../components/match_prediction/sport_dropdown.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int)? onNavigateToIndex;
+  
+  const HomeScreen({super.key, this.onNavigateToIndex});
 
   static final Logger logger = Logger();
 
@@ -60,7 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: const Color(0xFF1e2f42),
-      appBar: const DefaultAppBar(),
+      appBar: LogoAppBar(
+        currentScreenIndex: 0,
+        onNavigateToIndex: widget.onNavigateToIndex,
+      ),
       body: Column(
         children: [
           SportSelectorBar(

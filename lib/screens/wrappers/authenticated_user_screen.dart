@@ -21,52 +21,52 @@ class AuthenticatedUserScreen extends StatefulWidget {
 class _AuthenticatedUserScreenState extends State<AuthenticatedUserScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const HistoryScreen(),
-    const AiChatScreen(),
-  ];
+  void _changeScreenIndex(int index) {
+    if (_currentIndex == 2 && index != 2) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+    final userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    final upcomingPredictionsProvider =
+        Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+    final historyPredictionsProvider =
+        Provider.of<HistoryPredictionsProvider>(context, listen: false);
+
+    final selectedProduct = userProvider.selectedProductName;
+    final selectedPredictionObjectFilter =
+        userProvider.predictionObjectFilter;
+
+    if (index == 0) {
+      upcomingPredictionsProvider.fetchUpcomingPredictions(
+          updateIsLoading: false);
+    }
+
+    if (index == 1) {
+      historyPredictionsProvider.fetchPaginatedHistoryPredictions(
+        selectedProduct,
+        selectedPredictionObjectFilter,
+        updateIsLoading: true,
+        forceRefresh: true,
+      );
+    }
+
+    setState(() => _currentIndex = index);
+  }
 
   @override
   build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: [
+          HomeScreen(onNavigateToIndex: _changeScreenIndex),
+          HistoryScreen(onNavigateToIndex: _changeScreenIndex),
+          AiChatScreen(onNavigateToIndex: _changeScreenIndex),
+        ],
       ),
       bottomNavigationBar: DefaultBottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          if (_currentIndex == 2 && index != 2) {
-            FocusManager.instance.primaryFocus?.unfocus();
-          }
-          final userProvider =
-              Provider.of<UserProvider>(context, listen: false);
-          final upcomingPredictionsProvider =
-              Provider.of<UpcomingPredictionsProvider>(context, listen: false);
-          final historyPredictionsProvider =
-              Provider.of<HistoryPredictionsProvider>(context, listen: false);
-
-          final selectedProduct = userProvider.selectedProductName;
-          final selectedPredictionObjectFilter =
-              userProvider.predictionObjectFilter;
-
-          if (index == 0) {
-            upcomingPredictionsProvider.fetchUpcomingPredictions(
-                updateIsLoading: false);
-          }
-
-          if (index == 1) {
-            historyPredictionsProvider.fetchPaginatedHistoryPredictions(
-              selectedProduct,
-              selectedPredictionObjectFilter,
-              updateIsLoading: true,
-              forceRefresh: true,
-            );
-          }
-
-          setState(() => _currentIndex = index);
-        },
+        onTap: _changeScreenIndex,
       ),
     );
   }

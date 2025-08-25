@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/products/product_display_name.dart';
 import 'package:smore_mobile_app/screens/base/base_back_button_screen.dart';
 
+import '../components/delete_account_dialog.dart';
 import '../models/product.dart';
 import '../models/user.dart';
 import '../models/user_subscription.dart';
@@ -370,108 +371,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                             onPressed: () async {
                               final confirmed = await showDialog<bool>(
                                 context: context,
-                                builder: (context) => Dialog(
-                                  backgroundColor:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                        color: Theme.of(context).primaryColor,
-                                        width: 1),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(24.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(LucideIcons.triangleAlert,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .error,
-                                            size: 48),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'Delete Account',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          'Are you sure you want to delete your account? This action cannot be undone.',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 24),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Expanded(
-                                              child: OutlinedButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context)
-                                                        .pop(false),
-                                                style: OutlinedButton.styleFrom(
-                                                  foregroundColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  side: BorderSide(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .primary),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                ),
-                                                child: const Text('Cancel'),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context)
-                                                        .pop(true),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.red,
-                                                  foregroundColor: Colors.white,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                ),
-                                                child: const Text('Delete',
-                                                    style: TextStyle(
-                                                        color: Colors.white)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                builder: (context) => const DeleteAccountDialog(),
                               );
                               if (confirmed == true) {
                                 try {

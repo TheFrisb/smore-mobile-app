@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../providers/user_provider.dart';
 import '../screens/manage_plan_screen.dart';
 import '../screens/my_account_screen.dart';
+import 'timezone_picker_dialog.dart';
 
 class DrawerDestinationLink {
   const DrawerDestinationLink(this.label, this.icon, this.destination);
@@ -136,7 +137,7 @@ class SideDrawer extends StatelessWidget {
               onTap: () async {
                 final selected = await showDialog<String>(
                   context: context,
-                  builder: (context) => _TimezonePickerDialog(
+                  builder: (context) => TimezonePickerDialog(
                     initialValue: context.read<UserProvider>().userTimezone,
                   ),
                 );
@@ -144,7 +145,14 @@ class SideDrawer extends StatelessWidget {
                   // Update provider
                   await context.read<UserProvider>().setUserTimezone(selected);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Timezone changed to $selected')),
+                    SnackBar(
+                      content: Text('Timezone changed to $selected'),
+                      backgroundColor: const Color(0xFF0BA5EC),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   );
                 }
               },
@@ -254,156 +262,4 @@ class SlideFadePageRoute<T> extends PageRouteBuilder<T> {
         );
 }
 
-// Timezone picker dialog
-class _TimezonePickerDialog extends StatefulWidget {
-  final String? initialValue;
 
-  const _TimezonePickerDialog({this.initialValue});
-
-  @override
-  State<_TimezonePickerDialog> createState() => _TimezonePickerDialogState();
-}
-
-class _TimezonePickerDialogState extends State<_TimezonePickerDialog> {
-  late List<String> _allTimezones;
-  late List<String> _filteredTimezones;
-  String? _selected;
-  String _search = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _allTimezones = tz.timeZoneDatabase.locations.keys.toList()..sort();
-    _filteredTimezones = _allTimezones;
-    // Use initialValue if set, otherwise use device timezone
-    _selected = widget.initialValue ?? tz.local.name;
-  }
-
-  void _onSearchChanged(String value) {
-    setState(() {
-      _search = value;
-      _filteredTimezones = _allTimezones
-          .where((tz) => tz.toLowerCase().contains(_search.toLowerCase()))
-          .toList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        width: 370,
-        height: 520,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: theme.dialogBackgroundColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              decoration: BoxDecoration(
-                color: theme.primaryColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: const Text(
-                'Select Timezone',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: TextField(
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Search Timezone',
-                  prefixIcon: const Icon(LucideIcons.search),
-                  filled: true,
-                  fillColor: theme.cardColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                ),
-                onChanged: _onSearchChanged,
-              ),
-            ),
-            Expanded(
-              child: _filteredTimezones.isEmpty
-                  ? const Center(child: Text('No results'))
-                  : ListView.builder(
-                      itemCount: _filteredTimezones.length,
-                      itemBuilder: (context, i) {
-                        final tzName = _filteredTimezones[i];
-                        final isSelected = tzName == _selected;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          child: Card(
-                            color: isSelected
-                                ? theme.primaryColor.withOpacity(0.15)
-                                : theme.cardColor,
-                            elevation: isSelected ? 2 : 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: isSelected
-                                  ? BorderSide(
-                                      color: theme.primaryColor, width: 2)
-                                  : const BorderSide(
-                                      color: Colors.transparent, width: 1),
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                tzName,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? theme.primaryColor
-                                      : theme.textTheme.bodyLarge?.color,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                ),
-                              ),
-                              trailing: isSelected
-                                  ? Icon(LucideIcons.check,
-                                      color: theme.primaryColor)
-                                  : null,
-                              onTap: () {
-                                setState(() => _selected = tzName);
-                                Navigator.of(context).pop(tzName);
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: TextButton.styleFrom(
-                  foregroundColor: theme.primaryColor,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text('Cancel'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
