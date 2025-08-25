@@ -94,7 +94,7 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
         child: Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
-            width: 400,
+            width: 500,
             height: 600,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
@@ -130,7 +130,8 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
               children: [
                 // Header
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(24),
@@ -148,41 +149,25 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           LucideIcons.clock9,
                           color: Colors.white,
-                          size: 24,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Select Timezone',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Choose your local timezone',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(width: 12),
+                      const Text(
+                        'Select Timezone',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
@@ -191,10 +176,10 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
 
                 // Search field
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                       gradient: const LinearGradient(
                         colors: [
                           Color(0xFF1a2a3a),
@@ -218,39 +203,39 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                       autofocus: true,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Search timezone...',
                         hintStyle: TextStyle(
                           color: Colors.white.withOpacity(0.4),
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
                         prefixIcon: Container(
-                          margin: const EdgeInsets.all(12),
-                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: const Color(0xFF0BA5EC).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Icon(
                             LucideIcons.search,
                             color: Color(0xFF0BA5EC),
-                            size: 20,
+                            size: 16,
                           ),
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
                             color: const Color(0xFF0BA5EC).withOpacity(0.5),
                             width: 2,
@@ -259,8 +244,8 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                         filled: true,
                         fillColor: Colors.transparent,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
+                          horizontal: 12,
+                          vertical: 12,
                         ),
                       ),
                       onChanged: _onSearchChanged,
@@ -271,90 +256,27 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                 // Current timezone display
                 if (widget.initialValue != null)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [
-                            const Color(0xFF0BA5EC).withOpacity(0.1),
-                            const Color(0xFF0BA5EC).withOpacity(0.05),
-                          ],
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.clock9,
+                          size: 14,
+                          color: Color(0xFF0BA5EC),
                         ),
-                        border: Border.all(
-                          color: const Color(0xFF0BA5EC).withOpacity(0.3),
-                          width: 1,
+                        const SizedBox(width: 8),
+                        Text(
+                          'Current: ${_getTimezoneDisplayName(widget.initialValue!)}',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            LucideIcons.clock9,
-                            size: 16,
-                            color: Color(0xFF0BA5EC),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Current Timezone',
-                                  style: TextStyle(
-                                    color: Color(0xFF0BA5EC),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _getTimezoneDisplayName(widget.initialValue!),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  widget.initialValue!,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.6),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
-
-                // Results count
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Icon(
-                        LucideIcons.list,
-                        size: 16,
-                        color: Colors.white.withOpacity(0.6),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${_filteredTimezones.length} timezone${_filteredTimezones.length == 1 ? '' : 's'} found',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
                 const SizedBox(height: 12),
 
@@ -413,6 +335,7 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                                     borderRadius: BorderRadius.circular(12),
                                     onTap: () {
                                       setState(() => _selected = tzName);
+                                      Navigator.of(context).pop(tzName);
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
@@ -424,8 +347,10 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                                         gradient: isSelected
                                             ? LinearGradient(
                                                 colors: [
-                                                  const Color(0xFF0BA5EC).withOpacity(0.2),
-                                                  const Color(0xFF0BA5EC).withOpacity(0.1),
+                                                  const Color(0xFF0BA5EC)
+                                                      .withOpacity(0.2),
+                                                  const Color(0xFF0BA5EC)
+                                                      .withOpacity(0.1),
                                                 ],
                                               )
                                             : null,
@@ -446,27 +371,33 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                                             decoration: BoxDecoration(
                                               color: isSelected
                                                   ? const Color(0xFF0BA5EC)
-                                                  : Colors.white.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(8),
+                                                  : Colors.white
+                                                      .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             child: Icon(
                                               LucideIcons.clock9,
                                               size: 16,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : Colors.white.withOpacity(0.6),
+                                                  : Colors.white
+                                                      .withOpacity(0.6),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  _getTimezoneDisplayName(tzName),
+                                                  _getTimezoneDisplayName(
+                                                      tzName),
                                                   style: TextStyle(
                                                     color: isSelected
-                                                        ? const Color(0xFF0BA5EC)
+                                                        ? const Color(
+                                                            0xFF0BA5EC)
                                                         : Colors.white,
                                                     fontSize: 16,
                                                     fontWeight: isSelected
@@ -478,7 +409,8 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                                                 Text(
                                                   tzName,
                                                   style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.5),
+                                                    color: Colors.white
+                                                        .withOpacity(0.5),
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w400,
                                                   ),
@@ -491,7 +423,8 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                                               padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF0BA5EC),
-                                                borderRadius: BorderRadius.circular(6),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
                                               ),
                                               child: const Icon(
                                                 LucideIcons.check,
@@ -507,65 +440,6 @@ class _TimezonePickerDialogState extends State<TimezonePickerDialog>
                               );
                             },
                           ),
-                  ),
-                ),
-
-                // Bottom actions
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white.withOpacity(0.7),
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1.5,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _selected != null
-                              ? () => Navigator.of(context).pop(_selected)
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _selected != null
-                                ? const Color(0xFF0BA5EC)
-                                : const Color(0xFF0BA5EC).withOpacity(0.3),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            _selected != null ? 'Confirm' : 'Select a timezone',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: _selected != null ? Colors.white : Colors.white.withOpacity(0.7),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],

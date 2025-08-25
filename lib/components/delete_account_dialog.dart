@@ -125,7 +125,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog>
                 // Header
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(24),
@@ -154,202 +154,190 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog>
                               0,
                             ),
                             child: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
                                 LucideIcons.trash2,
                                 color: Colors.white,
-                                size: 24,
+                                size: 20,
                               ),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Delete Account',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'This action cannot be undone',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(width: 12),
+                      const Text(
+                        'Delete Account',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // Content
-                Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    children: [
-                      // Warning icon
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
-                            width: 1,
+                // Scrollable Content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        // Warning icon
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.red.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            LucideIcons.triangleAlert,
+                            size: 48,
+                            color: Colors.red.shade400,
                           ),
                         ),
-                        child: Icon(
-                          LucideIcons.triangleAlert,
-                          size: 48,
-                          color: Colors.red.shade400,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                      // Warning text
-                      const Text(
-                        'Are you absolutely sure?',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        // Warning text
+                        const Text(
+                          'Are you absolutely sure?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // Description
-                      Text(
-                        'This will permanently delete your account and all associated data. This action cannot be undone.',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 16,
-                          height: 1.5,
+                        // Description
+                        Text(
+                          'This will permanently delete your account and all associated data. This action cannot be undone.',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                      // Warning list
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.red.withOpacity(0.2),
-                            width: 1,
+                        // Warning list
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.red.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              _buildWarningItem(
+                                LucideIcons.circleX,
+                                'All your data will be permanently deleted',
+                              ),
+                              const SizedBox(height: 8),
+                              _buildWarningItem(
+                                LucideIcons.circleX,
+                                'Your subscription will be cancelled',
+                              ),
+                              const SizedBox(height: 8),
+                              _buildWarningItem(
+                                LucideIcons.circleX,
+                                'You will lose access to all features',
+                              ),
+                            ],
                           ),
                         ),
-                        child: Column(
+                        const SizedBox(height: 32),
+
+                        // Action buttons
+                        Column(
                           children: [
-                            _buildWarningItem(
-                              LucideIcons.circleX,
-                              'All your data will be permanently deleted',
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: _isDeleting
+                                    ? null
+                                    : () => Navigator.of(context).pop(false),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white.withOpacity(0.7),
+                                  side: BorderSide(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 1.5,
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            _buildWarningItem(
-                              LucideIcons.circleX,
-                              'Your subscription will be cancelled',
-                            ),
-                            const SizedBox(height: 8),
-                            _buildWarningItem(
-                              LucideIcons.circleX,
-                              'You will lose access to all features',
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _isDeleting
+                                    ? null
+                                    : () {
+                                        setState(() => _isDeleting = true);
+                                        _triggerShake();
+                                        Navigator.of(context).pop(true);
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: _isDeleting
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Delete Account',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Action buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: _isDeleting
-                                  ? null
-                                  : () => Navigator.of(context).pop(false),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white.withOpacity(0.7),
-                                side: BorderSide(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 1.5,
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _isDeleting
-                                  ? null
-                                  : () {
-                                      setState(() => _isDeleting = true);
-                                      _triggerShake();
-                                      Navigator.of(context).pop(true);
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade600,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: _isDeleting
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                      ),
-                                    )
-                                  : const Text(
-                                      'Delete Account',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

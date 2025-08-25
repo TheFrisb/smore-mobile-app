@@ -151,11 +151,11 @@ class _LogoAppBarState extends State<LogoAppBar>
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),
               child: CircleAvatar(
-                radius: 16,
+                radius: 18,
                 backgroundColor: Color(0xB50D151E),
                 child: Icon(
                   LucideIcons.user,
-                  size: 18,
+                  size: 22,
                   color: Color(0xFFB7C9DB),
                 ),
               ),
