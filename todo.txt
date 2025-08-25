@@ -1,3 +1,4 @@
-3. Pokazuvi live statuse u app
-
-Client ID: 960380879898-8rao54v668hd0ga1rce43ee0dqlcenev.apps.googleusercontent.com
+1. Pokazi live status
+2. Sredi apple sign in
+3. Sredi notifikacii
+--
