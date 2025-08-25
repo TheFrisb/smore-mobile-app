@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:smore_mobile_app/constants/constants.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 
@@ -66,9 +66,10 @@ class _AppleSignInButtonState extends State<AppleSignInButton> {
         return;
       }
 
-      _logger.i('Apple authentication successful for user: ${credential.userIdentifier}');
+      _logger.i(
+          'Apple authentication successful for user: ${credential.userIdentifier}');
       _logger.i('Getting ID token');
-      
+
       final String? idToken = credential.identityToken;
       if (idToken == null) {
         _logger.e('Failed to get ID token');

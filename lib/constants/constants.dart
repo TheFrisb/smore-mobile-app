@@ -19,5 +19,6 @@ class Constants {
   // Apple Sign-In Configuration
   static const String appleSignInClientId = 'com.smoreltd.smore';
   static const String appleSignInRedirectUri =
-      'https://magical-rat-merely.ngrok-free.app/api/auth/apple-receiver/';
+      'https://smoreltd.com/api/auth/apple-receiver/';
+  static const String appleSignInCallbackScheme = 'signinwithapple';
 }
