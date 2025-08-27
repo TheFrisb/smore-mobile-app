@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:smore_mobile_app/app_colors.dart';
 
 class NotificationItem extends StatelessWidget {
   final String icon;
@@ -22,20 +22,20 @@ class NotificationItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
-        color: isRead 
-            ? const Color(0xFF1A2330).withOpacity(0.4)
-            : const Color(0xFF1A2330),
+        color: isRead
+            ? AppColors.secondary.shade400.withOpacity(0.1)
+            : AppColors.secondary.shade600.withOpacity(0.5),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isRead 
-              ? const Color(0xFF2A3B4D).withOpacity(0.2)
-              : const Color(0xFF2A3B4D),
+          color: isRead
+              ? AppColors.secondary.shade600.withOpacity(0.5)
+              : AppColors.secondary.shade600.withOpacity(1),
           width: 0.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -55,10 +55,10 @@ class NotificationItem extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0D151E),
+                    color: AppColors.primary.shade900,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFF2A3B4D),
+                      color: AppColors.primary.shade600.withOpacity(0.3),
                       width: 0.5,
                     ),
                   ),
@@ -78,9 +78,9 @@ class NotificationItem extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          color: isRead 
-                              ? const Color(0xFFB7C9DB).withOpacity(0.7)
-                              : const Color(0xFFB7C9DB),
+                          color: isRead
+                              ? const Color(0xFFE2E8F0).withOpacity(0.8)
+                              : const Color(0xFFF8FAFC),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
@@ -91,7 +91,9 @@ class NotificationItem extends StatelessWidget {
                         Text(
                           description!,
                           style: TextStyle(
-                            color: const Color(0xFF8A9BAE).withOpacity(0.7),
+                            color: isRead
+                                ? const Color(0xFFCBD5E1).withOpacity(0.8)
+                                : const Color(0xFFE2E8F0),
                             fontSize: 11,
                             height: 1.3,
                             letterSpacing: 0.2,

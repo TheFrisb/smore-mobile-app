@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -28,8 +29,12 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     try {
       _logger.i('Initializing Google Sign-In');
       final GoogleSignIn signIn = GoogleSignIn.instance;
+      final clientId = Platform.isIOS
+          ? Constants.googleSignInIosClientId
+          : Constants.googleSignInAndroidClientId;
+
       await signIn.initialize(
-        clientId: Constants.googleSignInClientId,
+        clientId: clientId,
         serverClientId: Constants.googleSignInServerClientId,
       );
       _logger.i('Google Sign-In initialized successfully');
