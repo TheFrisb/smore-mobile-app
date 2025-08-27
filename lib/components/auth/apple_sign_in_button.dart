@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:smore_mobile_app/constants/constants.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
+
+import '../../constants/constants.dart';
 
 class AppleSignInButton extends StatefulWidget {
   const AppleSignInButton({super.key});
