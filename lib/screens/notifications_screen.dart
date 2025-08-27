@@ -124,9 +124,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   LucideIcons.bell,
-                  color: const Color(0xFFB7C9DB),
+                  color: Color(0xFFB7C9DB),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -228,7 +228,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 isRead: notification['isRead'],
                 onTap: () => _onNotificationTap(index),
               );
-            }).toList(),
+            }),
           ],
         );
       },

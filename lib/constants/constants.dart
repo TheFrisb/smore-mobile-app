@@ -22,5 +22,4 @@ class Constants {
   static const String appleSignInClientId = 'com.smoreltd.smore';
   static const String appleSignInRedirectUri =
       'https://smoreltd.com/api/auth/apple-receiver/';
-  static const String appleSignInCallbackScheme = 'signinwithapple';
 }

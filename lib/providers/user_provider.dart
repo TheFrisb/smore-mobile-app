@@ -249,7 +249,7 @@ class UserProvider with ChangeNotifier {
     try {
       final response =
           await _dioClient.dio.post('/auth/apple-receiver/', data: {
-        'credentials': idToken,
+        'id_token': idToken, // Changed from 'credentials'
       });
 
       await _storage.write(key: 'accessToken', value: response.data['access']);

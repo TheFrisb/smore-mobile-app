@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform; // Add this for platform check
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -51,21 +52,34 @@ class _AppleSignInButtonState extends State<AppleSignInButton> {
       }
 
       _logger.i('Authenticating with Apple');
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-        webAuthenticationOptions: WebAuthenticationOptions(
-          clientId: Constants.appleSignInClientId,
-          redirectUri: Uri.parse(Constants.appleSignInRedirectUri),
-        ),
-      );
-
-      if (credential.userIdentifier == null) {
-        _logger.i('Apple Sign-In cancelled by user');
-        return;
+      final AuthorizationCredentialAppleID credential;
+      if (Platform.isIOS) {
+        // Native flow for iOS
+        credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+      } else {
+        // Web flow for Android
+        credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          webAuthenticationOptions: WebAuthenticationOptions(
+            clientId: Constants.appleSignInClientId,
+            redirectUri: Uri.parse(Constants.appleSignInRedirectUri),
+          ),
+        );
       }
+      _logger.i(credential);
+
+      // if (credential.userIdentifier == null) {
+      //   _logger.i('Apple Sign-In cancelled by user');
+      //   return;
+      // }
 
       _logger.i(
           'Apple authentication successful for user: ${credential.userIdentifier}');
