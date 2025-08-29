@@ -36,7 +36,7 @@ class TicketPrediction extends StatelessWidget {
               _buildTicketLabel(context),
               const SizedBox(height: 24),
             ],
-            TicketHeader(ticket: ticket),
+            TicketHeader(ticket: ticket, canViewTicket: canViewTicket),
             const SizedBox(height: 24),
             const BrandGradientLine(),
             const SizedBox(height: 24),

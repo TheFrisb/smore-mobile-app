@@ -5,14 +5,20 @@ import 'package:smore_mobile_app/models/sport/ticket.dart';
 
 class TicketHeader extends StatelessWidget {
   final Ticket ticket;
+  final bool canViewTicket;
 
-  const TicketHeader({super.key, required this.ticket});
+  const TicketHeader({
+    super.key, 
+    required this.ticket,
+    required this.canViewTicket,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isPendingWithStake = ticket.status == TicketStatus.PENDING && ticket.stake > 0;
+    final shouldShowStakeAndOdds = canViewTicket && isPendingWithStake;
 
-    if (isPendingWithStake) {
+    if (shouldShowStakeAndOdds) {
       // Product name centered, stake and total odds below
       return Column(
         children: [
@@ -72,7 +78,7 @@ class TicketHeader extends StatelessWidget {
         ],
       );
     } else {
-      // Original layout
+      // Original layout - only show product name and total odds if can view ticket
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -93,26 +99,27 @@ class TicketHeader extends StatelessWidget {
               ),
             ],
           ),
-          // Total odds
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                'Total Odds',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor.withOpacity(0.5),
+          // Total odds - only show if can view ticket
+          if (canViewTicket)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Total Odds',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor.withOpacity(0.5),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                ticket.totalOdds.toStringAsFixed(2),
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 5),
+                Text(
+                  ticket.totalOdds.toStringAsFixed(2),
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       );
     }
