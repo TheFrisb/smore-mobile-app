@@ -8,8 +8,6 @@
 
 
 
-1. Pass FCM token wherever suitable
-2. Subscribe to topic wherever suitable
 3. Notification provider
 - Fetch all notifications
 - Show all notifications
