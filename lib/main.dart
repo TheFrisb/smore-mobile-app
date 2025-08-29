@@ -10,6 +10,7 @@ import 'package:smore_mobile_app/firebase_options.dart';
 import 'package:smore_mobile_app/providers/history_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
+import 'package:smore_mobile_app/providers/user_notification_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
 import 'package:smore_mobile_app/service/firebase/firebase_messaging_service.dart';
 import 'package:smore_mobile_app/service/firebase/local_notifications_service.dart';
@@ -64,6 +65,7 @@ void main() async {
             ChangeNotifierProvider(
                 create: (_) => UpcomingPredictionsProvider()),
             ChangeNotifierProvider(create: (_) => HistoryPredictionsProvider()),
+            ChangeNotifierProvider(create: (_) => UserNotificationProvider()),
           ],
           child: const MyApp(),
         ),

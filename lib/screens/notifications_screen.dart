@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/notification_item.dart';
+import 'package:smore_mobile_app/providers/user_notification_provider.dart';
 
 import '../app_colors.dart';
+import '../models/user_notification.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -14,80 +16,16 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<Map<String, dynamic>> _notifications = [
-    // August 25, 2024
-    {
-      'icon': '🌟',
-      'title': 'Good Morning, SMORE Fam!',
-      'description':
-          "It's a brand-new day, and we're all set to chase down one more winning day! 💪🔥",
-      'isRead': false,
-      'date': '2024-08-25',
-    },
-    {
-      'icon': '💵',
-      'title': "Don't miss out!",
-      'description':
-          'Single picks & parlays on sale for 9.99\$ each. Unlock daily selection for 24.99\$ or Premium Channel for 69.99\$/month.',
-      'isRead': false,
-      'date': '2024-08-25',
-    },
-    {
-      'icon': '⚽️',
-      'title': '🇩🇪 Germany: Super Cup',
-      'description':
-          'Stuttgart vs. Bayern Munich - Over 0.5 (1st Half) & Over 2.5 Goals @ 1.47',
-      'isRead': false,
-      'date': '2024-08-25',
-    },
-    {
-      'icon': '🎉',
-      'title': 'Parlay 1 win',
-      'description': 'Congratulations! Your 3-leg parlay hit!',
-      'isRead': true,
-      'date': '2024-08-25',
-    },
-    {
-      'icon': '🏀',
-      'title': '🇺🇸 NBA: Lakers vs. Warriors',
-      'description': 'Lakers -5.5 @ 1.85 - Final Score: 112-105 ✅',
-      'isRead': true,
-      'date': '2024-08-25',
-    },
-
-    // August 24, 2024
-    {
-      'icon': '⚽️',
-      'title': '🇪🇸 La Liga: Real Madrid',
-      'description': 'Real Madrid -1.5 @ 1.65 - Final Score: 3-1 ✅',
-      'isRead': true,
-      'date': '2024-08-24',
-    },
-    {
-      'icon': '🎯',
-      'title': 'Premium Channel Update',
-      'description':
-          'New risk management protocols available in Premium Channel',
-      'isRead': true,
-      'date': '2024-08-24',
-    },
-
-    // August 20, 2024
-    {
-      'icon': '📊',
-      'title': 'Weekly Stats Report',
-      'description': 'Your week: 12 wins, 3 losses (80% accuracy)',
-      'isRead': true,
-      'date': '2024-08-20',
-    },
-    {
-      'icon': '🔔',
-      'title': 'New Feature Available',
-      'description': 'Live bet tracking now available in the app',
-      'isRead': true,
-      'date': '2024-08-20',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the notification provider when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider =
+          Provider.of<UserNotificationProvider>(context, listen: false);
+      provider.initialize();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,100 +55,209 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           child: BrandGradientLine(),
         ),
       ),
-      body: Column(
-        children: [
-          // Header with notification count
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Row(
-              children: [
-                const Icon(
-                  LucideIcons.bell,
-                  color: Color(0xFFB7C9DB),
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${_notifications.where((n) => !n['isRead']).length} unread',
-                  style: const TextStyle(
-                    color: Color(0xFF8A9BAE),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: _markAllAsRead,
-                  child: const Text(
-                    'Mark all as read',
+      body: Consumer<UserNotificationProvider>(
+        builder: (context, notificationProvider, child) {
+          if (notificationProvider.isLoading &&
+              notificationProvider.notifications.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF00D4AA),
+              ),
+            );
+          }
+
+          if (notificationProvider.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Error loading notifications',
                     style: TextStyle(
-                      color: Color(0xFF00D4AA),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      color: AppColors.secondary.shade400,
+                      fontSize: 16,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => notificationProvider.refresh(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              // Header with notification count
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  children: [
+                    const Icon(
+                      LucideIcons.bell,
+                      color: Color(0xFFB7C9DB),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${notificationProvider.unreadCount} unread',
+                      style: const TextStyle(
+                        color: Color(0xFF8A9BAE),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const Spacer(),
+                    Visibility(
+                      visible: notificationProvider.unreadCount > 0,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: TextButton(
+                        onPressed: () =>
+                            notificationProvider.markAllNotificationsAsRead(),
+                        child: const Text(
+                          'Mark all as read',
+                          style: TextStyle(
+                            color: Color(0xFF00D4AA),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          // Notifications list
-          Expanded(
-            child: _buildNotificationsList(),
-          ),
-        ],
+              ),
+              // Notifications list
+              Expanded(
+                child: _buildNotificationsList(notificationProvider),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  void _onNotificationTap(int index) {
-    setState(() {
-      _notifications[index]['isRead'] = true;
-    });
-
-    // Here you could add navigation logic based on notification type
-    // For now, just mark as read
+  void _onNotificationTap(UserNotification notification) {
+    // Mark notification as read
+    final provider =
+        Provider.of<UserNotificationProvider>(context, listen: false);
+    provider.markNotificationAsRead(notification.id);
   }
 
-  void _markAllAsRead() {
-    setState(() {
-      for (var notification in _notifications) {
-        notification['isRead'] = true;
-      }
-    });
-  }
-
-  Widget _buildNotificationsList() {
-    // Group notifications by date
-    final Map<String, List<Map<String, dynamic>>> groupedNotifications = {};
-
-    for (var notification in _notifications) {
-      final date = notification['date'] as String;
-      if (!groupedNotifications.containsKey(date)) {
-        groupedNotifications[date] = [];
-      }
-      groupedNotifications[date]!.add(notification);
+  Widget _buildNotificationsList(
+      UserNotificationProvider notificationProvider) {
+    if (notificationProvider.notifications.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Bell icon with subtle styling
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF15212E),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(
+                    color: const Color(0xFF2D4763).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  LucideIcons.bell,
+                  size: 36,
+                  color: Color(0xFF8A9BAE),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Main message
+              const Text(
+                'All caught up!',
+                style: TextStyle(
+                  color: Color(0xFFB7C9DB),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              // Subtitle
+              const Text(
+                'You have no new notifications at the moment. We\'ll notify you when there\'s something important!',
+                style: TextStyle(
+                  color: Color(0xFF8A9BAE),
+                  fontSize: 14,
+                  height: 1.4,
+                  letterSpacing: 0.2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              // Optional: Add a refresh button
+              OutlinedButton.icon(
+                onPressed: () => notificationProvider.refresh(),
+                icon: const Icon(
+                  LucideIcons.refreshCw,
+                  size: 16,
+                  color: Color(0xFF00D4AA),
+                ),
+                label: const Text(
+                  'Refresh',
+                  style: TextStyle(
+                    color: Color(0xFF00D4AA),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(
+                    color: Color(0xFF00D4AA),
+                    width: 1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
-    // Sort dates in descending order (most recent first)
-    final sortedDates = groupedNotifications.keys.toList()
-      ..sort((a, b) => b.compareTo(a));
+    return RefreshIndicator(
+      onRefresh: () => notificationProvider.refresh(),
+      color: const Color(0xFF00D4AA),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: notificationProvider.sortedDateKeys.length,
+        itemBuilder: (context, dateIndex) {
+          final dateKey = notificationProvider.sortedDateKeys[dateIndex];
+          final notificationsForDate =
+              notificationProvider.getNotificationsForDate(dateKey);
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: sortedDates.length,
-      itemBuilder: (context, dateIndex) {
-        final date = sortedDates[dateIndex];
-        final notificationsForDate = groupedNotifications[date]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Date header
-            Padding(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Date header
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Center(
                   child: Text(
-                    _formatDate(date),
+                    notificationProvider.getDisplayDate(dateKey),
                     style: TextStyle(
                       color: AppColors.secondary.shade400,
                       fontSize: 12,
@@ -218,37 +265,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                )),
-            // Notifications for this date
-            ...notificationsForDate.map((notification) {
-              final index = _notifications.indexOf(notification);
-              return NotificationItem(
-                icon: notification['icon'],
-                title: notification['title'],
-                description: notification['description'],
-                isRead: notification['isRead'],
-                onTap: () => _onNotificationTap(index),
-              );
-            }),
-          ],
-        );
-      },
+                ),
+              ),
+              // Notifications for this date
+              ...notificationsForDate.map((notification) {
+                return NotificationItem(
+                  icon: notificationProvider.getNotificationIcon(notification),
+                  title: notification.title,
+                  description: notification.message,
+                  isRead: notification.isRead,
+                  onTap: () => _onNotificationTap(notification),
+                );
+              }),
+            ],
+          );
+        },
+      ),
     );
-  }
-
-  String _formatDate(String dateString) {
-    final date = DateTime.parse(dateString);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final notificationDate = DateTime(date.year, date.month, date.day);
-
-    if (notificationDate == today) {
-      return 'Today';
-    } else if (notificationDate == yesterday) {
-      return 'Yesterday';
-    } else {
-      return DateFormat('d MMMM').format(date);
-    }
   }
 }

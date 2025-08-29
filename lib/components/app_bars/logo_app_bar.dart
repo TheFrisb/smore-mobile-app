@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
+import 'package:smore_mobile_app/providers/user_notification_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/authenticated_user_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -141,76 +142,94 @@ class _LogoAppBarState extends State<LogoAppBar>
         ),
       ),
       actions: [
-        // Bell icon for notifications with count badge
-        Container(
-          alignment: Alignment.center,
-          child: InkResponse(
-            onTap: () {
-              logger.i("Bell icon tapped, navigating to notifications");
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsScreen(),
+        // Bell icon for notifications with count badge (only for authenticated users)
+        Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            if (!userProvider.isAuthenticated) {
+              return const SizedBox.shrink();
+            }
+            
+            return Container(
+              alignment: Alignment.center,
+              child: InkResponse(
+                onTap: () {
+                  logger.i("Bell icon tapped, navigating to notifications");
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationsScreen(),
+                    ),
+                  );
+                  logger.d("Navigated to notifications screen");
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Color(0xB50D151E),
+                        child: Icon(
+                          LucideIcons.bell,
+                          size: 20,
+                          color: Color(0xFFB7C9DB),
+                        ),
+                      ),
+                      // Notification count badge
+                      Consumer<UserNotificationProvider>(
+                        builder: (context, notificationProvider, child) {
+                          final unreadCount = notificationProvider.unreadCount;
+                          
+                          if (unreadCount == 0) {
+                            return const SizedBox.shrink();
+                          }
+                          
+                          return Positioned(
+                            top: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00D4AA),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: const Color(0xFF0D151E),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 3,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                  style: const TextStyle(
+                                    color: Color(0xFF0D151E),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              );
-              logger.d("Navigated to notifications screen");
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Color(0xB50D151E),
-                    child: Icon(
-                      LucideIcons.bell,
-                      size: 20,
-                      color: Color(0xFFB7C9DB),
-                    ),
-                  ),
-                  // Notification count badge
-                  Positioned(
-                    top: -2,
-                    right: -2,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00D4AA),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: const Color(0xFF0D151E),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 3,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '3',
-                          style: TextStyle(
-                            color: Color(0xFF0D151E),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
-            ),
-          ),
+            );
+          },
         ),
         // Avatar icon on right with InkResponse
         Container(
