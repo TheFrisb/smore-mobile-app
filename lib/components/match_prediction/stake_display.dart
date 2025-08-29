@@ -5,43 +5,59 @@ import '../../app_colors.dart';
 
 class StakeDisplay extends StatelessWidget {
   final double stake;
+  final double fontSize;
+  final bool displayIcon;
 
-  const StakeDisplay({super.key, required this.stake});
+  const StakeDisplay({
+    super.key,
+    required this.stake,
+    this.fontSize = 16,
+    this.displayIcon = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final stakeText = RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: 'Stake: ',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextSpan(
+            text: '${stake.toStringAsFixed(0)}%',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: fontSize,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!displayIcon) {
+      return GestureDetector(
+        onTap: () => _showStakeInfoModal(context),
+        child: stakeText,
+      );
+    }
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'Stake: ',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(
-                text: '${stake.toStringAsFixed(0)}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
+        stakeText,
+        const SizedBox(width: 6),
         GestureDetector(
           onTap: () => _showStakeInfoModal(context),
           child: Icon(
             LucideIcons.info,
             color: AppColors.secondary.shade400,
-            size: 16,
+            size: fontSize,
           ),
         ),
       ],
@@ -85,75 +101,75 @@ class StakeDisplay extends StatelessWidget {
                 const SizedBox(height: 32),
 
                 // Enhanced Title with gradient background
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.secondary.shade400.withOpacity(0.1),
-                        AppColors.secondary.shade400.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.secondary.shade400.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.shade400.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          LucideIcons.trophy,
-                          color: AppColors.secondary.shade400,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Introducing STAKE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Your Smartest Betting Strategy!',
-                            style: TextStyle(
-                              color: Color(0xFF00DEA2),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(width: 8),
-                          Icon(
-                            LucideIcons.target,
-                            color: Color(0xFF00DEA2),
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
+                // Container(
+                //   width: double.infinity,
+                //   padding: const EdgeInsets.all(20),
+                //   decoration: BoxDecoration(
+                //     gradient: LinearGradient(
+                //       colors: [
+                //         AppColors.secondary.shade400.withOpacity(0.1),
+                //         AppColors.secondary.shade400.withOpacity(0.05),
+                //       ],
+                //       begin: Alignment.topLeft,
+                //       end: Alignment.bottomRight,
+                //     ),
+                //     borderRadius: BorderRadius.circular(16),
+                //     border: Border.all(
+                //       color: AppColors.secondary.shade400.withOpacity(0.2),
+                //     ),
+                //   ),
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     children: [
+                //       Container(
+                //         padding: const EdgeInsets.all(12),
+                //         decoration: BoxDecoration(
+                //           color: AppColors.secondary.shade400.withOpacity(0.2),
+                //           borderRadius: BorderRadius.circular(12),
+                //         ),
+                //         child: Icon(
+                //           LucideIcons.trophy,
+                //           color: AppColors.secondary.shade400,
+                //           size: 28,
+                //         ),
+                //       ),
+                //       const SizedBox(height: 16),
+                //       const Text(
+                //         'Introducing STAKE',
+                //         style: TextStyle(
+                //           color: Colors.white,
+                //           fontSize: 24,
+                //           fontWeight: FontWeight.bold,
+                //           letterSpacing: 1.2,
+                //         ),
+                //         textAlign: TextAlign.center,
+                //       ),
+                //       const SizedBox(height: 8),
+                //       const Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           Text(
+                //             'Your Smartest Betting Strategy!',
+                //             style: TextStyle(
+                //               color: Color(0xFF00DEA2),
+                //               fontSize: 16,
+                //               fontWeight: FontWeight.w600,
+                //               letterSpacing: 0.5,
+                //             ),
+                //             textAlign: TextAlign.center,
+                //           ),
+                //           SizedBox(width: 8),
+                //           Icon(
+                //             LucideIcons.target,
+                //             color: Color(0xFF00DEA2),
+                //             size: 20,
+                //           ),
+                //         ],
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 32),
 
                 // What is Stake section
                 _buildSectionHeader(
@@ -171,7 +187,7 @@ class StakeDisplay extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'In SMORE, Stake refers to the amount of money you invest in a particular bet based on your total betting budget. Instead of betting randomly, we recommend a strategic percentage of your bankroll to help you manage risk and maximize long-term success 📈',
+                    'In SMORE, Stake refers to the amount of money you invest in a particular bet based on your total betting budget. Instead of betting randomly, we recommend a strategic percentage of your bankroll to help you manage risk and maximize long-term success.',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -221,7 +237,7 @@ class StakeDisplay extends StatelessWidget {
                   context: context,
                   title: '💎 Conservative Betting',
                   description:
-                      '• You have a bankroll of €1,000.\n• We recommend a ${stake.toStringAsFixed(0)}% Stake on a match.\n• You place €${(1000 * stake / 100).toStringAsFixed(0)} on the bet (${stake.toStringAsFixed(0)}% of €1,000).',
+                      '• You have a bankroll of €1,000.\n• We recommend a ${stake.toStringAsFixed(0)}% Stake on a prediction.\n• You place €${(1000 * stake / 100).toStringAsFixed(0)} on the bet (${stake.toStringAsFixed(0)}% of €1,000).',
                   gradient: LinearGradient(
                     colors: [
                       AppColors.secondary.shade400.withOpacity(0.1),
@@ -236,7 +252,7 @@ class StakeDisplay extends StatelessWidget {
                   context: context,
                   title: '🚀 Aggressive Betting',
                   description:
-                      '• Your bankroll is €5,000.\n• We suggest a ${stake.toStringAsFixed(0)}% Stake for a high-confidence bet.\n• You place €${(5000 * stake / 100).toStringAsFixed(0)} on that match.',
+                      '• Your bankroll is €5,000.\n• We suggest a ${stake.toStringAsFixed(0)}% Stake for a high-confidence bet.\n• You place €${(5000 * stake / 100).toStringAsFixed(0)} on that prediction.',
                   gradient: LinearGradient(
                     colors: [
                       const Color(0xFF00DEA2).withOpacity(0.1),
@@ -245,85 +261,6 @@ class StakeDisplay extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Why Use Stake section
-                _buildSectionHeader(
-                  icon: LucideIcons.info,
-                  title: 'Why Use Stake',
-                ),
-                const SizedBox(height: 12),
-
-                // Benefits cards
-                _buildBenefitCard(
-                  icon: LucideIcons.shield,
-                  title: 'Risk Management',
-                  description: 'Protect your bankroll from sudden losses.',
-                ),
-                const SizedBox(height: 12),
-                _buildBenefitCard(
-                  icon: LucideIcons.trendingUp,
-                  title: 'Long-Term Success',
-                  description:
-                      'Helps you stay disciplined instead of betting emotionally.',
-                ),
-                const SizedBox(height: 12),
-                _buildBenefitCard(
-                  icon: LucideIcons.refreshCw,
-                  title: 'Adaptability',
-                  description:
-                      'As your bankroll grows, your Stakes adjust accordingly.',
-                ),
-                const SizedBox(height: 32),
-
-                // Conclusion
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.secondary.shade400.withOpacity(0.15),
-                        AppColors.secondary.shade400.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.secondary.shade400.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.shade400.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          LucideIcons.target,
-                          color: AppColors.secondary.shade400,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Text(
-                          'By following SMORE\'s Stake recommendations, you ensure a smart, structured approach to sports betting instead of gambling blindly',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            height: 1.4,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
               ],
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
@@ -7,6 +8,7 @@ import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
+import 'package:smore_mobile_app/service/user_service.dart';
 import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -184,6 +186,7 @@ class UserProvider with ChangeNotifier {
           key: 'refreshToken', value: response.data['refresh']);
       await getUserDetails();
       await _setInitialTimezone();
+      subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
     } on DioException catch (e) {
@@ -219,6 +222,7 @@ class UserProvider with ChangeNotifier {
           key: 'refreshToken', value: response.data['refresh']);
       await getUserDetails();
       await _setInitialTimezone();
+      subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
     } on DioException catch (e) {
@@ -257,6 +261,7 @@ class UserProvider with ChangeNotifier {
           key: 'refreshToken', value: response.data['refresh']);
       await getUserDetails();
       await _setInitialTimezone();
+      subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
     } on DioException catch (e) {
@@ -291,6 +296,16 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<void> subscribeToFcmTopic() async {
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic("ALL");
+      await UserService().sendFcmTokenToBackend(
+          await FirebaseMessaging.instance.getToken() ?? '');
+    } catch (e) {
+      logger.e('Error subscribing to FCM topic: $e');
+    }
+  }
+
   Future<void> logout() async {
     logger.i('Logging out user');
     await _storage.delete(key: 'accessToken');
@@ -298,6 +313,9 @@ class UserProvider with ChangeNotifier {
     await _storage.delete(key: 'userTimezone');
     await _storage.delete(key: 'selectedProductName');
     await _storage.delete(key: 'predictionObjectFilter');
+
+    await FirebaseMessaging.instance.unsubscribeFromTopic("ALL");
+
     _user = null;
     _userTimezone = null;
     _selectedProductName = null;

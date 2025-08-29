@@ -27,13 +27,29 @@ class UserService {
     }
   }
 
+  Future<void> sendFcmTokenToBackend(String fcmToken) async {
+    try {
+      await _dioClient.dio.post(
+        '/auth/me/update-fcm-token/',
+        data: {'fcm_token': fcmToken},
+      );
+    } on DioException catch (e) {
+      String errorMessage = 'Failed to send FCM token. Please try again.';
+      if (e.response?.data is Map<String, dynamic>) {
+        errorMessage = e.response!.data['detail'] ?? errorMessage;
+      } else if (e.response?.data is String) {
+        errorMessage = e.response!.data;
+      }
+      throw Exception(errorMessage);
+    }
+  }
+
   Future<void> deleteAccount() async {
     try {
       await _dioClient.dio.delete('/accounts/delete/');
 
       await _storage.delete(key: 'refreshToken');
       await _storage.delete(key: 'accessToken');
-
     } on DioException catch (e) {
       String errorMessage = 'Failed to delete account. Please try again.';
       if (e.response?.data is Map<String, dynamic>) {

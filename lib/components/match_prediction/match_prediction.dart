@@ -8,6 +8,7 @@ import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/match_prediction/locked_prediction_section.dart';
 import 'package:smore_mobile_app/components/match_prediction/prediction_text.dart';
 import 'package:smore_mobile_app/components/match_prediction/prediction_vs_row.dart';
+import 'package:smore_mobile_app/components/match_prediction/stake_display.dart';
 import 'package:smore_mobile_app/models/sport/sport_type.dart';
 import 'package:smore_mobile_app/utils/string_utils.dart';
 
@@ -129,7 +130,8 @@ class MatchPrediction extends StatelessWidget {
                   if (prediction.status == PredictionStatus.PENDING)
                     const SizedBox(height: 12),
                   PredictionVsRow(prediction: prediction),
-                  if (userProvider.canViewPrediction(prediction)) _buildOdds()
+                  if (userProvider.canViewPrediction(prediction))
+                    _buildOddsAndStake()
                 ],
               ),
             ),
@@ -201,31 +203,82 @@ class MatchPrediction extends StatelessWidget {
     );
   }
 
-  Widget _buildOdds() {
+  Widget _buildOddsAndStake() {
     return Column(
       children: [
         const SizedBox(height: 12),
         const BrandGradientLine(),
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Icon(
-              LucideIcons.chevronUp,
-              color: Color(0xFF00DEA2),
+        if (prediction.status == PredictionStatus.PENDING)
+          // Mirror the PredictionVsRow structure for alignment under teams
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            // Match PredictionVsRow padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                    child: Center(
+                  child: StakeDisplay(
+                    stake: prediction.stake,
+                    fontSize: 14,
+                    displayIcon: false,
+                  ),
+                )),
+                const SizedBox(width: 120),
+                // Match the fixed width in _buildVersusRow for center alignment
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // Center the odds within the right Expanded
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Odds",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        prediction.odds.toString(),
+                        style: const TextStyle(
+                          color: Color(0xFF00DEA2),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const Text("Odds"),
-            const SizedBox(width: 4),
-            Text(
-              prediction.odds.toString(),
-              style: const TextStyle(
-                color: Color(0xFF00DEA2),
-                fontWeight: FontWeight.bold,
+          )
+        else
+          // Center only odds for non-PENDING predictions (unchanged)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "Odds",
+                style: TextStyle(
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 4),
+              Text(
+                prediction.odds.toString(),
+                style: const TextStyle(
+                  color: Color(0xFF00DEA2),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
       ],
     );

@@ -33,6 +33,14 @@ class SportMatch {
     );
   }
 
+  // is_live getter
+  bool get isLive {
+    // check if kickoff_datetime is before now and before kickoff_datetime + 105 minutes
+    final now = DateTime.now().toUtc();
+    return kickoffDateTime.isBefore(now) &&
+        now.isBefore(kickoffDateTime.add(const Duration(minutes: 105)));
+  }
+
   static SportType _parseSportType(String sportType) {
     switch (sportType) {
       case 'SOCCER':

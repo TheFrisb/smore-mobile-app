@@ -207,17 +207,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             // Date header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text(
-                _formatDate(date),
-                style: TextStyle(
-                  color: AppColors.secondary.shade400,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Center(
+                  child: Text(
+                    _formatDate(date),
+                    style: TextStyle(
+                      color: AppColors.secondary.shade400,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                )),
             // Notifications for this date
             ...notificationsForDate.map((notification) {
               final index = _notifications.indexOf(notification);

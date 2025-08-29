@@ -1,4 +1,23 @@
-1. Pokazi live status
-2. Sredi apple sign in
-3. Sredi notifikacii
---
+9. Add stake to backend
+10. Fix logo issue
+11. Fix history tickets issue
+12. Add stake to prediction/tickets
+
+
+-----------------------------------------------------
+
+
+
+1. Pass FCM token wherever suitable
+2. Subscribe to topic wherever suitable
+3. Notification provider
+- Fetch all notifications
+- Show all notifications
+- Refetch notifications on new notification
+
+
+
+
+
+4. Add capabilities & sign application
+5. Send to google and apple for review

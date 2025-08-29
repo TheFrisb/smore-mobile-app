@@ -11,7 +11,7 @@ class Ticket {
   final String label;
   final double totalOdds;
   final List<BetLine> betLines;
-  final double? stake; // Nullable stake field
+  final double stake; // Nullable stake field
 
   Ticket({
     required this.id,
@@ -46,7 +46,7 @@ class Ticket {
             .toList(),
         stake: json['stake'] != null
             ? double.parse(json['stake'].toString())
-            : null,
+            : 0.0, // Default stake to 0.0 if null
       );
     } catch (e) {
       print('Error parsing Ticket JSON: $e');

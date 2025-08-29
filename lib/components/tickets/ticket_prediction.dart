@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/tickets/ticket_header.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/bet_line.dart';
@@ -35,7 +36,7 @@ class TicketPrediction extends StatelessWidget {
               _buildTicketLabel(context),
               const SizedBox(height: 24),
             ],
-            _buildTopRow(context, canViewTicket),
+            TicketHeader(ticket: ticket),
             const SizedBox(height: 24),
             const BrandGradientLine(),
             const SizedBox(height: 24),
@@ -45,74 +46,6 @@ class TicketPrediction extends StatelessWidget {
               TicketLockedSection(ticketId: ticket.id),
           ]),
         ));
-  }
-
-  Widget _buildTopRow(BuildContext context, bool canViewTicket) {
-    if (canViewTicket) {
-      // Original layout with odds when user has access
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xB50D151E),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.all(5),
-                child: Icon(_getProductIcon()),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                ticket.product.name.displayName,
-                style: const TextStyle(color: Color(0xFFdbe4ed)),
-              ),
-            ],
-          ),
-          // container with Total odds on top, and odds below
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                'Total Odds',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor.withOpacity(0.5),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                ticket.totalOdds.toStringAsFixed(2),
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-    } else {
-      // Centered layout without odds when user doesn't have access
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xB50D151E),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.all(5),
-            child: Icon(_getProductIcon()),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            ticket.product.name.displayName,
-            style: const TextStyle(color: Color(0xFFdbe4ed)),
-          ),
-        ],
-      );
-    }
   }
 
   Widget _buildTicketLabel(BuildContext context) {
@@ -161,7 +94,7 @@ class TicketPrediction extends StatelessWidget {
             betLine.bet,
             betLine.betType,
             betLine.odds,
-            betLine.status.toString().split('.').last,
+            betLine.status,
             isPending,
             hasConnectingLine,
             hasScores,
@@ -175,7 +108,7 @@ class TicketPrediction extends StatelessWidget {
       String bet,
       String betType,
       double odds,
-      String status,
+      BetLineStatus status,
       bool isPending,
       bool hasConnectingLine,
       bool hasScores,
@@ -201,32 +134,8 @@ class TicketPrediction extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Status Icon with background
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: status == 'PENDING'
-                      ? const Color(0xFF0D151E)
-                          .withOpacity(0.5) // Faint blue background for pending
-                      : const Color(0xff0B1F31),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: status == 'PENDING'
-                        ? Theme.of(context)
-                            .primaryColor // Blue border for pending (matches card border)
-                        : _getStatusColor(status),
-                    width: 2,
-                  ),
-                ),
-                child: status == 'PENDING'
-                    ? null // No icon for pending
-                    : Icon(
-                        _getStatusIcon(status),
-                        color: _getStatusColor(status),
-                        size: 12,
-                      ),
-              ),
+              // Status Icon
+              _buildPulsingIcon(status, betLine.match.isLive),
               const SizedBox(width: 16),
               // Bet Details
               Expanded(
@@ -316,8 +225,15 @@ class TicketPrediction extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child:
-                        Icon(_getProductIcon(), size: 12, color: Colors.black),
+                    child: Icon(
+                      ticket.product.name == ProductName.SOCCER
+                          ? Icons.sports_soccer
+                          : ticket.product.name == ProductName.BASKETBALL
+                              ? Icons.sports_basketball
+                              : Icons.sports,
+                      size: 12,
+                      color: Colors.black,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   // Fix: Remove Flexible, just use Text
@@ -378,8 +294,15 @@ class TicketPrediction extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child:
-                        Icon(_getProductIcon(), size: 12, color: Colors.black),
+                    child: Icon(
+                      ticket.product.name == ProductName.SOCCER
+                          ? Icons.sports_soccer
+                          : ticket.product.name == ProductName.BASKETBALL
+                              ? Icons.sports_basketball
+                              : Icons.sports,
+                      size: 12,
+                      color: Colors.black,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   // Fix: Remove Flexible, just use Text
@@ -425,27 +348,25 @@ class TicketPrediction extends StatelessWidget {
     );
   }
 
-  IconData _getStatusIcon(String status) {
+  IconData _getStatusIcon(BetLineStatus status, bool isLive) {
     switch (status) {
-      case 'WON':
-        return LucideIcons.check;
-      case 'LOST':
-        return LucideIcons.x;
-      case 'PENDING':
-      default:
-        return Icons.radio_button_unchecked;
+      case BetLineStatus.WON:
+        return LucideIcons.circleCheck;
+      case BetLineStatus.LOST:
+        return LucideIcons.circleX;
+      case BetLineStatus.PENDING:
+        return isLive ? LucideIcons.circleDot : LucideIcons.circle;
     }
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BetLineStatus status) {
     switch (status) {
-      case 'WON':
+      case BetLineStatus.WON:
         return Colors.green;
-      case 'LOST':
+      case BetLineStatus.LOST:
         return Colors.red;
-      case 'PENDING':
-      default:
-        return const Color(0xFFdbe4ed);
+      case BetLineStatus.PENDING:
+        return AppColors.secondary;
     }
   }
 
@@ -481,27 +402,92 @@ class TicketPrediction extends StatelessWidget {
     }
   }
 
-  IconData _getProductIcon() {
-    switch (ticket.product.name) {
-      case ProductName.SOCCER:
-        return Icons.sports_soccer;
-      case ProductName.BASKETBALL:
-        return Icons.sports_basketball;
-
-      default:
-        return LucideIcons.trophy;
+  Color _getConnectingLineColor(BetLineStatus status) {
+    switch (status) {
+      case BetLineStatus.WON:
+        return Colors.green.withOpacity(0.3);
+      case BetLineStatus.LOST:
+        return Colors.red.withOpacity(0.3);
+      case BetLineStatus.PENDING:
+        return AppColors.secondary.shade400.withOpacity(0.3);
     }
   }
 
-  Color _getConnectingLineColor(String status) {
-    switch (status) {
-      case 'WON':
-        return Colors.green.withOpacity(0.3);
-      case 'LOST':
-        return Colors.red.withOpacity(0.3);
-      case 'PENDING':
-      default:
-        return AppColors.secondary.shade400.withOpacity(0.3);
+  Widget _buildPulsingIcon(BetLineStatus status, bool isLive) {
+    final isLivePending = status == BetLineStatus.PENDING && isLive;
+
+    if (!isLivePending) {
+      // Return static icon for non-live pending, won, or lost status
+      return Icon(
+        _getStatusIcon(status, isLive),
+        color: _getStatusColor(status),
+        size: 24,
+      );
     }
+
+    // Return pulsing icon for live pending matches
+    return _PulsingIcon(
+      icon: _getStatusIcon(status, isLive),
+      color: _getStatusColor(status),
+    );
+  }
+}
+
+class _PulsingIcon extends StatefulWidget {
+  final IconData icon;
+  final Color color;
+
+  const _PulsingIcon({
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  State<_PulsingIcon> createState() => _PulsingIconState();
+}
+
+class _PulsingIconState extends State<_PulsingIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Icon(
+            widget.icon,
+            color: widget.color,
+            size: 24,
+          ),
+        );
+      },
+    );
   }
 }

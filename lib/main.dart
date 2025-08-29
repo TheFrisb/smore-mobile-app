@@ -1,17 +1,20 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:smore_mobile_app/firebase_options.dart';
 import 'package:smore_mobile_app/providers/history_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/upcoming_predictions_provider.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/auth_wrapper_screen.dart';
+import 'package:smore_mobile_app/service/firebase/firebase_messaging_service.dart';
+import 'package:smore_mobile_app/service/firebase/local_notifications_service.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -19,7 +22,16 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  tz.initializeTimeZones();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final localNotificationsService = LocalNotificationsService.instance();
+  await localNotificationsService.init();
+
+  final firebaseMessagingService = FirebaseMessagingService.instance();
+  await firebaseMessagingService.init(
+      localNotificationsService: localNotificationsService);
+
   Logger logger = Logger();
   final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
 
@@ -97,7 +109,7 @@ class _MyAppState extends State<MyApp> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.updateCustomerInfo();
       _logger.i('Customer info updated successfully in context');
-      
+
       // Log the customer info update
       final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
       revenueCatLogger.logRevenueCatInfo(
