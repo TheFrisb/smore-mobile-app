@@ -8,24 +8,8 @@ import 'package:smore_mobile_app/providers/user_notification_provider.dart';
 import '../app_colors.dart';
 import '../models/user_notification.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
-
-  @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the notification provider when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider =
-          Provider.of<UserNotificationProvider>(context, listen: false);
-      provider.initialize();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +118,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
               // Notifications list
               Expanded(
-                child: _buildNotificationsList(notificationProvider),
+                child: _buildNotificationsList(context, notificationProvider),
               ),
             ],
           );
@@ -143,7 +127,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  void _onNotificationTap(UserNotification notification) {
+  void _onNotificationTap(BuildContext context, UserNotification notification) {
     // Mark notification as read
     final provider =
         Provider.of<UserNotificationProvider>(context, listen: false);
@@ -151,7 +135,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildNotificationsList(
-      UserNotificationProvider notificationProvider) {
+      BuildContext context, UserNotificationProvider notificationProvider) {
     if (notificationProvider.notifications.isEmpty) {
       return Center(
         child: Padding(
@@ -274,7 +258,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   title: notification.title,
                   description: notification.message,
                   isRead: notification.isRead,
-                  onTap: () => _onNotificationTap(notification),
+                  onTap: () => _onNotificationTap(context, notification),
                 );
               }),
             ],
