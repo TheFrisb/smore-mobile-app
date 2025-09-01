@@ -217,7 +217,8 @@ class TicketPrediction extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (betLine.match.homeTeam.logoUrl != null)
                     CachedNetworkImage(
@@ -233,7 +234,6 @@ class TicketPrediction extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   const SizedBox(width: 8),
-                  // Fix: Remove Flexible, just use Text
                   Text(
                     betLine.match.homeTeam.name,
                     style: const TextStyle(
@@ -282,7 +282,8 @@ class TicketPrediction extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (betLine.match.awayTeam.logoUrl != null)
                     CachedNetworkImage(
@@ -298,7 +299,6 @@ class TicketPrediction extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   const SizedBox(width: 8),
-                  // Fix: Remove Flexible, just use Text
                   Text(
                     betLine.match.awayTeam.name,
                     style: const TextStyle(
