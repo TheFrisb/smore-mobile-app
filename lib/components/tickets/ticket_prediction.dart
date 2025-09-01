@@ -50,6 +50,8 @@ class TicketPrediction extends StatelessWidget {
               const SizedBox(height: 24),
             ],
             if (canViewTicket && ticket.status == TicketStatus.PENDING && ticket.stake > 0) ...[
+              const BrandGradientLine(),
+              const SizedBox(height: 16),
               _buildStakeAndOdds(context),
             ],
           ]),
