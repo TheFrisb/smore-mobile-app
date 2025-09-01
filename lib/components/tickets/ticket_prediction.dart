@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
+import 'package:smore_mobile_app/components/match_prediction/stake_display.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_header.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
 import 'package:smore_mobile_app/models/product.dart';
@@ -45,6 +46,14 @@ class TicketPrediction extends StatelessWidget {
               _buildBetLines(context)
             else
               TicketLockedSection(ticketId: ticket.id),
+            if (canViewTicket) ...[
+              const SizedBox(height: 24),
+              const BrandGradientLine(),
+              const SizedBox(height: 24),
+            ],
+            if (canViewTicket && ticket.status == TicketStatus.PENDING && ticket.stake > 0) ...[
+              _buildStakeAndOdds(context),
+            ],
           ]),
         ));
   }
@@ -335,6 +344,55 @@ class TicketPrediction extends StatelessWidget {
                   ),
                 ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStakeAndOdds(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Stake on the left
+          Expanded(
+            child: Center(
+              child: StakeDisplay(
+                stake: ticket.stake,
+                fontSize: 14,
+                displayIcon: false,
+              ),
+            ),
+          ),
+          const SizedBox(width: 120),
+          // Total odds on the right
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Odds",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFdbe4ed),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  ticket.totalOdds.toStringAsFixed(2),
+                  style: const TextStyle(
+                    color: Color(0xFF00DEA2),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
