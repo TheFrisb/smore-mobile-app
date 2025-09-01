@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -218,23 +219,19 @@ class TicketPrediction extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
                 children: [
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                  if (betLine.match.homeTeam.logoUrl != null)
+                    CachedNetworkImage(
+                      imageUrl: betLine.match.homeTeam.logoUrl!,
+                      height: 16,
+                      width: 16,
+                      fit: BoxFit.contain,
+                    )
+                  else
+                    Icon(
+                      LucideIcons.shieldAlert,
+                      size: 16,
+                      color: Colors.grey,
                     ),
-                    child: Icon(
-                      ticket.product.name == ProductName.SOCCER
-                          ? Icons.sports_soccer
-                          : ticket.product.name == ProductName.BASKETBALL
-                              ? Icons.sports_basketball
-                              : Icons.sports,
-                      size: 12,
-                      color: Colors.black,
-                    ),
-                  ),
                   const SizedBox(width: 8),
                   // Fix: Remove Flexible, just use Text
                   Text(
@@ -287,23 +284,19 @@ class TicketPrediction extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min, // <-- Fix: shrink-wrap children
                 children: [
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                  if (betLine.match.awayTeam.logoUrl != null)
+                    CachedNetworkImage(
+                      imageUrl: betLine.match.awayTeam.logoUrl!,
+                      height: 16,
+                      width: 16,
+                      fit: BoxFit.contain,
+                    )
+                  else
+                    Icon(
+                      LucideIcons.shieldAlert,
+                      size: 16,
+                      color: Colors.grey,
                     ),
-                    child: Icon(
-                      ticket.product.name == ProductName.SOCCER
-                          ? Icons.sports_soccer
-                          : ticket.product.name == ProductName.BASKETBALL
-                              ? Icons.sports_basketball
-                              : Icons.sports,
-                      size: 12,
-                      color: Colors.black,
-                    ),
-                  ),
                   const SizedBox(width: 8),
                   // Fix: Remove Flexible, just use Text
                   Text(
