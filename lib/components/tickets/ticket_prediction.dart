@@ -8,7 +8,6 @@ import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart'
 import 'package:smore_mobile_app/components/match_prediction/stake_display.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_header.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
-import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/bet_line.dart';
 import 'package:smore_mobile_app/models/sport/ticket.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
@@ -47,9 +46,11 @@ class TicketPrediction extends StatelessWidget {
             else
               TicketLockedSection(ticketId: ticket.id),
             if (canViewTicket) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
             ],
-            if (canViewTicket && ticket.status == TicketStatus.PENDING && ticket.stake > 0) ...[
+            if (canViewTicket &&
+                ticket.status == TicketStatus.PENDING &&
+                ticket.stake > 0) ...[
               const BrandGradientLine(),
               const SizedBox(height: 16),
               _buildStakeAndOdds(context),
