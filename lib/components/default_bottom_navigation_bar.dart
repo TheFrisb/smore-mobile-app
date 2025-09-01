@@ -30,7 +30,7 @@ class DefaultBottomNavigationBar extends StatelessWidget {
             items: const [
               BottomNavigationBarItem(
                 label: 'Predictions',
-                icon: Icon(Icons.insights_outlined),
+                icon: Icon(LucideIcons.listOrdered),
               ),
               BottomNavigationBarItem(
                 label: 'History',

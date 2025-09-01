@@ -24,7 +24,7 @@ class FilterBar extends StatelessWidget {
         children: [
           _buildFilterItem(context, 0, 'All', LucideIcons.list),
           SizedBox(width: isSmallScreen ? 4 : 16),
-          _buildFilterItem(context, 1, 'Predictions', LucideIcons.listOrdered),
+          _buildFilterItem(context, 1, 'Predictions', LucideIcons.listCheck),
           SizedBox(width: isSmallScreen ? 4 : 16),
           _buildFilterItem(context, 2, 'Parlays', LucideIcons.scrollText),
         ],

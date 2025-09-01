@@ -128,7 +128,7 @@ class _HistoryPredictionsListState extends State<HistoryPredictionsList> {
   IconData _getEmptyIcon(PredictionObjectFilter? filter) {
     switch (filter) {
       case PredictionObjectFilter.predictions:
-        return LucideIcons.listOrdered;
+        return LucideIcons.listCheck;
       case PredictionObjectFilter.tickets:
         return LucideIcons.scrollText;
       case null:
