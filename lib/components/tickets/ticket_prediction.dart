@@ -48,8 +48,6 @@ class TicketPrediction extends StatelessWidget {
               TicketLockedSection(ticketId: ticket.id),
             if (canViewTicket) ...[
               const SizedBox(height: 24),
-              const BrandGradientLine(),
-              const SizedBox(height: 24),
             ],
             if (canViewTicket && ticket.status == TicketStatus.PENDING && ticket.stake > 0) ...[
               _buildStakeAndOdds(context),
