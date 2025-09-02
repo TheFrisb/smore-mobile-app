@@ -55,6 +55,12 @@ class TicketPrediction extends StatelessWidget {
               const SizedBox(height: 16),
               _buildStakeAndOdds(context),
             ],
+            if (canViewTicket &&
+                ticket.status != TicketStatus.PENDING) ...[
+              const BrandGradientLine(),
+              const SizedBox(height: 16),
+              _buildTotalOddsOnly(context),
+            ],
           ]),
         ));
   }
@@ -377,7 +383,7 @@ class TicketPrediction extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Odds",
+                  "Total Odds",
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFFdbe4ed),
@@ -397,6 +403,31 @@ class TicketPrediction extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTotalOddsOnly(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          "Total Odds",
+          style: TextStyle(
+            fontSize: 14,
+            color: Color(0xFFdbe4ed),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          ticket.totalOdds.toStringAsFixed(2),
+          style: const TextStyle(
+            color: Color(0xFF00DEA2),
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
   }
 
