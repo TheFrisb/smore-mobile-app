@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
 import 'package:smore_mobile_app/components/match_prediction/stake_display.dart';
-import 'package:smore_mobile_app/components/tickets/ticket_header.dart';
 import 'package:smore_mobile_app/components/tickets/ticket_locked_section.dart';
 import 'package:smore_mobile_app/models/sport/bet_line.dart';
 import 'package:smore_mobile_app/models/sport/ticket.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
+
+import '../../models/product.dart';
+import '../../utils/string_utils.dart';
 
 class TicketPrediction extends StatelessWidget {
   static final Logger logger = Logger();
@@ -33,12 +35,10 @@ class TicketPrediction extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(children: [
-            if (ticket.status == TicketStatus.PENDING) ...[
-              _buildTicketLabel(context),
-              const SizedBox(height: 24),
-            ],
-            TicketHeader(ticket: ticket, canViewTicket: canViewTicket),
-            const SizedBox(height: 24),
+            _buildTicketLabel(context),
+            const SizedBox(height: 16),
+            // TicketHeader(ticket: ticket, canViewTicket: canViewTicket),
+            // const SizedBox(height: 24),
             const BrandGradientLine(),
             const SizedBox(height: 24),
             if (canViewTicket)
@@ -55,8 +55,7 @@ class TicketPrediction extends StatelessWidget {
               const SizedBox(height: 16),
               _buildStakeAndOdds(context),
             ],
-            if (canViewTicket &&
-                ticket.status != TicketStatus.PENDING) ...[
+            if (canViewTicket && ticket.status != TicketStatus.PENDING) ...[
               const BrandGradientLine(),
               const SizedBox(height: 16),
               _buildTotalOddsOnly(context),
@@ -66,34 +65,45 @@ class TicketPrediction extends StatelessWidget {
   }
 
   Widget _buildTicketLabel(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0D151E).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.diamond,
-            size: 20,
-            color: Theme.of(context).primaryColor,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            ticket.label,
-            style: const TextStyle(
-              color: Color(0xFFdbe4ed),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xB50D151E),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.all(5),
+              child: Icon(_getProductIcon()),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(width: 10),
+            Text(
+              StringUtils.capitalize(ticket.product.name.displayName),
+              style: const TextStyle(color: Color(0xFFdbe4ed)),
+            ),
+          ],
+        ),
+      ],
     );
+  }
+
+  IconData _getProductIcon() {
+    switch (ticket.product.name) {
+      case ProductName.SOCCER:
+        return Icons.sports_soccer;
+      case ProductName.BASKETBALL:
+        return Icons.sports_basketball;
+      case ProductName.TENNIS:
+        return Icons.sports_tennis;
+      case ProductName.NFL_NHL:
+        return Icons.sports_football;
+      case ProductName.AI_ANALYST:
+        return Icons.psychology;
+      default:
+        return Icons.sports;
+    }
   }
 
   Widget _buildBetLines(BuildContext context) {
@@ -374,7 +384,7 @@ class TicketPrediction extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 120),
+          const SizedBox(width: 114),
           // Total odds on the right
           Expanded(
             child: Row(
@@ -383,7 +393,7 @@ class TicketPrediction extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Total Odds",
+                  "Total Odds:",
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFFdbe4ed),
