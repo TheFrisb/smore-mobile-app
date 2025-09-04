@@ -243,7 +243,7 @@ class MatchPrediction extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        prediction.odds.toString(),
+                        prediction.odds.toStringAsFixed(2),
                         style: const TextStyle(
                           color: Color(0xFF00DEA2),
                           fontWeight: FontWeight.bold,
@@ -270,7 +270,7 @@ class MatchPrediction extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                prediction.odds.toString(),
+                prediction.odds.toStringAsFixed(2),
                 style: const TextStyle(
                   color: Color(0xFF00DEA2),
                   fontWeight: FontWeight.bold,
