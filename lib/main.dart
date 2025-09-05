@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +18,16 @@ import 'package:smore_mobile_app/service/firebase/local_notifications_service.da
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
 import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Initialize timezone database
+  tz.initializeTimeZones();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -82,16 +87,21 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final Connectivity _connectivity = Connectivity();
   SnackBar? _currentSnackBar;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   final Logger _logger = Logger();
+  Timer? _periodicRefreshTimer;
 
   @override
   void initState() {
     super.initState();
+    
+    // Add app lifecycle observer
+    WidgetsBinding.instance.addObserver(this);
+    
     // Set up the network status listener
     _connectivity.onConnectivityChanged
         .listen((List<ConnectivityResult> results) {
@@ -105,6 +115,104 @@ class _MyAppState extends State<MyApp> {
     });
 
     _setupRevenueCatListener();
+    _startPeriodicRefresh();
+  }
+
+  @override
+  void dispose() {
+    // Remove app lifecycle observer
+    WidgetsBinding.instance.removeObserver(this);
+    _periodicRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _logger.i('App became active - performing background refresh');
+        _performBackgroundRefresh();
+        _startPeriodicRefresh();
+        break;
+      case AppLifecycleState.paused:
+        _logger.i('App went to background - stopping periodic updates');
+        _stopPeriodicRefresh();
+        break;
+      case AppLifecycleState.detached:
+        _logger.i('App detached - stopping periodic updates');
+        _stopPeriodicRefresh();
+        break;
+      case AppLifecycleState.inactive:
+        // App is transitioning between states
+        break;
+      case AppLifecycleState.hidden:
+        // App is hidden but still running
+        break;
+    }
+  }
+
+  /// Start periodic refresh timer
+  void _startPeriodicRefresh() {
+    _stopPeriodicRefresh(); // Stop any existing timer
+    
+    _logger.i('Starting periodic refresh - Upcoming: 5min, Notifications: 10min');
+    
+    // Refresh upcoming predictions every 5 minutes
+    _periodicRefreshTimer = Timer.periodic(
+      const Duration(minutes: 5),
+      (_) => _performPeriodicRefresh(),
+    );
+  }
+
+  /// Stop periodic refresh timer
+  void _stopPeriodicRefresh() {
+    _periodicRefreshTimer?.cancel();
+    _periodicRefreshTimer = null;
+  }
+
+  /// Perform periodic refresh of data
+  Future<void> _performPeriodicRefresh() async {
+    try {
+      _logger.d('Performing periodic refresh');
+      
+      final upcomingProvider = Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+      final notificationProvider = Provider.of<UserNotificationProvider>(context, listen: false);
+      
+      // Refresh upcoming predictions
+      await upcomingProvider.fetchUpcomingPredictions(updateIsLoading: false);
+      
+      // Refresh notifications every 10 minutes (every 2nd call)
+      final now = DateTime.now();
+      if (now.minute % 10 == 0) {
+        await notificationProvider.refresh();
+      }
+      
+      _logger.d('Periodic refresh completed successfully');
+    } catch (e) {
+      _logger.e('Error during periodic refresh: $e');
+    }
+  }
+
+  /// Perform background refresh when app becomes active
+  Future<void> _performBackgroundRefresh() async {
+    try {
+      final upcomingProvider = Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+      final notificationProvider = Provider.of<UserNotificationProvider>(context, listen: false);
+      
+      _logger.i('Refreshing data in background (app became active)');
+      
+      // Refresh upcoming predictions
+      await upcomingProvider.fetchUpcomingPredictions(updateIsLoading: false);
+      
+      // Refresh notifications
+      await notificationProvider.refresh();
+      
+      _logger.i('Background refresh completed successfully');
+    } catch (e) {
+      _logger.e('Error during background refresh: $e');
+    }
   }
 
   void _setupRevenueCatListener() {

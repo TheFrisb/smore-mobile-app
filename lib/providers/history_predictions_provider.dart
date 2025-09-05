@@ -224,6 +224,81 @@ class HistoryPredictionsProvider with ChangeNotifier {
     );
   }
 
+  // Refresh data without clearing existing predictions (for pull-to-refresh)
+  Future<void> refreshDataKeepExisting(ProductName? productFilter,
+      PredictionObjectFilter? predictionObjectFilter,
+      {bool updateIsLoading = true}) async {
+    logger.i('Refreshing history predictions data while keeping existing data');
+    
+    if (_isFetchingHistoryPredictions) {
+      logger.i('Already fetching history predictions, skipping this request.');
+      return;
+    }
+
+    // Reset pagination state but keep existing data
+    _currentPage = 1;
+    _totalPages = 0;
+    _totalCount = 0;
+    _hasMorePages = false;
+    _isLoadingMore = false;
+    _errorMessage = null;
+
+    if (updateIsLoading) {
+      logger.i('Setting isFetchingHistoryPredictions to true');
+      _isFetchingHistoryPredictions = true;
+      notifyListeners();
+    }
+
+    Map<String, dynamic> queryParameters =
+        _buildQueryParameters(productFilter, predictionObjectFilter);
+
+    try {
+      final response = await _dioClient.dio.get(
+        '/history/paginated-predictions/',
+        queryParameters: queryParameters,
+      );
+      final data = response.data;
+
+      if (data is! Map<String, dynamic>) {
+        throw Exception(
+            'Expected a paginated response -- invalid response format');
+      }
+
+      // Parse pagination metadata from API response
+      _totalCount = data['count'] as int? ?? 0;
+      _totalPages = data['total_pages'] as int? ?? 0;
+      _currentPage = data['current_page'] as int? ?? 1;
+      _pageSize = data['page_size'] as int? ?? 20;
+      _hasMorePages = data['next'] != null;
+      logger.i(
+          'Pagination state: page=$_currentPage/$_totalPages, hasMore=$_hasMorePages, count=$_totalCount, next=${data['next']}');
+
+      // Parse results and replace existing data
+      final results = data['results'] as List<dynamic>? ?? [];
+      final newPredictions =
+          results.map((json) => PredictionResponse.fromJson(json)).toList();
+
+      _historyPredictions = newPredictions;
+      logger.i(
+          'Replaced history predictions with ${newPredictions.length} items (kept existing during refresh)');
+
+      logger.i(
+          'Fetched page $_currentPage of $_totalPages (total: $_totalCount items)');
+    } catch (e) {
+      if (e is DioException) {
+        logger.e('DioException occurred: $e');
+        _errorMessage = handleDioError(e);
+      } else {
+        _errorMessage = 'An unexpected error occurred: $e';
+        logger.e('Unexpected error: $e');
+      }
+    } finally {
+      _isFetchingHistoryPredictions = false;
+      _isLoadingMore = false;
+      notifyListeners();
+    }
+  }
+
   // Load more data (fetch next page)
   Future<void> loadMoreData(ProductName? productFilter,
       PredictionObjectFilter? predictionObjectFilter) async {

@@ -31,8 +31,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  void _fetchHistoryPredictions(bool updateIsLoading,
-      {bool forceRefresh = false}) {
+  Future<void> _fetchHistoryPredictions(bool updateIsLoading,
+      {bool forceRefresh = false}) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final historyProvider =
         Provider.of<HistoryPredictionsProvider>(context, listen: false);
@@ -40,7 +40,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final selectedProduct = userProvider.selectedProductName;
     final selectedPredictionObjectFilter = userProvider.predictionObjectFilter;
 
-    historyProvider.fetchPaginatedHistoryPredictions(
+    await historyProvider.fetchPaginatedHistoryPredictions(
       selectedProduct,
       selectedPredictionObjectFilter,
       updateIsLoading: updateIsLoading,
@@ -102,10 +102,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
             },
           ),
           const BrandGradientLine(),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: HistoryPredictionsList(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                // Use the new method that keeps existing data during refresh
+                final userProvider = Provider.of<UserProvider>(context, listen: false);
+                final historyProvider = Provider.of<HistoryPredictionsProvider>(context, listen: false);
+                
+                final selectedProduct = userProvider.selectedProductName;
+                final selectedPredictionObjectFilter = userProvider.predictionObjectFilter;
+                
+                await historyProvider.refreshDataKeepExisting(
+                  selectedProduct, 
+                  selectedPredictionObjectFilter,
+                  updateIsLoading: true,
+                );
+              },
+              color: const Color(0xFF36BFFA), // Primary blue
+              backgroundColor: const Color(0xFF1e2f42), // Dark background
+              strokeWidth: 2.5,
+              displacement: 40.0,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: HistoryPredictionsList(),
+              ),
             ),
           ),
         ],

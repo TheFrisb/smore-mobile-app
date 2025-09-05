@@ -38,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void fetchUpcomingPredictions(bool updateIsLoading) {
+  Future<void> fetchUpcomingPredictions(bool updateIsLoading) async {
     UpcomingPredictionsProvider upcomingPredictionsProvider =
         Provider.of<UpcomingPredictionsProvider>(context, listen: false);
 
-    upcomingPredictionsProvider.fetchUpcomingPredictions(
+    await upcomingPredictionsProvider.fetchUpcomingPredictions(
         updateIsLoading: updateIsLoading);
   }
 
@@ -100,10 +100,19 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           const BrandGradientLine(),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: PredictionsList(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await fetchUpcomingPredictions(false);
+              },
+              color: const Color(0xFF36BFFA), // Primary blue
+              backgroundColor: const Color(0xFF1e2f42), // Dark background
+              strokeWidth: 2.5,
+              displacement: 40.0,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: PredictionsList(),
+              ),
             ),
           ),
         ],
