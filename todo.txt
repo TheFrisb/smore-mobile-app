@@ -1,21 +1,23 @@
-9. Add stake to backend
-10. Fix logo issue
-11. Fix history tickets issue
-12. Add stake to prediction/tickets
+7. Backend
+-- Protect AI
+-- Parse revenuecat subscriptions
+---------------------------------------
 
+1. Application notifications
+-- Receive notifications on foreground and background
+-- On receive, refetch the notifications from backend
+Total: 2 hours
 
------------------------------------------------------
+2. Prediction backend
+-- Add image support
+-- Add icon support
+-- Add topic support
+-- Add metadata support
+-- On click, take to wherever the notification is from, inside the application
+Total: 2 hours
 
-
-
-3. Notification provider
-- Fetch all notifications
-- Show all notifications
-- Refetch notifications on new notification
-
-
-
-
-
-4. Add capabilities & sign application
-5. Send to google and apple for review
+3. Fix apple entitlements issues
+-- Apple sign in
+-- Apple notifications
+-- Join the new entitlements files
+-- Fix the app icon
