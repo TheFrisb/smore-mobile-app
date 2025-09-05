@@ -274,11 +274,10 @@ class TicketPrediction extends StatelessWidget {
                 Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     return Text(
-                      userProvider.formatDateTimeForDisplay(
-                          betLine.match.kickoffDateTime),
+                      _formatMatchTime(betLine.match.kickoffDateTime, userProvider),
                       style: const TextStyle(
                         color: Color(0xFFdbe4ed),
-                        fontSize: 12,
+                        fontSize: 10,
                       ),
                     );
                   },
@@ -336,12 +335,32 @@ class TicketPrediction extends StatelessWidget {
                 ],
               ),
               if (isPending)
-                Text(
-                  betLine.match.league.name,
-                  style: const TextStyle(
-                    color: Color(0xFFdbe4ed),
-                    fontSize: 12,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (betLine.match.league.country.logoUrl != null)
+                      CachedNetworkImage(
+                        imageUrl: betLine.match.league.country.logoUrl!,
+                        height: 12,
+                        width: 12,
+                        fit: BoxFit.contain,
+                      )
+                    else
+                      Icon(
+                        LucideIcons.shieldAlert,
+                        size: 12,
+                        color: Colors.grey,
+                      ),
+                    const SizedBox(width: 6),
+                    Text(
+                      betLine.match.league.name,
+                      style: const TextStyle(
+                        color: Color(0xFFdbe4ed),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 )
               else if (betLine.match.awayTeamScore.isNotEmpty)
                 Container(
@@ -504,6 +523,23 @@ class TicketPrediction extends StatelessWidget {
       case BetLineStatus.PENDING:
         return AppColors.secondary.shade400.withOpacity(0.3);
     }
+  }
+
+  String _formatMatchTime(DateTime utcDateTime, UserProvider userProvider) {
+    final localDateTime = userProvider.convertToUserTimezone(utcDateTime);
+    
+    // Get month abbreviations
+    const monthAbbreviations = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    
+    final month = monthAbbreviations[localDateTime.month - 1];
+    final day = localDateTime.day.toString().padLeft(2, '0');
+    final hour = localDateTime.hour.toString().padLeft(2, '0');
+    final minute = localDateTime.minute.toString().padLeft(2, '0');
+    
+    return '$month $day, $hour:$minute';
   }
 
   Widget _buildPulsingIcon(BetLineStatus status, bool isLive) {

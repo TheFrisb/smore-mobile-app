@@ -61,6 +61,14 @@ class _LogoAppBarState extends State<LogoAppBar>
     logger.i("Logo tapped");
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    // Always reset filters to ALL when logo is tapped
+    logger.d(
+        "Current screen index: ${widget.currentScreenIndex}, Filters - Product: ${userProvider.selectedProductName}, Filter: ${userProvider.predictionObjectFilter}");
+    
+    userProvider.setSelectedProductName(null); // ALL sport types
+    userProvider.setPredictionObjectFilter(null); // ALL object types
+    logger.d("Filters reset to default");
+
     // If we're already on the predictions screen (index 0), just shake the logo
     if (widget.currentScreenIndex == 0) {
       logger.i("Already on predictions screen, shaking logo");
@@ -74,12 +82,6 @@ class _LogoAppBarState extends State<LogoAppBar>
     }
 
     logger.i("Navigating to predictions screen");
-    logger.d(
-        "Current screen index: ${widget.currentScreenIndex}, Filters - Product: ${userProvider.selectedProductName}, Filter: ${userProvider.predictionObjectFilter}");
-
-    userProvider.setSelectedProductName(null); // ALL sport types
-    userProvider.setPredictionObjectFilter(null); // ALL object types
-    logger.d("Filters reset to default");
 
     // Use the navigation callback if available, otherwise fall back to old navigation
     if (widget.onNavigateToIndex != null) {

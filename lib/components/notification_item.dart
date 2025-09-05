@@ -45,8 +45,7 @@ class NotificationItem extends StatelessWidget {
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
-    final second = dateTime.second.toString().padLeft(2, '0');
-    return '$hour:$minute:$second';
+    return '$hour:$minute';
   }
 
   Color _getBackgroundColor() {
@@ -108,17 +107,17 @@ class NotificationItem extends StatelessWidget {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Stack(
-              children: [
-                // Main content
-                Row(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Icon container
@@ -147,14 +146,31 @@ class NotificationItem extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              color: _getTitleColor(),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: _getTitleColor(),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                _formatTime(createdAt),
+                                style: TextStyle(
+                                  color:
+                                      _getDescriptionColor().withOpacity(0.7),
+                                  fontSize: 10,
+                                  height: 1.2,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
                           ),
                           if (description != null) ...[
                             const SizedBox(height: 3),
@@ -168,49 +184,37 @@ class NotificationItem extends StatelessWidget {
                               ),
                             ),
                           ],
-                          // const SizedBox(height: 4),
-                          // Text(
-                          //   _formatTime(createdAt),
-                          //   style: TextStyle(
-                          //     color: _getDescriptionColor().withOpacity(0.7),
-                          //     fontSize: 10,
-                          //     height: 1.2,
-                          //     letterSpacing: 0.3,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
-                    // Spacer to maintain consistent layout
-                    const SizedBox(width: 16),
                   ],
                 ),
-                // Unread indicator - absolutely positioned
-                if (!isRead)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00D4AA),
-                        // Always use teal for unread indicator
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF00D4AA).withOpacity(0.3),
-                            blurRadius: 4,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
-        ),
+          // Unread indicator - positioned outside the padded content
+          if (!isRead)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00D4AA),
+                  // Always use teal for unread indicator
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00D4AA).withOpacity(0.3),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

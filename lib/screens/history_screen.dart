@@ -13,7 +13,7 @@ import '../components/match_prediction/sport_dropdown.dart';
 
 class HistoryScreen extends StatefulWidget {
   final Function(int)? onNavigateToIndex;
-  
+
   const HistoryScreen({super.key, this.onNavigateToIndex});
 
   static final Logger logger = Logger();
@@ -106,22 +106,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: RefreshIndicator(
               onRefresh: () async {
                 // Use the new method that keeps existing data during refresh
-                final userProvider = Provider.of<UserProvider>(context, listen: false);
-                final historyProvider = Provider.of<HistoryPredictionsProvider>(context, listen: false);
-                
+                final userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
+                final historyProvider = Provider.of<HistoryPredictionsProvider>(
+                    context,
+                    listen: false);
+
                 final selectedProduct = userProvider.selectedProductName;
-                final selectedPredictionObjectFilter = userProvider.predictionObjectFilter;
-                
+                final selectedPredictionObjectFilter =
+                    userProvider.predictionObjectFilter;
+
                 await historyProvider.refreshDataKeepExisting(
-                  selectedProduct, 
+                  selectedProduct,
                   selectedPredictionObjectFilter,
                   updateIsLoading: true,
                 );
               },
-              color: const Color(0xFF36BFFA), // Primary blue
-              backgroundColor: const Color(0xFF1e2f42), // Dark background
+              color: const Color(0xFF36BFFA),
+              // Primary blue
+              backgroundColor: const Color(0xFF1e2f42),
+              // Dark background
               strokeWidth: 2.5,
-              displacement: 40.0,
+              displacement: 10.0,
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: HistoryPredictionsList(),

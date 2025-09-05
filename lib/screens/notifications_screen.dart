@@ -136,26 +136,29 @@ class NotificationsScreen extends StatelessWidget {
 
   int _getTotalItemCount(UserNotificationProvider notificationProvider) {
     int count = 0;
-    
+
     // Add important notifications from today
     count += notificationProvider.importantNotificationsToday.length;
-    
+
     // Add date headers and notifications for normal notifications
     for (final dateKey in notificationProvider.sortedNormalDateKeys) {
       count += 1; // Date header
-      count += notificationProvider.getNormalNotificationsForDate(dateKey).length;
+      count +=
+          notificationProvider.getNormalNotificationsForDate(dateKey).length;
     }
-    
+
     return count;
   }
 
-  Widget _buildListItem(BuildContext context, UserNotificationProvider notificationProvider, int index) {
-    final importantNotifications = notificationProvider.importantNotificationsToday;
-    
+  Widget _buildListItem(BuildContext context,
+      UserNotificationProvider notificationProvider, int index) {
+    final importantNotifications =
+        notificationProvider.importantNotificationsToday;
+
     // If we're still in the important notifications section
     if (index < importantNotifications.length) {
       final notification = importantNotifications[index];
-      
+
       // Show "Pinned" header for the first important notification
       if (index == 0) {
         return Column(
@@ -169,13 +172,13 @@ class NotificationsScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      LucideIcons.pin,
+                      LucideIcons.circleAlert,
                       size: 12,
                       color: Color(0xFF00D4AA),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Pinned',
+                      'Important',
                       style: TextStyle(
                         color: AppColors.secondary.shade400,
                         fontSize: 12,
@@ -199,7 +202,7 @@ class NotificationsScreen extends StatelessWidget {
           ],
         );
       }
-      
+
       // Regular important notification without header
       return NotificationItem(
         icon: notificationProvider.getNotificationIcon(notification),
@@ -211,15 +214,16 @@ class NotificationsScreen extends StatelessWidget {
         onTap: () => _onNotificationTap(context, notification),
       );
     }
-    
+
     // Adjust index for normal notifications
     int adjustedIndex = index - importantNotifications.length;
-    
+
     // Build normal notifications with date headers
     int currentIndex = 0;
     for (final dateKey in notificationProvider.sortedNormalDateKeys) {
-      final notificationsForDate = notificationProvider.getNormalNotificationsForDate(dateKey);
-      
+      final notificationsForDate =
+          notificationProvider.getNormalNotificationsForDate(dateKey);
+
       // Date header
       if (currentIndex == adjustedIndex) {
         return Padding(
@@ -238,7 +242,7 @@ class NotificationsScreen extends StatelessWidget {
         );
       }
       currentIndex++;
-      
+
       // Notifications for this date
       for (final notification in notificationsForDate) {
         if (currentIndex == adjustedIndex) {
@@ -255,7 +259,7 @@ class NotificationsScreen extends StatelessWidget {
         currentIndex++;
       }
     }
-    
+
     return const SizedBox.shrink();
   }
 
@@ -349,10 +353,12 @@ class NotificationsScreen extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => notificationProvider.refresh(),
-      color: const Color(0xFF36BFFA), // Primary blue
-      backgroundColor: const Color(0xFF0D151E), // Dark background
+      color: const Color(0xFF36BFFA),
+      // Primary blue
+      backgroundColor: const Color(0xFF0D151E),
+      // Dark background
       strokeWidth: 2.5,
-      displacement: 40.0,
+      displacement: 10.0,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: _getTotalItemCount(notificationProvider),

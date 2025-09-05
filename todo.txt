@@ -1,14 +1,38 @@
-1. Prediction backend
--- On click, take to wherever the notification is from, inside the application
+App:
+1. Refresh indicator da zastanuva do nekoo pozicija, da zavibrire, a ne da se vlece nonstop
+2. Ikonkata da vraka na All
+3. Saat da se ubace na notifikacija
+4. Ticket saato da e primer -> Sep 05, 20:45
+5. Pinned da stane important so (!)
+6. Ligite od dole na tiket da ne e predlgo, a drzavata zname
+-- Work: 1 hour
 
-2. Apple entitlements
--- Join the new entitlements files
--- Apple sign in
--- Apple notifications
--- Fix the app icon
+Web:
+1. Odds da se prekrste u Total Odds kaj tiketto
+2. Stake u detail analysis da se klika cel
+5. Da e rich text editor tava za notifikacija message i da se renderire u app
+6. Prediction/Ticket admin visibility
+-- Work: 1hour
+
+Notifications:
+1. SMORE Picks are in - 30 minuti posle kosarkata avtomatsko -> important
+2. New topic football, za useri samo so plan football
+3. Important notfikaciite da isceznuvat ka ga markire admino poslednata predikcija/tiket win/lose
+4. Avtomatska notifikacija za win predikcija, tiket
+-- Work: 2 hours
+
+Sredi Merge Requestovite
+
+Plans:
+1. Soccer | 1 week (49.99€), 1 mesec(119.99€), 3 meseca (269.99€)
+2. Basketball | 1 week (35.99€), 1 mesec (79.99€), 3 meseca (159.99€)
+3. AI | 1 mesec (19.99€) -- da se trgne godina
+4. Free trial 3 dena za site planovi
 
 
 
+--
+1. Produp domeno da se trgne
 
 
 ---------------------------------------
