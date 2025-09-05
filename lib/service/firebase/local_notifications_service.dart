@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../../utils/backend_logger.dart';
+
 class LocalNotificationsService {
   // Private constructor for singleton pattern
   LocalNotificationsService._internal();
@@ -39,37 +41,72 @@ class LocalNotificationsService {
   //Counter for generating unique notification IDs
   int _notificationIdCounter = 0;
 
+  // Backend logger instance
+  final BackendLogger _logger = BackendLogger();
+
   /// Initializes the local notifications plugin for Android and iOS.
   Future<void> init() async {
     // Check if already initialized to prevent redundant setup
     if (_isFlutterLocalNotificationInitialized) {
+      _logger.info('Local notifications service already initialized', additionalData: {
+        'component': 'local_notifications_service',
+        'operation': 'init_skip'
+      });
       return;
     }
 
-    // Create plugin instance
-    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    // Combine platform-specific settings
-    final initializationSettings = InitializationSettings(
-      android: _androidInitializationSettings,
-      iOS: _iosInitializationSettings,
-    );
-
-    // Initialize plugin with settings and callback for notification taps
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // Handle notification tap in foreground
-      print('Foreground notification has been tapped: ${response.payload}');
+    _logger.info('Initializing local notifications service', additionalData: {
+      'component': 'local_notifications_service',
+      'operation': 'init_start'
     });
 
-    // Create Android notification channel
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_androidChannel);
+    try {
+      // Create plugin instance
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // Mark initialization as complete
-    _isFlutterLocalNotificationInitialized = true;
+      // Combine platform-specific settings
+      final initializationSettings = InitializationSettings(
+        android: _androidInitializationSettings,
+        iOS: _iosInitializationSettings,
+      );
+
+      // Initialize plugin with settings and callback for notification taps
+      await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+          onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Handle notification tap in foreground
+        print('Foreground notification has been tapped: ${response.payload}');
+        _logger.info('Foreground notification tapped', additionalData: {
+          'component': 'local_notifications_service',
+          'operation': 'notification_tap',
+          'payload': response.payload
+        });
+      });
+
+      // Create Android notification channel
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(_androidChannel);
+
+      // Mark initialization as complete
+      _isFlutterLocalNotificationInitialized = true;
+
+      _logger.info('Local notifications service initialized successfully', additionalData: {
+        'component': 'local_notifications_service',
+        'operation': 'init_complete'
+      });
+    } catch (e, stackTrace) {
+      _logger.errorWithException(
+        'Failed to initialize local notifications service',
+        error: e,
+        stackTrace: stackTrace,
+        additionalData: {
+          'component': 'local_notifications_service',
+          'operation': 'init_failed'
+        },
+      );
+      rethrow;
+    }
   }
 
   /// Show a local notification with the given title, body, and payload.
@@ -78,31 +115,64 @@ class LocalNotificationsService {
     String? body,
     String? payload,
   ) async {
-    // Android-specific notification details
-    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      _androidChannel.id,
-      _androidChannel.name,
-      channelDescription: _androidChannel.description,
-      importance: Importance.max,
-      priority: Priority.high,
-    );
+    _logger.info('Showing local notification', additionalData: {
+      'component': 'local_notifications_service',
+      'operation': 'show_notification',
+      'title': title,
+      'body': body,
+      'payload': payload,
+      'notificationId': _notificationIdCounter
+    });
 
-    // iOS-specific notification details
-    const iosDetails = DarwinNotificationDetails();
+    try {
+      // Android-specific notification details
+      AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+        _androidChannel.id,
+        _androidChannel.name,
+        channelDescription: _androidChannel.description,
+        importance: Importance.max,
+        priority: Priority.high,
+      );
 
-    // Combine platform-specific details
-    final notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+      // iOS-specific notification details
+      const iosDetails = DarwinNotificationDetails();
 
-    // Display the notification
-    await _flutterLocalNotificationsPlugin.show(
-      _notificationIdCounter++,
-      title,
-      body,
-      notificationDetails,
-      payload: payload,
-    );
+      // Combine platform-specific details
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      // Display the notification
+      await _flutterLocalNotificationsPlugin.show(
+        _notificationIdCounter++,
+        title,
+        body,
+        notificationDetails,
+        payload: payload,
+      );
+
+      _logger.info('Local notification displayed successfully', additionalData: {
+        'component': 'local_notifications_service',
+        'operation': 'show_notification_success',
+        'title': title,
+        'body': body,
+        'notificationId': _notificationIdCounter - 1
+      });
+    } catch (e, stackTrace) {
+      _logger.errorWithException(
+        'Failed to show local notification',
+        error: e,
+        stackTrace: stackTrace,
+        additionalData: {
+          'component': 'local_notifications_service',
+          'operation': 'show_notification_failed',
+          'title': title,
+          'body': body,
+          'payload': payload
+        },
+      );
+      rethrow;
+    }
   }
 }

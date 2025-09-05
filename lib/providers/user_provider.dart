@@ -314,7 +314,11 @@ class UserProvider with ChangeNotifier {
     await _storage.delete(key: 'selectedProductName');
     await _storage.delete(key: 'predictionObjectFilter');
 
-    await FirebaseMessaging.instance.unsubscribeFromTopic("ALL");
+    try {
+      await FirebaseMessaging.instance.unsubscribeFromTopic("ALL");
+    } catch (e) {
+      logger.e('Error unsubscribing from FCM topic: $e');
+    }
 
     _user = null;
     _userTimezone = null;
