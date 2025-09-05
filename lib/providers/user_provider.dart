@@ -9,7 +9,7 @@ import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/service/user_service.dart';
-import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
+import 'package:smore_mobile_app/utils/backend_logger.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/sport/ticket.dart';
@@ -25,7 +25,7 @@ class UserProvider with ChangeNotifier {
   final DioClient _dioClient = DioClient();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   static final Logger logger = Logger();
-  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+  final BackendLogger _revenueCatLogger = BackendLogger();
 
   User? _user;
   bool _isLoading = false;

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'revenuecat_error_handler.dart';
-import 'revenuecat_logger.dart';
+
 import '../components/common/error_snackbar.dart';
+import 'backend_logger.dart';
+import 'revenuecat_error_handler.dart';
 
 /// Mixin for handling RevenueCat errors in widgets
 mixin RevenueCatErrorMixin<T extends StatefulWidget> on State<T> {
   static final Logger _logger = Logger();
   final RevenueCatErrorHandler _errorHandler = RevenueCatErrorHandler();
-  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+  final BackendLogger _revenueCatLogger = BackendLogger();
 
   /// Handle RevenueCat errors with automatic logging and user notification
   void handleRevenueCatError(
@@ -47,11 +48,11 @@ mixin RevenueCatErrorMixin<T extends StatefulWidget> on State<T> {
   }) async {
     try {
       final result = await operation();
-      
+
       if (onSuccess != null) {
         onSuccess();
       }
-      
+
       return result;
     } catch (error, stackTrace) {
       handleRevenueCatError(
@@ -183,4 +184,4 @@ mixin RevenueCatErrorMixin<T extends StatefulWidget> on State<T> {
       additionalData: additionalData,
     );
   }
-} 
+}

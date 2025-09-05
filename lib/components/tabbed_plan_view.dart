@@ -6,7 +6,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
-import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
+import 'package:smore_mobile_app/utils/backend_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../components/purchases/subscription_button.dart';
@@ -23,7 +23,7 @@ class TabbedPlanView extends StatefulWidget {
 class _TabbedPlanViewState extends State<TabbedPlanView>
     with SingleTickerProviderStateMixin {
   static final Logger _logger = Logger();
-  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+  final BackendLogger _revenueCatLogger = BackendLogger();
 
   late TabController _tabController;
   bool _isLoading = true;

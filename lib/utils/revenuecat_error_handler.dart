@@ -1,7 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'revenuecat_logger.dart';
+
+import 'backend_logger.dart';
 
 /// Error information structure
 class RevenueCatError {
@@ -34,7 +35,7 @@ class RevenueCatErrorHandler {
   RevenueCatErrorHandler._internal();
 
   static final Logger _logger = Logger();
-  final RevenueCatLogger _revenueCatLogger = RevenueCatLogger();
+  final BackendLogger _revenueCatLogger = BackendLogger();
 
   /// Handle RevenueCat purchase errors
   RevenueCatError handlePurchaseError(
@@ -344,7 +345,8 @@ class RevenueCatErrorHandler {
   }
 
   /// Log successful operation
-  void logSuccess(String operation, {String? productId, String? transactionId}) {
+  void logSuccess(String operation,
+      {String? productId, String? transactionId}) {
     _revenueCatLogger.logRevenueCatSuccess(
       operation: operation,
       productId: productId,

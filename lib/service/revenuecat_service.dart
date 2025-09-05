@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/constants/constants.dart';
+import 'package:smore_mobile_app/utils/backend_logger.dart';
 import 'package:smore_mobile_app/utils/revenuecat_error_handler.dart';
-import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
 
 enum ConsumableIdentifiers {
   dailyOffer("daily_offer"),
@@ -112,13 +112,13 @@ class RevenueCatService {
       ConsumableIdentifiers.values.map((e) => e.value).toList(),
     );
 
-    RevenueCatLogger().info(
+    BackendLogger().info(
       'Available products: ${products.map((p) => p.identifier).join(', ')}',
     );
   }
 
   void _logOfferings() async {
-    RevenueCatLogger rLogger = RevenueCatLogger();
+    BackendLogger rLogger = BackendLogger();
     Offerings? offerings = await Purchases.getOfferings();
 
     if (offerings.current == null) {

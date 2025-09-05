@@ -13,14 +13,12 @@ enum InternalLogLevel {
   const InternalLogLevel(this.value);
 }
 
-/// Internal logging class for RevenueCat errors
-/// Logs to both console and backend
-class RevenueCatLogger {
-  static final RevenueCatLogger _instance = RevenueCatLogger._internal();
+class BackendLogger {
+  static final BackendLogger _instance = BackendLogger._internal();
 
-  factory RevenueCatLogger() => _instance;
+  factory BackendLogger() => _instance;
 
-  RevenueCatLogger._internal();
+  BackendLogger._internal();
 
   final Logger _consoleLogger = Logger();
   final DioClient _dioClient = DioClient();

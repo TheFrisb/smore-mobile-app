@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ import 'package:smore_mobile_app/service/firebase/firebase_messaging_service.dar
 import 'package:smore_mobile_app/service/firebase/local_notifications_service.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/theme/app_theme.dart';
-import 'package:smore_mobile_app/utils/revenuecat_logger.dart';
+import 'package:smore_mobile_app/utils/backend_logger.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -39,7 +40,7 @@ void main() async {
       localNotificationsService: localNotificationsService);
 
   Logger logger = Logger();
-  final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
+  final BackendLogger revenueCatLogger = BackendLogger();
 
   // Initialize RevenueCat before running the app
   try {
@@ -98,10 +99,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    
+
     // Add app lifecycle observer
     WidgetsBinding.instance.addObserver(this);
-    
+
     // Set up the network status listener
     _connectivity.onConnectivityChanged
         .listen((List<ConnectivityResult> results) {
@@ -129,7 +130,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    
+
     switch (state) {
       case AppLifecycleState.resumed:
         _logger.i('App became active - performing background refresh');
@@ -156,9 +157,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   /// Start periodic refresh timer
   void _startPeriodicRefresh() {
     _stopPeriodicRefresh(); // Stop any existing timer
-    
-    _logger.i('Starting periodic refresh - Upcoming: 5min, Notifications: 10min');
-    
+
+    _logger
+        .i('Starting periodic refresh - Upcoming: 5min, Notifications: 10min');
+
     // Refresh upcoming predictions every 5 minutes
     _periodicRefreshTimer = Timer.periodic(
       const Duration(minutes: 5),
@@ -176,19 +178,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _performPeriodicRefresh() async {
     try {
       _logger.d('Performing periodic refresh');
-      
-      final upcomingProvider = Provider.of<UpcomingPredictionsProvider>(context, listen: false);
-      final notificationProvider = Provider.of<UserNotificationProvider>(context, listen: false);
-      
+
+      final upcomingProvider =
+          Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+      final notificationProvider =
+          Provider.of<UserNotificationProvider>(context, listen: false);
+
       // Refresh upcoming predictions
       await upcomingProvider.fetchUpcomingPredictions(updateIsLoading: false);
-      
+
       // Refresh notifications every 10 minutes (every 2nd call)
       final now = DateTime.now();
       if (now.minute % 10 == 0) {
         await notificationProvider.refresh();
       }
-      
+
       _logger.d('Periodic refresh completed successfully');
     } catch (e) {
       _logger.e('Error during periodic refresh: $e');
@@ -198,17 +202,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   /// Perform background refresh when app becomes active
   Future<void> _performBackgroundRefresh() async {
     try {
-      final upcomingProvider = Provider.of<UpcomingPredictionsProvider>(context, listen: false);
-      final notificationProvider = Provider.of<UserNotificationProvider>(context, listen: false);
-      
+      final upcomingProvider =
+          Provider.of<UpcomingPredictionsProvider>(context, listen: false);
+      final notificationProvider =
+          Provider.of<UserNotificationProvider>(context, listen: false);
+
       _logger.i('Refreshing data in background (app became active)');
-      
+
       // Refresh upcoming predictions
       await upcomingProvider.fetchUpcomingPredictions(updateIsLoading: false);
-      
+
       // Refresh notifications
       await notificationProvider.refresh();
-      
+
       _logger.i('Background refresh completed successfully');
     } catch (e) {
       _logger.e('Error during background refresh: $e');
@@ -222,7 +228,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       _logger.i('Customer info updated successfully in context');
 
       // Log the customer info update
-      final RevenueCatLogger revenueCatLogger = RevenueCatLogger();
+      final BackendLogger revenueCatLogger = BackendLogger();
       revenueCatLogger.logRevenueCatInfo(
         operation: 'customer_info_listener',
         infoMessage: 'Customer info updated via listener',
