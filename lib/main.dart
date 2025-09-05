@@ -36,8 +36,27 @@ void main() async {
   await localNotificationsService.init();
 
   final firebaseMessagingService = FirebaseMessagingService.instance();
+  
+  // Create a function to refresh notifications
+  Future<void> refreshNotifications() async {
+    // This will be called from the provider context
+    // We'll need to access the provider from the global navigator key
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      try {
+        final notificationProvider = Provider.of<UserNotificationProvider>(context, listen: false);
+        await notificationProvider.refresh();
+      } catch (e) {
+        // Provider might not be available yet, that's okay
+        print('Could not refresh notifications: $e');
+      }
+    }
+  }
+  
   await firebaseMessagingService.init(
-      localNotificationsService: localNotificationsService);
+    localNotificationsService: localNotificationsService,
+    onNotificationReceived: refreshNotifications,
+  );
 
   Logger logger = Logger();
   final BackendLogger revenueCatLogger = BackendLogger();

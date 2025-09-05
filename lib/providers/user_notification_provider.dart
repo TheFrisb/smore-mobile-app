@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:smore_mobile_app/components/notification_item.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
 import 'package:smore_mobile_app/service/user_notifications_service.dart';
 
@@ -52,6 +53,65 @@ class UserNotificationProvider with ChangeNotifier {
   // Get sorted date keys (most recent first)
   List<String> get sortedDateKeys {
     final keys = groupedNotifications.keys.toList();
+    keys.sort((a, b) => b.compareTo(a)); // Sort dates in descending order
+    return keys;
+  }
+
+  // Get important notifications from today
+  List<UserNotification> get importantNotificationsToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    return _notifications.where((notification) {
+      final notificationDate = DateTime(
+        notification.createdAt.year,
+        notification.createdAt.month,
+        notification.createdAt.day,
+      );
+      return notification.isImportant && notificationDate == today;
+    }).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sort by creation time, newest first
+  }
+
+  // Get normal notifications (excluding important ones from today)
+  List<UserNotification> get normalNotifications {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    return _notifications.where((notification) {
+      final notificationDate = DateTime(
+        notification.createdAt.year,
+        notification.createdAt.month,
+        notification.createdAt.day,
+      );
+      // Include if not important, or if important but not from today
+      return !notification.isImportant || notificationDate != today;
+    }).toList();
+  }
+
+  // Group normal notifications by date (most recent first)
+  Map<String, List<UserNotification>> get groupedNormalNotifications {
+    final Map<String, List<UserNotification>> grouped = {};
+
+    for (var notification in normalNotifications) {
+      final dateKey = _formatDateKey(notification.createdAt);
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey]!.add(notification);
+    }
+
+    // Sort notifications within each group by creation time (newest first)
+    for (var notifications in grouped.values) {
+      notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+
+    return grouped;
+  }
+
+  // Get sorted date keys for normal notifications (most recent first)
+  List<String> get sortedNormalDateKeys {
+    final keys = groupedNormalNotifications.keys.toList();
     keys.sort((a, b) => b.compareTo(a)); // Sort dates in descending order
     return keys;
   }
@@ -110,6 +170,8 @@ class UserNotificationProvider with ChangeNotifier {
       title: notification.title,
       message: notification.message,
       isRead: true,
+      isImportant: notification.isImportant,
+      icon: notification.icon,
       createdAt: notification.createdAt,
     );
     notifyListeners();
@@ -149,6 +211,8 @@ class UserNotificationProvider with ChangeNotifier {
           title: notification.title,
           message: notification.message,
           isRead: true,
+          isImportant: notification.isImportant,
+          icon: notification.icon,
           createdAt: notification.createdAt,
         );
       }
@@ -186,6 +250,11 @@ class UserNotificationProvider with ChangeNotifier {
   /// Get notifications for a specific date
   List<UserNotification> getNotificationsForDate(String dateKey) {
     return groupedNotifications[dateKey] ?? [];
+  }
+
+  /// Get normal notifications for a specific date
+  List<UserNotification> getNormalNotificationsForDate(String dateKey) {
+    return groupedNormalNotifications[dateKey] ?? [];
   }
 
   /// Format date key for grouping (YYYY-MM-DD format)
@@ -229,8 +298,8 @@ class UserNotificationProvider with ChangeNotifier {
     return months[month - 1];
   }
 
-  /// Get notification icon - always returns bell icon
+  /// Get notification icon based on notification's icon field
   IconData getNotificationIcon(UserNotification notification) {
-    return LucideIcons.bell; // Always return bell icon
+    return NotificationItem.getNotificationIcon(notification.icon);
   }
 }

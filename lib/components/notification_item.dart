@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
+import 'package:smore_mobile_app/models/user_notification.dart';
 
 class NotificationItem extends StatelessWidget {
   final IconData icon;
@@ -7,6 +9,8 @@ class NotificationItem extends StatelessWidget {
   final String? description;
   final VoidCallback? onTap;
   final bool isRead;
+  final bool isImportant;
+  final DateTime createdAt;
 
   const NotificationItem({
     super.key,
@@ -15,21 +19,85 @@ class NotificationItem extends StatelessWidget {
     this.description,
     this.onTap,
     this.isRead = false,
+    this.isImportant = false,
+    required this.createdAt,
   });
+
+  static IconData getNotificationIcon(NotificationIcon? icon) {
+    if (icon == null) {
+      return LucideIcons.bell;
+    }
+
+    switch (icon) {
+      case NotificationIcon.SOCCER:
+        return Icons.sports_soccer;
+      case NotificationIcon.BASKETBALL:
+        return Icons.sports_basketball;
+      case NotificationIcon.TROPHY:
+        return LucideIcons.trophy;
+      case NotificationIcon.CHECKMARK:
+        return LucideIcons.circleCheck;
+      case NotificationIcon.XMARK:
+        return LucideIcons.circleX;
+    }
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final second = dateTime.second.toString().padLeft(2, '0');
+    return '$hour:$minute:$second';
+  }
+
+  Color _getBackgroundColor() {
+    if (isImportant) {
+      // Important notifications always use unread styling (don't reset when read)
+      return AppColors.secondary.shade600.withOpacity(0.5);
+    }
+    return isRead
+        ? AppColors.secondary.shade400.withOpacity(0.1)
+        : AppColors.secondary.shade600.withOpacity(0.5);
+  }
+
+  Color _getBorderColor() {
+    if (isImportant) {
+      // Important notifications always use unread styling (don't reset when read)
+      return AppColors.secondary.shade600.withOpacity(1);
+    }
+    return isRead
+        ? AppColors.secondary.shade600.withOpacity(0.5)
+        : AppColors.secondary.shade600.withOpacity(1);
+  }
+
+  Color _getTitleColor() {
+    if (isImportant) {
+      // Important notifications always use unread styling (don't reset when read)
+      return const Color(0xFFF8FAFC);
+    }
+    return isRead
+        ? const Color(0xFFE2E8F0).withOpacity(0.8)
+        : const Color(0xFFF8FAFC);
+  }
+
+  Color _getDescriptionColor() {
+    if (isImportant) {
+      // Important notifications always use unread styling (don't reset when read)
+      return const Color(0xFFE2E8F0);
+    }
+    return isRead
+        ? const Color(0xFFCBD5E1).withOpacity(0.8)
+        : const Color(0xFFE2E8F0);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
-        color: isRead
-            ? AppColors.secondary.shade400.withOpacity(0.1)
-            : AppColors.secondary.shade600.withOpacity(0.5),
+        color: _getBackgroundColor(),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isRead
-              ? AppColors.secondary.shade600.withOpacity(0.5)
-              : AppColors.secondary.shade600.withOpacity(1),
+          color: _getBorderColor(),
           width: 0.5,
         ),
         boxShadow: [
@@ -82,9 +150,7 @@ class NotificationItem extends StatelessWidget {
                           Text(
                             title,
                             style: TextStyle(
-                              color: isRead
-                                  ? const Color(0xFFE2E8F0).withOpacity(0.8)
-                                  : const Color(0xFFF8FAFC),
+                              color: _getTitleColor(),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               height: 1.2,
@@ -95,15 +161,23 @@ class NotificationItem extends StatelessWidget {
                             Text(
                               description!,
                               style: TextStyle(
-                                color: isRead
-                                    ? const Color(0xFFCBD5E1).withOpacity(0.8)
-                                    : const Color(0xFFE2E8F0),
+                                color: _getDescriptionColor(),
                                 fontSize: 11,
                                 height: 1.3,
                                 letterSpacing: 0.2,
                               ),
                             ),
                           ],
+                          // const SizedBox(height: 4),
+                          // Text(
+                          //   _formatTime(createdAt),
+                          //   style: TextStyle(
+                          //     color: _getDescriptionColor().withOpacity(0.7),
+                          //     fontSize: 10,
+                          //     height: 1.2,
+                          //     letterSpacing: 0.3,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -121,6 +195,7 @@ class NotificationItem extends StatelessWidget {
                       height: 6,
                       decoration: BoxDecoration(
                         color: const Color(0xFF00D4AA),
+                        // Always use teal for unread indicator
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(

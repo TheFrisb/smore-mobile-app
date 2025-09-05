@@ -134,6 +134,131 @@ class NotificationsScreen extends StatelessWidget {
     provider.markNotificationAsRead(notification.id);
   }
 
+  int _getTotalItemCount(UserNotificationProvider notificationProvider) {
+    int count = 0;
+    
+    // Add important notifications from today
+    count += notificationProvider.importantNotificationsToday.length;
+    
+    // Add date headers and notifications for normal notifications
+    for (final dateKey in notificationProvider.sortedNormalDateKeys) {
+      count += 1; // Date header
+      count += notificationProvider.getNormalNotificationsForDate(dateKey).length;
+    }
+    
+    return count;
+  }
+
+  Widget _buildListItem(BuildContext context, UserNotificationProvider notificationProvider, int index) {
+    final importantNotifications = notificationProvider.importantNotificationsToday;
+    
+    // If we're still in the important notifications section
+    if (index < importantNotifications.length) {
+      final notification = importantNotifications[index];
+      
+      // Show "Pinned" header for the first important notification
+      if (index == 0) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Pinned header without extra top padding
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      LucideIcons.pin,
+                      size: 12,
+                      color: Color(0xFF00D4AA),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Pinned',
+                      style: TextStyle(
+                        color: AppColors.secondary.shade400,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            NotificationItem(
+              icon: notificationProvider.getNotificationIcon(notification),
+              title: notification.title,
+              description: notification.message,
+              isRead: notification.isRead,
+              isImportant: true,
+              createdAt: notification.createdAt,
+              onTap: () => _onNotificationTap(context, notification),
+            ),
+          ],
+        );
+      }
+      
+      // Regular important notification without header
+      return NotificationItem(
+        icon: notificationProvider.getNotificationIcon(notification),
+        title: notification.title,
+        description: notification.message,
+        isRead: notification.isRead,
+        isImportant: true,
+        createdAt: notification.createdAt,
+        onTap: () => _onNotificationTap(context, notification),
+      );
+    }
+    
+    // Adjust index for normal notifications
+    int adjustedIndex = index - importantNotifications.length;
+    
+    // Build normal notifications with date headers
+    int currentIndex = 0;
+    for (final dateKey in notificationProvider.sortedNormalDateKeys) {
+      final notificationsForDate = notificationProvider.getNormalNotificationsForDate(dateKey);
+      
+      // Date header
+      if (currentIndex == adjustedIndex) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Center(
+            child: Text(
+              notificationProvider.getDisplayDate(dateKey),
+              style: TextStyle(
+                color: AppColors.secondary.shade400,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        );
+      }
+      currentIndex++;
+      
+      // Notifications for this date
+      for (final notification in notificationsForDate) {
+        if (currentIndex == adjustedIndex) {
+          return NotificationItem(
+            icon: notificationProvider.getNotificationIcon(notification),
+            title: notification.title,
+            description: notification.message,
+            isRead: notification.isRead,
+            isImportant: false,
+            createdAt: notification.createdAt,
+            onTap: () => _onNotificationTap(context, notification),
+          );
+        }
+        currentIndex++;
+      }
+    }
+    
+    return const SizedBox.shrink();
+  }
+
   Widget _buildNotificationsList(
       BuildContext context, UserNotificationProvider notificationProvider) {
     if (notificationProvider.notifications.isEmpty) {
@@ -224,45 +349,15 @@ class NotificationsScreen extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => notificationProvider.refresh(),
-      color: const Color(0xFF00D4AA),
+      color: const Color(0xFF36BFFA), // Primary blue
+      backgroundColor: const Color(0xFF0D151E), // Dark background
+      strokeWidth: 2.5,
+      displacement: 40.0,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: notificationProvider.sortedDateKeys.length,
-        itemBuilder: (context, dateIndex) {
-          final dateKey = notificationProvider.sortedDateKeys[dateIndex];
-          final notificationsForDate =
-              notificationProvider.getNotificationsForDate(dateKey);
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Date header
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Center(
-                  child: Text(
-                    notificationProvider.getDisplayDate(dateKey),
-                    style: TextStyle(
-                      color: AppColors.secondary.shade400,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-              // Notifications for this date
-              ...notificationsForDate.map((notification) {
-                return NotificationItem(
-                  icon: notificationProvider.getNotificationIcon(notification),
-                  title: notification.title,
-                  description: notification.message,
-                  isRead: notification.isRead,
-                  onTap: () => _onNotificationTap(context, notification),
-                );
-              }),
-            ],
-          );
+        itemCount: _getTotalItemCount(notificationProvider),
+        itemBuilder: (context, index) {
+          return _buildListItem(context, notificationProvider, index);
         },
       ),
     );

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../utils/backend_logger.dart';
+import '../user_service.dart';
 import 'local_notifications_service.dart';
 
 class FirebaseMessagingService {
@@ -20,10 +21,18 @@ class FirebaseMessagingService {
 
   // Backend logger instance
   final BackendLogger _logger = BackendLogger();
+  
+  // User service for backend operations
+  final UserService _userService = UserService();
+  
+  // Callback function to refresh notifications
+  Future<void> Function()? _onNotificationReceivedCallback;
 
   /// Initialize Firebase Messaging and sets up all message listeners
-  Future<void> init(
-      {required LocalNotificationsService localNotificationsService}) async {
+  Future<void> init({
+    required LocalNotificationsService localNotificationsService,
+    Future<void> Function()? onNotificationReceived,
+  }) async {
     _logger.info('Initializing Firebase Messaging Service', additionalData: {
       'component': 'firebase_messaging_service',
       'operation': 'initialization'
@@ -32,6 +41,9 @@ class FirebaseMessagingService {
     try {
       // Init local notifications service
       _localNotificationsService = localNotificationsService;
+      
+      // Set notification received callback
+      _onNotificationReceivedCallback = onNotificationReceived;
 
       // Handle FCM token
       _handlePushNotificationsToken();
@@ -93,6 +105,11 @@ class FirebaseMessagingService {
         'token': token
       });
 
+      // Send initial token to backend
+      if (token != null) {
+        await _sendTokenToBackend(token);
+      }
+
       // Listen for token refresh events
       FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
         _logger.info('FCM token refreshed', additionalData: {
@@ -100,7 +117,9 @@ class FirebaseMessagingService {
           'operation': 'token_refresh',
           'newToken': fcmToken
         });
-        // TODO: optionally send token to your server for targeting this device
+        
+        // Send refreshed token to backend
+        _sendTokenToBackend(fcmToken);
       }).onError((error) {
         // Handle errors during token refresh
         _logger.errorWithException(
@@ -122,6 +141,37 @@ class FirebaseMessagingService {
           'operation': 'token_handling_failed'
         },
       );
+    }
+  }
+
+  /// Sends FCM token to backend with error handling
+  Future<void> _sendTokenToBackend(String token) async {
+    try {
+      _logger.info('Sending FCM token to backend', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'send_token_to_backend',
+        'token': token
+      });
+
+      await _userService.sendFcmTokenToBackend(token);
+
+      _logger.info('FCM token successfully sent to backend', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'send_token_to_backend_success',
+        'token': token
+      });
+    } catch (e, stackTrace) {
+      _logger.errorWithException(
+        'Failed to send FCM token to backend',
+        error: e,
+        stackTrace: stackTrace,
+        additionalData: {
+          'component': 'firebase_messaging_service',
+          'operation': 'send_token_to_backend_failed',
+          'token': token
+        },
+      );
+      // Don't rethrow - we don't want token sending failures to break the app
     }
   }
 
@@ -191,6 +241,9 @@ class FirebaseMessagingService {
             'data': message.data
           });
     }
+    
+    // Refresh notifications in the provider
+    _refreshNotifications('foreground_message');
   }
 
   /// Handles notification taps when app is opened from the background or terminated state
@@ -203,7 +256,48 @@ class FirebaseMessagingService {
       'from': message.from,
       'sentTime': message.sentTime?.toIso8601String()
     });
+    
+    // Refresh notifications in the provider
+    _refreshNotifications('notification_tap');
     // TODO: Add navigation or specific handling based on message data
+  }
+
+  /// Refreshes notifications in the provider
+  Future<void> _refreshNotifications(String trigger) async {
+    if (_onNotificationReceivedCallback != null) {
+      try {
+        _logger.info('Refreshing notifications due to $trigger', additionalData: {
+          'component': 'firebase_messaging_service',
+          'operation': 'refresh_notifications',
+          'trigger': trigger
+        });
+        
+        await _onNotificationReceivedCallback!();
+        
+        _logger.info('Notifications refreshed successfully', additionalData: {
+          'component': 'firebase_messaging_service',
+          'operation': 'refresh_notifications_success',
+          'trigger': trigger
+        });
+      } catch (e, stackTrace) {
+        _logger.errorWithException(
+          'Failed to refresh notifications',
+          error: e,
+          stackTrace: stackTrace,
+          additionalData: {
+            'component': 'firebase_messaging_service',
+            'operation': 'refresh_notifications_failed',
+            'trigger': trigger
+          },
+        );
+      }
+    } else {
+      _logger.warning('No notification refresh callback set', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'refresh_notifications_no_callback',
+        'trigger': trigger
+      });
+    }
   }
 }
 

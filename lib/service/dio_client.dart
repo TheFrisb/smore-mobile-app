@@ -1,6 +1,7 @@
 // lib/core/network/dio_client.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:logger/logger.dart';
 
 import '../constants/constants.dart';
 
@@ -8,6 +9,7 @@ class DioClient {
   static final DioClient _instance = DioClient._internal();
   final Dio _dio = Dio();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final Logger _logger = Logger();
 
   factory DioClient() => _instance;
 
@@ -22,7 +24,7 @@ class DioClient {
 
     _dio.interceptors.addAll([
       _authInterceptor,
-      LogInterceptor(requestBody: true, responseBody: true),
+      _createErrorLoggingInterceptor(),
     ]);
   }
 
@@ -57,6 +59,31 @@ class DioClient {
       return handler.next(error);
     },
   );
+
+  // Create error logging interceptor method
+  Interceptor _createErrorLoggingInterceptor() {
+    return InterceptorsWrapper(
+      onError: (error, handler) {
+        _logger.e(
+          'Dio Error: ${error.requestOptions.method} ${error.requestOptions.path}',
+          error: error,
+          stackTrace: error.stackTrace,
+        );
+
+        // Log additional error details
+        if (error.response != null) {
+          _logger.e(
+            'Response Status: ${error.response?.statusCode}',
+            error: error.response?.data,
+          );
+        } else {
+          _logger.e('Network Error: ${error.message}');
+        }
+
+        return handler.next(error);
+      },
+    );
+  }
 
   Future<String> _refreshToken() async {
     final refreshToken = await _storage.read(key: 'refreshToken');
