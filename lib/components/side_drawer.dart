@@ -202,8 +202,49 @@ class SideDrawer extends StatelessWidget {
                     title: const Text('Logout'),
                     leading: Icon(LucideIcons.logOut,
                         color: Colors.red.withOpacity(0.6)),
-                    onTap: () {
-                      context.read<UserProvider>().logout();
+                    onTap: () async {
+                      // Close drawer immediately for better UX
+                      Navigator.pop(context);
+                      
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF0BA5EC),
+                          ),
+                        ),
+                      );
+                      
+                      try {
+                        // Perform logout
+                        await context.read<UserProvider>().logout();
+                        
+                        // Close loading dialog
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        // Close loading dialog
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                        
+                        // Show error message
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Logout failed: ${e.toString()}'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     },
                     dense: true,
                   ),

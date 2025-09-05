@@ -308,24 +308,47 @@ class UserProvider with ChangeNotifier {
 
   Future<void> logout() async {
     logger.i('Logging out user');
-    await _storage.delete(key: 'accessToken');
-    await _storage.delete(key: 'refreshToken');
-    await _storage.delete(key: 'userTimezone');
-    await _storage.delete(key: 'selectedProductName');
-    await _storage.delete(key: 'predictionObjectFilter');
-
-    try {
-      await FirebaseMessaging.instance.unsubscribeFromTopic("ALL");
-    } catch (e) {
-      logger.e('Error unsubscribing from FCM topic: $e');
-    }
-
+    
+    // Immediately clear user state for instant UI response
     _user = null;
     _userTimezone = null;
     _selectedProductName = null;
     _predictionObjectFilter = null;
     _isGuest = false;
     notifyListeners();
+    
+    // Handle cleanup in background without blocking UI
+    _performLogoutCleanup();
+  }
+  
+  Future<void> _performLogoutCleanup() async {
+    try {
+      // Delete storage items
+      await Future.wait([
+        _storage.delete(key: 'accessToken'),
+        _storage.delete(key: 'refreshToken'),
+        _storage.delete(key: 'userTimezone'),
+        _storage.delete(key: 'selectedProductName'),
+        _storage.delete(key: 'predictionObjectFilter'),
+      ]);
+      
+      // Unsubscribe from FCM topic with timeout
+      try {
+        await FirebaseMessaging.instance.unsubscribeFromTopic("ALL").timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            logger.w('FCM unsubscribe timed out, continuing logout');
+          },
+        );
+      } catch (e) {
+        logger.e('Error unsubscribing from FCM topic: $e');
+      }
+      
+      logger.i('Logout cleanup completed successfully');
+    } catch (e) {
+      logger.e('Error during logout cleanup: $e');
+      // Don't rethrow - logout should succeed even if cleanup fails
+    }
   }
 
   Future<void> _setInitialTimezone() async {

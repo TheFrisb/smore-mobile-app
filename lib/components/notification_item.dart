@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
@@ -174,14 +175,18 @@ class NotificationItem extends StatelessWidget {
                           ),
                           if (description != null) ...[
                             const SizedBox(height: 3),
-                            Text(
-                              description!,
-                              style: TextStyle(
-                                color: _getDescriptionColor(),
-                                fontSize: 11,
-                                height: 1.3,
-                                letterSpacing: 0.2,
-                              ),
+                            Html(
+                              data: description!,
+                              style: {
+                                "body": Style(
+                                  margin: Margins.zero,
+                                  padding: HtmlPaddings.zero,
+                                  color: _getDescriptionColor(),
+                                  fontSize: FontSize(11),
+                                  lineHeight: const LineHeight(1.3),
+                                  letterSpacing: 0.2,
+                                ),
+                              },
                             ),
                           ],
                         ],
