@@ -1,25 +1,19 @@
 Notifications:
 1. SMORE Picks are in - 30 minuti posle kosarkata avtomatsko -> important
-2. New topic football, za useri samo so plan football
-3. Important notfikaciite da isceznuvat ka ga markire admino poslednata predikcija/tiket win/lose
-4. Avtomatska notifikacija za win predikcija, tiket
+2. Important notfikaciite da isceznuvat ka ga markire admino poslednata predikcija/tiket win/lose
 -- Work: 2 hours
 
-Sredi Merge Requestovite
 
+1. Sredi MR
+2. Sredi produp domen
+---------------------------------------
 Plans:
 1. Soccer | 1 week (49.99€), 1 mesec(119.99€), 3 meseca (269.99€)
 2. Basketball | 1 week (35.99€), 1 mesec (79.99€), 3 meseca (159.99€)
 3. AI | 1 mesec (19.99€) -- da se trgne godina
 4. Free trial 3 dena za site planovi
-
-
-
---
-1. Produp domeno da se trgne
-
-
 ---------------------------------------
+
 7. Backend
 -- Protect AI
 -- Parse revenuecat subscriptions

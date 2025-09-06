@@ -69,6 +69,9 @@ class UserProvider with ChangeNotifier {
         },
       );
 
+      // Update FCM subscriptions based on new entitlements
+      await updateFcmSubscriptions();
+
       notifyListeners();
     } catch (e, stackTrace) {
       logger.e('Error updating customer info: $e');
@@ -299,6 +302,7 @@ class UserProvider with ChangeNotifier {
   Future<void> subscribeToFcmTopic() async {
     try {
       await FirebaseMessaging.instance.subscribeToTopic("ALL");
+      await _subscribeToSportTopics();
       await UserService().sendFcmTokenToBackend(
           await FirebaseMessaging.instance.getToken() ?? '');
     } catch (e) {
@@ -306,9 +310,68 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<void> _subscribeToSportTopics() async {
+    if (_user == null) return;
+
+    try {
+      List<String> topicsToSubscribe = [];
+
+      // Check for SOCCER access
+      if (hasAccessToProduct(ProductName.SOCCER)) {
+        topicsToSubscribe.add("SOCCER");
+        logger.i('User has SOCCER access, subscribing to SOCCER topic');
+      }
+
+      // Check for BASKETBALL access
+      if (hasAccessToProduct(ProductName.BASKETBALL)) {
+        topicsToSubscribe.add("BASKETBALL");
+        logger.i('User has BASKETBALL access, subscribing to BASKETBALL topic');
+      }
+
+      // Subscribe to all sport topics the user has access to
+      if (topicsToSubscribe.isNotEmpty) {
+        await Future.wait(topicsToSubscribe.map(
+            (topic) => FirebaseMessaging.instance.subscribeToTopic(topic)));
+        logger.i('Successfully subscribed to sport topics: $topicsToSubscribe');
+      }
+    } catch (e) {
+      logger.e('Error subscribing to sport topics: $e');
+    }
+  }
+
+  // Method to update FCM subscriptions when user's product access changes
+  Future<void> updateFcmSubscriptions() async {
+    if (_user == null) return;
+
+    try {
+      // First unsubscribe from all sport topics
+      await _unsubscribeFromSportTopics();
+
+      // Then subscribe to topics based on current access
+      await _subscribeToSportTopics();
+
+      logger.i('FCM subscriptions updated successfully');
+    } catch (e) {
+      logger.e('Error updating FCM subscriptions: $e');
+    }
+  }
+
+  Future<void> _unsubscribeFromSportTopics() async {
+    try {
+      List<String> sportTopics = ["SOCCER", "BASKETBALL"];
+
+      await Future.wait(sportTopics.map(
+          (topic) => FirebaseMessaging.instance.unsubscribeFromTopic(topic)));
+
+      logger.i('Successfully unsubscribed from sport topics: $sportTopics');
+    } catch (e) {
+      logger.e('Error unsubscribing from sport topics: $e');
+    }
+  }
+
   Future<void> logout() async {
     logger.i('Logging out user');
-    
+
     // Immediately clear user state for instant UI response
     _user = null;
     _userTimezone = null;
@@ -316,11 +379,11 @@ class UserProvider with ChangeNotifier {
     _predictionObjectFilter = null;
     _isGuest = false;
     notifyListeners();
-    
+
     // Handle cleanup in background without blocking UI
     _performLogoutCleanup();
   }
-  
+
   Future<void> _performLogoutCleanup() async {
     try {
       // Delete storage items
@@ -331,23 +394,42 @@ class UserProvider with ChangeNotifier {
         _storage.delete(key: 'selectedProductName'),
         _storage.delete(key: 'predictionObjectFilter'),
       ]);
-      
-      // Unsubscribe from FCM topic with timeout
+
+      // Unsubscribe from FCM topics with timeout
       try {
-        await FirebaseMessaging.instance.unsubscribeFromTopic("ALL").timeout(
+        await _unsubscribeFromAllFcmTopics().timeout(
           const Duration(seconds: 5),
           onTimeout: () {
             logger.w('FCM unsubscribe timed out, continuing logout');
           },
         );
       } catch (e) {
-        logger.e('Error unsubscribing from FCM topic: $e');
+        logger.e('Error unsubscribing from FCM topics: $e');
       }
-      
+
       logger.i('Logout cleanup completed successfully');
     } catch (e) {
       logger.e('Error during logout cleanup: $e');
       // Don't rethrow - logout should succeed even if cleanup fails
+    }
+  }
+
+  Future<void> _unsubscribeFromAllFcmTopics() async {
+    try {
+      List<String> topicsToUnsubscribe = ["ALL"];
+
+      // Add sport topics to unsubscribe list
+      topicsToUnsubscribe.addAll(["SOCCER", "BASKETBALL"]);
+
+      // Unsubscribe from all topics
+      await Future.wait(topicsToUnsubscribe.map(
+          (topic) => FirebaseMessaging.instance.unsubscribeFromTopic(topic)));
+
+      logger
+          .i('Successfully unsubscribed from FCM topics: $topicsToUnsubscribe');
+    } catch (e) {
+      logger.e('Error unsubscribing from FCM topics: $e');
+      rethrow;
     }
   }
 
