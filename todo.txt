@@ -6,6 +6,7 @@ Notifications:
 
 1. Sredi MR
 2. Sredi produp domen
+3. App must recover from no internet scenarios
 ---------------------------------------
 Plans:
 1. Soccer | 1 week (49.99€), 1 mesec(119.99€), 3 meseca (269.99€)
