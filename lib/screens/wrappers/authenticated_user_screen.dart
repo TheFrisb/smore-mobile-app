@@ -32,6 +32,12 @@ class _AuthenticatedUserScreenState extends State<AuthenticatedUserScreen> {
     final historyPredictionsProvider =
         Provider.of<HistoryPredictionsProvider>(context, listen: false);
 
+    // Reset filters to ALL when navigating to home (0) or history (1) screens
+    if (index == 0 || index == 1) {
+      userProvider.setSelectedProductName(null); // Reset to ALL sports
+      userProvider.setPredictionObjectFilter(null); // Reset to ALL objects
+    }
+
     final selectedProduct = userProvider.selectedProductName;
     final selectedPredictionObjectFilter =
         userProvider.predictionObjectFilter;

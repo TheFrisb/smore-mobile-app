@@ -5,8 +5,8 @@ import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/decoration/brand_gradient_line.dart';
-import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/providers/user_notification_provider.dart';
+import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/authenticated_user_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -64,7 +64,7 @@ class _LogoAppBarState extends State<LogoAppBar>
     // Always reset filters to ALL when logo is tapped
     logger.d(
         "Current screen index: ${widget.currentScreenIndex}, Filters - Product: ${userProvider.selectedProductName}, Filter: ${userProvider.predictionObjectFilter}");
-    
+
     userProvider.setSelectedProductName(null); // ALL sport types
     userProvider.setPredictionObjectFilter(null); // ALL object types
     logger.d("Filters reset to default");
@@ -117,9 +117,9 @@ class _LogoAppBarState extends State<LogoAppBar>
                 -4,
               ),
               child: Image.asset(
-                'assets/brand/logo.png',
-                width: 48,
-                height: 48,
+                'assets/brand/smore-app-icon--no-bg-2.png',
+                width: 64,
+                height: 64,
                 fit: BoxFit.contain,
               ),
             );
@@ -150,7 +150,7 @@ class _LogoAppBarState extends State<LogoAppBar>
             if (!userProvider.isAuthenticated) {
               return const SizedBox.shrink();
             }
-            
+
             return Container(
               alignment: Alignment.center,
               child: InkResponse(
@@ -181,11 +181,11 @@ class _LogoAppBarState extends State<LogoAppBar>
                       Consumer<UserNotificationProvider>(
                         builder: (context, notificationProvider, child) {
                           final unreadCount = notificationProvider.unreadCount;
-                          
+
                           if (unreadCount == 0) {
                             return const SizedBox.shrink();
                           }
-                          
+
                           return Positioned(
                             top: -2,
                             right: -2,
@@ -213,7 +213,9 @@ class _LogoAppBarState extends State<LogoAppBar>
                               ),
                               child: Center(
                                 child: Text(
-                                  unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                  unreadCount > 99
+                                      ? '99+'
+                                      : unreadCount.toString(),
                                   style: const TextStyle(
                                     color: Color(0xFF0D151E),
                                     fontSize: 10,
