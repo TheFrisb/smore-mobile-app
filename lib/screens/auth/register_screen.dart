@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smore_mobile_app/components/app_bars/title_app_bar.dart';
 import 'package:smore_mobile_app/components/decoration/brand_logo.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/service/dio_client.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -92,6 +94,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool get _passwordsMatch {
     return _passwordController.text == _confirmPasswordController.text;
+  }
+
+  Future<void> _launchUrl(String url) async {
+    Uri uriResource = Uri.parse(url);
+    if (!await launchUrl(uriResource, mode: LaunchMode.externalApplication)) {
+      // Handle error if needed
+    }
   }
 
   @override
@@ -206,30 +215,70 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 20),
 
                 // Age Checkbox
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('I am 18+ years old',
-                      style: TextStyle(color: Colors.white70)),
-                  value: _ageChecked,
-                  activeColor: const Color(0xFF10648C),
-                  checkColor: Colors.white,
-                  onChanged: (value) =>
-                      setState(() => _ageChecked = value ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _ageChecked,
+                      activeColor: const Color(0xFF10648C),
+                      checkColor: Colors.white,
+                      onChanged: (value) =>
+                          setState(() => _ageChecked = value ?? false),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _ageChecked = !_ageChecked),
+                        child: const Text(
+                          'I am 18+ years old',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 // Terms Checkbox
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                      'I agree to the Terms of Service and Privacy Policy',
-                      style: TextStyle(color: Colors.white70)),
-                  value: _termsChecked,
-                  activeColor: const Color(0xFF10648C),
-                  checkColor: Colors.white,
-                  onChanged: (value) =>
-                      setState(() => _termsChecked = value ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _termsChecked,
+                      activeColor: const Color(0xFF10648C),
+                      checkColor: Colors.white,
+                      onChanged: (value) =>
+                          setState(() => _termsChecked = value ?? false),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _termsChecked = !_termsChecked),
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(color: Colors.white70),
+                            children: [
+                              const TextSpan(text: 'I agree to the '),
+                              TextSpan(
+                                text: 'Terms of Service',
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => _launchUrl('https://smoreltd.com/terms-of-service/'),
+                              ),
+                              const TextSpan(text: ' and '),
+                              TextSpan(
+                                text: 'Privacy Policy',
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => _launchUrl('https://smoreltd.com/privacy-policy/'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
 

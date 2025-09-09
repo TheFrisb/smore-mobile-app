@@ -183,7 +183,6 @@ class NotificationItem extends StatelessWidget {
                                   padding: HtmlPaddings.zero,
                                   color: _getDescriptionColor(),
                                   fontSize: FontSize(11),
-                                  lineHeight: const LineHeight(1.3),
                                   letterSpacing: 0.2,
                                 ),
                               },

@@ -185,7 +185,7 @@ class TicketLockedSection extends StatelessWidget {
                 onSuccess: null,
                 onError: null,
                 objectId: ticketId,
-                consumableIdentifier: ConsumableIdentifiers.singlePrediction),
+                consumableIdentifier: ConsumableIdentifiers.singleTicket),
             const SizedBox(height: 8),
             FutureBuilder<Package?>(
               future: RevenueCatService()

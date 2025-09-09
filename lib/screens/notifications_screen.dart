@@ -137,8 +137,8 @@ class NotificationsScreen extends StatelessWidget {
   int _getTotalItemCount(UserNotificationProvider notificationProvider) {
     int count = 0;
 
-    // Add important notifications from today
-    count += notificationProvider.importantNotificationsToday.length;
+    // Add important notifications
+    count += notificationProvider.importantNotifications.length;
 
     // Add date headers and notifications for normal notifications
     for (final dateKey in notificationProvider.sortedNormalDateKeys) {
@@ -153,7 +153,7 @@ class NotificationsScreen extends StatelessWidget {
   Widget _buildListItem(BuildContext context,
       UserNotificationProvider notificationProvider, int index) {
     final importantNotifications =
-        notificationProvider.importantNotificationsToday;
+        notificationProvider.importantNotifications;
 
     // If we're still in the important notifications section
     if (index < importantNotifications.length) {

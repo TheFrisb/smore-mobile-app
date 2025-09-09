@@ -57,36 +57,15 @@ class UserNotificationProvider with ChangeNotifier {
     return keys;
   }
 
-  // Get important notifications from today
-  List<UserNotification> get importantNotificationsToday {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    
-    return _notifications.where((notification) {
-      final notificationDate = DateTime(
-        notification.createdAt.year,
-        notification.createdAt.month,
-        notification.createdAt.day,
-      );
-      return notification.isImportant && notificationDate == today;
-    }).toList()
+  // Get all important notifications (pinned regardless of date)
+  List<UserNotification> get importantNotifications {
+    return _notifications.where((notification) => notification.isImportant).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sort by creation time, newest first
   }
 
-  // Get normal notifications (excluding important ones from today)
+  // Get normal notifications (excluding all important ones)
   List<UserNotification> get normalNotifications {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    
-    return _notifications.where((notification) {
-      final notificationDate = DateTime(
-        notification.createdAt.year,
-        notification.createdAt.month,
-        notification.createdAt.day,
-      );
-      // Include if not important, or if important but not from today
-      return !notification.isImportant || notificationDate != today;
-    }).toList();
+    return _notifications.where((notification) => !notification.isImportant).toList();
   }
 
   // Group normal notifications by date (most recent first)

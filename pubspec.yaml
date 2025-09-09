@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.65+1
+version: 1.0.67+1
 
 environment:
   sdk: ^3.5.4
@@ -125,27 +125,27 @@ flutter:
 flutter_launcher_icons:
   android: true
   image_path_android: "assets/brand/smore-app-icon--with-bg.png"
-  adaptive_icon_foreground: "assets/brand/smore-app-icon--no-background.png"
+  adaptive_icon_foreground: "assets/brand/smore-app-icon--no-bg-2.png"
   adaptive_icon_background: "#0C1A2C"
   min_sdk_android: 21
 
   ios: true
-  image_path_ios: "assets/brand/smore-app-icon--no-background.png"
+  image_path_ios: "assets/brand/smore-app-icon--no-bg-2.png"
   remove_alpha_ios: true
   background_color_ios: "#0C1A2C"
 
   web:
     generate: true
-    image_path: "assets/brand/smore-app-icon--no-background.png"
+    image_path: "assets/brand/smore-app-icon--no-bg-2.png"
     background_color: "#0C1A2C"
     theme_color: "#0C1A2C"
   windows:
     generate: true
-    image_path: "assets/brand/smore-app-icon--no-background.png"
+    image_path: "assets/brand/smore-app-icon--no-bg-2.png"
     icon_size: 48
   macos:
     generate: true
-    image_path: "assets/brand/smore-app-icon--no-background.png"
+    image_path: "assets/brand/smore-app-icon--no-bg-2.png"
 
 # Splash screen configuration
 flutter_native_splash:

@@ -274,7 +274,8 @@ class TicketPrediction extends StatelessWidget {
                 Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     return Text(
-                      _formatMatchTime(betLine.match.kickoffDateTime, userProvider),
+                      _formatMatchTime(
+                          betLine.match.kickoffDateTime, userProvider),
                       style: const TextStyle(
                         color: Color(0xFFdbe4ed),
                         fontSize: 10,
@@ -527,18 +528,28 @@ class TicketPrediction extends StatelessWidget {
 
   String _formatMatchTime(DateTime utcDateTime, UserProvider userProvider) {
     final localDateTime = userProvider.convertToUserTimezone(utcDateTime);
-    
+
     // Get month abbreviations
     const monthAbbreviations = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
-    
+
     final month = monthAbbreviations[localDateTime.month - 1];
     final day = localDateTime.day.toString().padLeft(2, '0');
     final hour = localDateTime.hour.toString().padLeft(2, '0');
     final minute = localDateTime.minute.toString().padLeft(2, '0');
-    
+
     return '$month $day, $hour:$minute';
   }
 
