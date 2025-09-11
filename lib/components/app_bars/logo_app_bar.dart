@@ -43,12 +43,14 @@ class _LogoAppBarState extends State<LogoAppBar>
   void initState() {
     super.initState();
     _shakeController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _shakeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _shakeController, curve: Curves.elasticOut),
-    );
+    _shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 8.0).chain(CurveTween(curve: Curves.easeOut)), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: -6.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)), weight: 20),
+    ]).animate(_shakeController);
   }
 
   @override
@@ -72,8 +74,7 @@ class _LogoAppBarState extends State<LogoAppBar>
     // If we're already on the predictions screen (index 0), just shake the logo
     if (widget.currentScreenIndex == 0) {
       logger.i("Already on predictions screen, shaking logo");
-      _shakeController.forward().then((_) {
-        _shakeController.reverse();
+      _shakeController.forward(from: 0).then((_) {
         logger.d("Shake animation completed");
       });
       HapticFeedback.mediumImpact();
@@ -113,7 +114,7 @@ class _LogoAppBarState extends State<LogoAppBar>
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(
-                _shakeAnimation.value * 10 * (_shakeAnimation.value - 0.5) * 2,
+                _shakeAnimation.value,
                 -4,
               ),
               child: Image.asset(
