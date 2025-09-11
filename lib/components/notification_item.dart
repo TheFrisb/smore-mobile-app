@@ -4,7 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
 
-class NotificationItem extends StatelessWidget {
+class NotificationItem extends StatefulWidget {
   final IconData icon;
   final String title;
   final String? description;
@@ -12,6 +12,8 @@ class NotificationItem extends StatelessWidget {
   final bool isRead;
   final bool isImportant;
   final DateTime createdAt;
+  final int maxDescriptionLines;
+  final int expandHintMinChars;
 
   const NotificationItem({
     super.key,
@@ -22,6 +24,8 @@ class NotificationItem extends StatelessWidget {
     this.isRead = false,
     this.isImportant = false,
     required this.createdAt,
+    this.maxDescriptionLines = 2,
+    this.expandHintMinChars = 120,
   });
 
   static IconData getNotificationIcon(NotificationIcon? icon) {
@@ -43,6 +47,14 @@ class NotificationItem extends StatelessWidget {
     }
   }
 
+  @override
+  State<NotificationItem> createState() => _NotificationItemState();
+}
+
+class _NotificationItemState extends State<NotificationItem> {
+  bool _isExpanded = false;
+  bool _invokedOnTapOnExpand = false;
+
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
@@ -50,43 +62,103 @@ class NotificationItem extends StatelessWidget {
   }
 
   Color _getBackgroundColor() {
-    if (isImportant) {
+    if (widget.isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return AppColors.secondary.shade600.withOpacity(0.5);
     }
-    return isRead
+    return widget.isRead
         ? AppColors.secondary.shade400.withOpacity(0.1)
         : AppColors.secondary.shade600.withOpacity(0.5);
   }
 
   Color _getBorderColor() {
-    if (isImportant) {
+    if (widget.isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return AppColors.secondary.shade600.withOpacity(1);
     }
-    return isRead
+    return widget.isRead
         ? AppColors.secondary.shade600.withOpacity(0.5)
         : AppColors.secondary.shade600.withOpacity(1);
   }
 
   Color _getTitleColor() {
-    if (isImportant) {
+    if (widget.isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return const Color(0xFFF8FAFC);
     }
-    return isRead
+    return widget.isRead
         ? const Color(0xFFE2E8F0).withOpacity(0.8)
         : const Color(0xFFF8FAFC);
   }
 
   Color _getDescriptionColor() {
-    if (isImportant) {
+    if (widget.isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return const Color(0xFFE2E8F0);
     }
-    return isRead
+    return widget.isRead
         ? const Color(0xFFCBD5E1).withOpacity(0.8)
         : const Color(0xFFE2E8F0);
+  }
+
+  String _htmlToPlainText(String html) {
+    // Convert common HTML line breaks to newlines
+    String withBreaks = html
+        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</p\s*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</div\s*>', caseSensitive: false), '\n');
+
+    // Strip remaining tags
+    String noTags = withBreaks.replaceAll(RegExp(r'<[^>]*>'), '');
+
+    // Normalize spaces while preserving newlines
+    // 1) Collapse runs of spaces/tabs but keep newlines intact
+    String normalized = noTags.replaceAll(RegExp(r'[\t\r\f ]+'), ' ');
+    // 2) Trim each line and remove extra blank lines
+    List<String> lines = normalized
+        .split('\n')
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
+    return lines.join('\n');
+  }
+
+  Widget _buildToggleButton(bool isExpanded) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: _onToggleExpanded,
+        icon: Icon(
+          isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+          size: 14,
+          color: const Color(0xFF00D4AA),
+        ),
+        label: Text(
+          isExpanded ? 'Show less' : 'Show more',
+          style: const TextStyle(
+            color: Color(0xFF00D4AA),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          minimumSize: const Size(0, 0),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+    );
+  }
+
+  void _onToggleExpanded() {
+    final expanding = !_isExpanded;
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+    if (expanding && widget.onTap != null && !_invokedOnTapOnExpand) {
+      _invokedOnTapOnExpand = true;
+      widget.onTap!();
+    }
   }
 
   @override
@@ -114,7 +186,7 @@ class NotificationItem extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: onTap,
+              onTap: widget.onTap,
               borderRadius: BorderRadius.circular(10),
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -135,7 +207,7 @@ class NotificationItem extends StatelessWidget {
                       ),
                       child: Center(
                         child: Icon(
-                          icon,
+                          widget.icon,
                           size: 18,
                           color: const Color(0xFFB7C9DB),
                         ),
@@ -152,7 +224,7 @@ class NotificationItem extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  title,
+                                  widget.title,
                                   style: TextStyle(
                                     color: _getTitleColor(),
                                     fontSize: 13,
@@ -162,7 +234,7 @@ class NotificationItem extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                _formatTime(createdAt),
+                                _formatTime(widget.createdAt),
                                 style: TextStyle(
                                   color:
                                       _getDescriptionColor().withOpacity(0.7),
@@ -173,18 +245,121 @@ class NotificationItem extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (description != null) ...[
+                          if (widget.description != null) ...[
                             const SizedBox(height: 3),
-                            Html(
-                              data: description!,
-                              style: {
-                                "body": Style(
-                                  margin: Margins.zero,
-                                  padding: HtmlPaddings.zero,
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final plainText =
+                                    _htmlToPlainText(widget.description!);
+                                final textStyle = TextStyle(
                                   color: _getDescriptionColor(),
-                                  fontSize: FontSize(11),
+                                  fontSize: 11,
                                   letterSpacing: 0.2,
-                                ),
+                                  height: 1.3,
+                                );
+
+                                final textPainter = TextPainter(
+                                  text: TextSpan(
+                                      text: plainText, style: textStyle),
+                                  maxLines: null,
+                                  textDirection: Directionality.of(context),
+                                )..layout(maxWidth: constraints.maxWidth);
+
+                                final lineHeight =
+                                    textPainter.preferredLineHeight;
+                                final maxLines = widget.maxDescriptionLines;
+                                final hasOverflow =
+                                    textPainter.computeLineMetrics().length >
+                                        maxLines;
+                                final double extraSpace = 8.0;
+                                final collapsedHeight =
+                                    lineHeight * maxLines + extraSpace;
+
+                                final baseStyle = {
+                                  "body": Style(
+                                    margin: Margins.zero,
+                                    padding: HtmlPaddings.zero,
+                                    color: _getDescriptionColor(),
+                                    fontSize: FontSize(11),
+                                    lineHeight: LineHeight.number(1.3),
+                                    letterSpacing: 0.2,
+                                  ),
+                                  "p": Style(
+                                    margin: Margins.zero,
+                                    padding: HtmlPaddings.zero,
+                                    color: _getDescriptionColor(),
+                                    fontSize: FontSize(11),
+                                    lineHeight: LineHeight.number(1.3),
+                                    letterSpacing: 0.2,
+                                  ),
+                                };
+
+                                final commonStyle = baseStyle;
+
+                                final truncatedStyle = {
+                                  ...baseStyle,
+                                  "body": Style(
+                                    margin: Margins.zero,
+                                    padding: HtmlPaddings.zero,
+                                    color: _getDescriptionColor(),
+                                    fontSize: FontSize(11),
+                                    lineHeight: LineHeight.number(1.3),
+                                    letterSpacing: 0.2,
+                                    maxLines: maxLines,
+                                    textOverflow: TextOverflow.ellipsis,
+                                  ),
+                                  "p": Style(
+                                    margin: Margins.zero,
+                                    padding: HtmlPaddings.zero,
+                                    color: _getDescriptionColor(),
+                                    fontSize: FontSize(11),
+                                    lineHeight: LineHeight.number(1.3),
+                                    letterSpacing: 0.2,
+                                    maxLines: maxLines,
+                                    textOverflow: TextOverflow.ellipsis,
+                                  ),
+                                };
+
+                                final fullHtml = Html(
+                                  data: widget.description!,
+                                  style: commonStyle,
+                                );
+
+                                final truncatedHtml = Html(
+                                  data: widget.description!,
+                                  style: truncatedStyle,
+                                );
+
+                                final descWidget = _isExpanded
+                                    ? fullHtml
+                                    : (hasOverflow ? truncatedHtml : fullHtml);
+
+                                if (_isExpanded) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      descWidget,
+                                      const SizedBox(height: 0),
+                                      _buildToggleButton(true),
+                                    ],
+                                  );
+                                } else {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: collapsedHeight,
+                                        child: descWidget,
+                                      ),
+                                      const SizedBox(height: 0),
+                                      hasOverflow
+                                          ? _buildToggleButton(false)
+                                          : const SizedBox(height: 24),
+                                    ],
+                                  );
+                                }
                               },
                             ),
                           ],
@@ -197,7 +372,7 @@ class NotificationItem extends StatelessWidget {
             ),
           ),
           // Unread indicator - positioned outside the padded content
-          if (!isRead)
+          if (!widget.isRead)
             Positioned(
               top: 6,
               right: 6,

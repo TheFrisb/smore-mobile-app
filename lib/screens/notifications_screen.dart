@@ -74,33 +74,15 @@ class NotificationsScreen extends StatelessWidget {
 
           return Column(
             children: [
-              // Header with notification count
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  children: [
-                    const Icon(
-                      LucideIcons.bell,
-                      color: Color(0xFFB7C9DB),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${notificationProvider.unreadCount} unread',
-                      style: const TextStyle(
-                        color: Color(0xFF8A9BAE),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const Spacer(),
-                    Visibility(
-                      visible: notificationProvider.unreadCount > 0,
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: TextButton(
+              // Top-right action for marking all as read (shown only when needed)
+              if (notificationProvider.unreadCount > 0)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      TextButton(
                         onPressed: () =>
                             notificationProvider.markAllNotificationsAsRead(),
                         child: const Text(
@@ -112,10 +94,9 @@ class NotificationsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               // Notifications list
               Expanded(
                 child: _buildNotificationsList(context, notificationProvider),
