@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/ticket.dart';
 
 class TicketHeader extends StatelessWidget {

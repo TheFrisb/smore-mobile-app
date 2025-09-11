@@ -254,7 +254,7 @@ class TicketPrediction extends StatelessWidget {
                       fit: BoxFit.contain,
                     )
                   else
-                    Icon(
+                    const Icon(
                       LucideIcons.shieldAlert,
                       size: 16,
                       color: Colors.grey,
@@ -319,7 +319,7 @@ class TicketPrediction extends StatelessWidget {
                       fit: BoxFit.contain,
                     )
                   else
-                    Icon(
+                    const Icon(
                       LucideIcons.shieldAlert,
                       size: 16,
                       color: Colors.grey,
@@ -348,7 +348,7 @@ class TicketPrediction extends StatelessWidget {
                         fit: BoxFit.contain,
                       )
                     else
-                      Icon(
+                      const Icon(
                         LucideIcons.shieldAlert,
                         size: 12,
                         color: Colors.grey,

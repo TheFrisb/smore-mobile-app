@@ -4,7 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
 
-class NotificationItem extends StatelessWidget {
+class NotificationItem extends StatefulWidget {
   final IconData icon;
   final String title;
   final String? description;
@@ -43,6 +43,18 @@ class NotificationItem extends StatelessWidget {
     }
   }
 
+  @override
+  State<NotificationItem> createState() => _NotificationItemState();
+}
+
+class _NotificationItemState extends State<NotificationItem> {
+  bool _isExpanded = false;
+  double? _fullHeight;
+  final GlobalKey _fullKey = GlobalKey();
+
+  static const double maxDescriptionHeight =
+      40.0; // Adjust based on testing; approximates space for ~3 lines + margins
+
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
@@ -50,169 +62,39 @@ class NotificationItem extends StatelessWidget {
   }
 
   Color _getBackgroundColor() {
-    if (isImportant) {
-      // Important notifications always use unread styling (don't reset when read)
+    if (widget.isImportant) {
       return AppColors.secondary.shade600.withOpacity(0.5);
     }
-    return isRead
+    return widget.isRead
         ? AppColors.secondary.shade400.withOpacity(0.1)
         : AppColors.secondary.shade600.withOpacity(0.5);
   }
 
   Color _getBorderColor() {
-    if (isImportant) {
-      // Important notifications always use unread styling (don't reset when read)
+    if (widget.isImportant) {
       return AppColors.secondary.shade600.withOpacity(1);
     }
-    return isRead
+    return widget.isRead
         ? AppColors.secondary.shade600.withOpacity(0.5)
         : AppColors.secondary.shade600.withOpacity(1);
   }
 
   Color _getTitleColor() {
-    if (isImportant) {
-      // Important notifications always use unread styling (don't reset when read)
+    if (widget.isImportant) {
       return const Color(0xFFF8FAFC);
     }
-    return isRead
+    return widget.isRead
         ? const Color(0xFFE2E8F0).withOpacity(0.8)
         : const Color(0xFFF8FAFC);
   }
 
   Color _getDescriptionColor() {
-    if (isImportant) {
-      // Important notifications always use unread styling (don't reset when read)
+    if (widget.isImportant) {
       return const Color(0xFFE2E8F0);
     }
-    return isRead
+    return widget.isRead
         ? const Color(0xFFCBD5E1).withOpacity(0.8)
         : const Color(0xFFE2E8F0);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-      decoration: BoxDecoration(
-        color: _getBackgroundColor(),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: _getBorderColor(),
-          width: 0.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(10),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Icon container
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.shade900,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: AppColors.primary.shade600.withOpacity(0.3),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          icon,
-                          size: 20,
-                          color: const Color(0xFFB7C9DB),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: _getTitleColor(),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                _formatTime(createdAt),
-                                style: TextStyle(
-                                  color:
-                                      _getDescriptionColor().withOpacity(0.7),
-                                  fontSize: 10,
-                                  height: 1.2,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (description != null) ...[
-                            const SizedBox(height: 3),
-                            Html(
-                              data: description!,
-                              style: _getBaseStyle(),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Unread indicator - positioned outside the padded content
-          if (!isRead)
-            Positioned(
-              top: 6,
-              right: 6,
-              child: Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00D4AA),
-                  // Always use teal for unread indicator
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00D4AA).withOpacity(0.3),
-                      blurRadius: 4,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
   }
 
   Map<String, Style> _getBaseStyle() {
@@ -224,7 +106,6 @@ class NotificationItem extends StatelessWidget {
         fontSize: FontSize(12),
         lineHeight: LineHeight.number(1.2),
         letterSpacing: 0.2,
-        maxLines: 3,
       ),
       "br": Style(margin: Margins.symmetric(vertical: 8)),
       "div": Style(
@@ -249,5 +130,220 @@ class NotificationItem extends StatelessWidget {
         margin: Margins.only(right: 12),
       ),
     };
+  }
+
+  bool get _needsTruncation =>
+      _fullHeight != null && _fullHeight! > maxDescriptionHeight;
+
+  Widget _buildDescription(String description) {
+    final htmlWidget = Html(
+      data: description,
+      style: _getBaseStyle(),
+    );
+
+    if (!_isExpanded && _needsTruncation) {
+      return Stack(
+        children: [
+          ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.black, Colors.transparent],
+              stops: [0.65, 1.0],
+            ).createShader(bounds),
+            blendMode: BlendMode.dstIn,
+            child: htmlWidget,
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () => setState(() => _isExpanded = true),
+              child: const Text(
+                'Show More',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return htmlWidget;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_fullHeight == null && widget.description != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final renderBox =
+            _fullKey.currentContext?.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          setState(() {
+            _fullHeight = renderBox.size.height;
+            if (_fullHeight! <= maxDescriptionHeight) {
+              _isExpanded = true;
+            }
+          });
+        }
+      });
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+      decoration: BoxDecoration(
+        color: _getBackgroundColor(),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: _getBorderColor(),
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: widget.onTap,
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.shade900,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: AppColors.primary.shade600.withOpacity(0.3),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          widget.icon,
+                          size: 20,
+                          color: const Color(0xFFB7C9DB),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.title,
+                                      style: TextStyle(
+                                        color: _getTitleColor(),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatTime(widget.createdAt),
+                                    style: TextStyle(
+                                      color: _getDescriptionColor()
+                                          .withOpacity(0.7),
+                                      fontSize: 10,
+                                      height: 1.2,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (widget.description != null) ...[
+                                const SizedBox(height: 3),
+                                if (_fullHeight == null)
+                                  Offstage(
+                                    child: Html(
+                                      key: _fullKey,
+                                      data: widget.description!,
+                                      style: _getBaseStyle(),
+                                    ),
+                                  ),
+                                ClipRect(
+                                  child: SizedBox(
+                                    height: _isExpanded
+                                        ? null
+                                        : maxDescriptionHeight,
+                                    child:
+                                        _buildDescription(widget.description!),
+                                  ),
+                                ),
+                                if (_needsTruncation && _isExpanded)
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          setState(() => _isExpanded = false),
+                                      child: const Text(
+                                        'Show Less',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (!widget.isRead)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00D4AA),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00D4AA).withOpacity(0.3),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/components/notification_item.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
 import 'package:smore_mobile_app/service/user_notifications_service.dart';
