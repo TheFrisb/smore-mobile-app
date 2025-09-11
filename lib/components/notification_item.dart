@@ -4,7 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:smore_mobile_app/app_colors.dart';
 import 'package:smore_mobile_app/models/user_notification.dart';
 
-class NotificationItem extends StatefulWidget {
+class NotificationItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? description;
@@ -12,8 +12,6 @@ class NotificationItem extends StatefulWidget {
   final bool isRead;
   final bool isImportant;
   final DateTime createdAt;
-  final int maxDescriptionLines;
-  final int expandHintMinChars;
 
   const NotificationItem({
     super.key,
@@ -24,8 +22,6 @@ class NotificationItem extends StatefulWidget {
     this.isRead = false,
     this.isImportant = false,
     required this.createdAt,
-    this.maxDescriptionLines = 2,
-    this.expandHintMinChars = 120,
   });
 
   static IconData getNotificationIcon(NotificationIcon? icon) {
@@ -47,14 +43,6 @@ class NotificationItem extends StatefulWidget {
     }
   }
 
-  @override
-  State<NotificationItem> createState() => _NotificationItemState();
-}
-
-class _NotificationItemState extends State<NotificationItem> {
-  bool _isExpanded = false;
-  bool _invokedOnTapOnExpand = false;
-
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
@@ -62,103 +50,43 @@ class _NotificationItemState extends State<NotificationItem> {
   }
 
   Color _getBackgroundColor() {
-    if (widget.isImportant) {
+    if (isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return AppColors.secondary.shade600.withOpacity(0.5);
     }
-    return widget.isRead
+    return isRead
         ? AppColors.secondary.shade400.withOpacity(0.1)
         : AppColors.secondary.shade600.withOpacity(0.5);
   }
 
   Color _getBorderColor() {
-    if (widget.isImportant) {
+    if (isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return AppColors.secondary.shade600.withOpacity(1);
     }
-    return widget.isRead
+    return isRead
         ? AppColors.secondary.shade600.withOpacity(0.5)
         : AppColors.secondary.shade600.withOpacity(1);
   }
 
   Color _getTitleColor() {
-    if (widget.isImportant) {
+    if (isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return const Color(0xFFF8FAFC);
     }
-    return widget.isRead
+    return isRead
         ? const Color(0xFFE2E8F0).withOpacity(0.8)
         : const Color(0xFFF8FAFC);
   }
 
   Color _getDescriptionColor() {
-    if (widget.isImportant) {
+    if (isImportant) {
       // Important notifications always use unread styling (don't reset when read)
       return const Color(0xFFE2E8F0);
     }
-    return widget.isRead
+    return isRead
         ? const Color(0xFFCBD5E1).withOpacity(0.8)
         : const Color(0xFFE2E8F0);
-  }
-
-  String _htmlToPlainText(String html) {
-    // Convert common HTML line breaks to newlines
-    String withBreaks = html
-        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'</p\s*>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'</div\s*>', caseSensitive: false), '\n');
-
-    // Strip remaining tags
-    String noTags = withBreaks.replaceAll(RegExp(r'<[^>]*>'), '');
-
-    // Normalize spaces while preserving newlines
-    // 1) Collapse runs of spaces/tabs but keep newlines intact
-    String normalized = noTags.replaceAll(RegExp(r'[\t\r\f ]+'), ' ');
-    // 2) Trim each line and remove extra blank lines
-    List<String> lines = normalized
-        .split('\n')
-        .map((l) => l.trim())
-        .where((l) => l.isNotEmpty)
-        .toList();
-    return lines.join('\n');
-  }
-
-  Widget _buildToggleButton(bool isExpanded) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TextButton.icon(
-        onPressed: _onToggleExpanded,
-        icon: Icon(
-          isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-          size: 14,
-          color: const Color(0xFF00D4AA),
-        ),
-        label: Text(
-          isExpanded ? 'Show less' : 'Show more',
-          style: const TextStyle(
-            color: Color(0xFF00D4AA),
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          minimumSize: const Size(0, 0),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-      ),
-    );
-  }
-
-  void _onToggleExpanded() {
-    final expanding = !_isExpanded;
-    setState(() {
-      _isExpanded = !_isExpanded;
-    });
-    if (expanding && widget.onTap != null && !_invokedOnTapOnExpand) {
-      _invokedOnTapOnExpand = true;
-      widget.onTap!();
-    }
   }
 
   @override
@@ -186,7 +114,7 @@ class _NotificationItemState extends State<NotificationItem> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: widget.onTap,
+              onTap: onTap,
               borderRadius: BorderRadius.circular(10),
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -207,8 +135,8 @@ class _NotificationItemState extends State<NotificationItem> {
                       ),
                       child: Center(
                         child: Icon(
-                          widget.icon,
-                          size: 18,
+                          icon,
+                          size: 20,
                           color: const Color(0xFFB7C9DB),
                         ),
                       ),
@@ -224,17 +152,17 @@ class _NotificationItemState extends State<NotificationItem> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  widget.title,
+                                  title,
                                   style: TextStyle(
                                     color: _getTitleColor(),
-                                    fontSize: 13,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     height: 1.2,
                                   ),
                                 ),
                               ),
                               Text(
-                                _formatTime(widget.createdAt),
+                                _formatTime(createdAt),
                                 style: TextStyle(
                                   color:
                                       _getDescriptionColor().withOpacity(0.7),
@@ -245,122 +173,11 @@ class _NotificationItemState extends State<NotificationItem> {
                               ),
                             ],
                           ),
-                          if (widget.description != null) ...[
+                          if (description != null) ...[
                             const SizedBox(height: 3),
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                final plainText =
-                                    _htmlToPlainText(widget.description!);
-                                final textStyle = TextStyle(
-                                  color: _getDescriptionColor(),
-                                  fontSize: 11,
-                                  letterSpacing: 0.2,
-                                  height: 1.3,
-                                );
-
-                                final textPainter = TextPainter(
-                                  text: TextSpan(
-                                      text: plainText, style: textStyle),
-                                  maxLines: null,
-                                  textDirection: Directionality.of(context),
-                                )..layout(maxWidth: constraints.maxWidth);
-
-                                final lineHeight =
-                                    textPainter.preferredLineHeight;
-                                final maxLines = widget.maxDescriptionLines;
-                                final hasOverflow =
-                                    textPainter.computeLineMetrics().length >
-                                        maxLines;
-                                final double extraSpace = 8.0;
-                                final collapsedHeight =
-                                    lineHeight * maxLines + extraSpace;
-
-                                final baseStyle = {
-                                  "body": Style(
-                                    margin: Margins.zero,
-                                    padding: HtmlPaddings.zero,
-                                    color: _getDescriptionColor(),
-                                    fontSize: FontSize(11),
-                                    lineHeight: LineHeight.number(1.3),
-                                    letterSpacing: 0.2,
-                                  ),
-                                  "p": Style(
-                                    margin: Margins.zero,
-                                    padding: HtmlPaddings.zero,
-                                    color: _getDescriptionColor(),
-                                    fontSize: FontSize(11),
-                                    lineHeight: LineHeight.number(1.3),
-                                    letterSpacing: 0.2,
-                                  ),
-                                };
-
-                                final commonStyle = baseStyle;
-
-                                final truncatedStyle = {
-                                  ...baseStyle,
-                                  "body": Style(
-                                    margin: Margins.zero,
-                                    padding: HtmlPaddings.zero,
-                                    color: _getDescriptionColor(),
-                                    fontSize: FontSize(11),
-                                    lineHeight: LineHeight.number(1.3),
-                                    letterSpacing: 0.2,
-                                    maxLines: maxLines,
-                                    textOverflow: TextOverflow.ellipsis,
-                                  ),
-                                  "p": Style(
-                                    margin: Margins.zero,
-                                    padding: HtmlPaddings.zero,
-                                    color: _getDescriptionColor(),
-                                    fontSize: FontSize(11),
-                                    lineHeight: LineHeight.number(1.3),
-                                    letterSpacing: 0.2,
-                                    maxLines: maxLines,
-                                    textOverflow: TextOverflow.ellipsis,
-                                  ),
-                                };
-
-                                final fullHtml = Html(
-                                  data: widget.description!,
-                                  style: commonStyle,
-                                );
-
-                                final truncatedHtml = Html(
-                                  data: widget.description!,
-                                  style: truncatedStyle,
-                                );
-
-                                final descWidget = _isExpanded
-                                    ? fullHtml
-                                    : (hasOverflow ? truncatedHtml : fullHtml);
-
-                                if (_isExpanded) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      descWidget,
-                                      const SizedBox(height: 0),
-                                      _buildToggleButton(true),
-                                    ],
-                                  );
-                                } else {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: collapsedHeight,
-                                        child: descWidget,
-                                      ),
-                                      const SizedBox(height: 0),
-                                      hasOverflow
-                                          ? _buildToggleButton(false)
-                                          : const SizedBox(height: 24),
-                                    ],
-                                  );
-                                }
-                              },
+                            Html(
+                              data: description!,
+                              style: _getBaseStyle(),
                             ),
                           ],
                         ],
@@ -372,7 +189,7 @@ class _NotificationItemState extends State<NotificationItem> {
             ),
           ),
           // Unread indicator - positioned outside the padded content
-          if (!widget.isRead)
+          if (!isRead)
             Positioned(
               top: 6,
               right: 6,
@@ -396,5 +213,36 @@ class _NotificationItemState extends State<NotificationItem> {
         ],
       ),
     );
+  }
+
+  Map<String, Style> _getBaseStyle() {
+    return {
+      "body": Style(
+        margin: Margins.only(top: 4),
+        padding: HtmlPaddings.zero,
+        color: _getDescriptionColor(),
+        fontSize: FontSize(12),
+        lineHeight: LineHeight.number(1.2),
+        letterSpacing: 0.2,
+      ),
+      "div": Style(
+        margin: Margins.only(bottom: 4),
+      ),
+      "p": Style(
+        margin: Margins.zero,
+        padding: HtmlPaddings.zero,
+        color: _getDescriptionColor(),
+        fontSize: FontSize(12),
+        lineHeight: LineHeight.number(1.2),
+        letterSpacing: 0.2,
+      ),
+      ".sport-title": Style(
+        fontSize: FontSize(14),
+      ),
+      ".sport-emoji": Style(
+        fontSize: FontSize(14),
+        margin: Margins.only(right: 12),
+      ),
+    };
   }
 }
