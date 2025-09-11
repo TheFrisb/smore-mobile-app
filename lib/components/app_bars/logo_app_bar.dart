@@ -117,9 +117,9 @@ class _LogoAppBarState extends State<LogoAppBar>
                 -4,
               ),
               child: Image.asset(
-                'assets/brand/smore-app-icon--no-bg-2.png',
-                width: 64,
-                height: 64,
+                'assets/brand/logo.png',
+                width: 48,
+                height: 48,
                 fit: BoxFit.contain,
               ),
             );
