@@ -224,9 +224,14 @@ class NotificationItem extends StatelessWidget {
         fontSize: FontSize(12),
         lineHeight: LineHeight.number(1.2),
         letterSpacing: 0.2,
+        maxLines: 3,
       ),
+      "br": Style(margin: Margins.symmetric(vertical: 8)),
       "div": Style(
         margin: Margins.only(bottom: 4),
+      ),
+      ".empty-line": Style(
+        margin: Margins.only(bottom: 8),
       ),
       "p": Style(
         margin: Margins.zero,
