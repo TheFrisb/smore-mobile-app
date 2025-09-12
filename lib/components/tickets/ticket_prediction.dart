@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -341,11 +342,14 @@ class TicketPrediction extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (betLine.match.league.country.logoUrl != null)
-                      CachedNetworkImage(
-                        imageUrl: betLine.match.league.country.logoUrl!,
+                      CachedNetworkSVGImage(
+                        betLine.match.league.country.logoUrl!,
                         height: 12,
-                        width: 12,
                         fit: BoxFit.contain,
+                        fadeDuration: const Duration(milliseconds: 50),
+                        placeholder:
+                            const CircularProgressIndicator(strokeWidth: 2),
+                        errorWidget: const Icon(LucideIcons.shieldAlert),
                       )
                     else
                       const Icon(

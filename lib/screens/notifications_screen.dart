@@ -74,30 +74,6 @@ class NotificationsScreen extends StatelessWidget {
 
           return Column(
             children: [
-              // Top-right action for marking all as read (shown only when needed)
-              if (notificationProvider.unreadCount > 0)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Row(
-                    children: [
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () =>
-                            notificationProvider.markAllNotificationsAsRead(),
-                        child: const Text(
-                          'Mark all as read',
-                          style: TextStyle(
-                            color: Color(0xFF00D4AA),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              // Notifications list
               Expanded(
                 child: _buildNotificationsList(context, notificationProvider),
               ),
