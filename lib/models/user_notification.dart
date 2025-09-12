@@ -1,4 +1,4 @@
-enum NotificationIcon { SOCCER, BASKETBALL, TROPHY, CHECKMARK, XMARK }
+enum NotificationIcon { SOCCER, BASKETBALL, TROPHY, CHECKMARK, XMARK, MONEY }
 
 class UserNotification {
   final int _id;
@@ -42,7 +42,7 @@ class UserNotification {
 
   factory UserNotification.fromJson(Map<String, dynamic> json) {
     NotificationIcon? icon;
-    
+
     if (json['icon'] != null) {
       try {
         icon = NotificationIcon.values.firstWhere(
@@ -53,7 +53,7 @@ class UserNotification {
         icon = null;
       }
     }
-    
+
     return UserNotification(
       id: json['id'],
       title: json['title'],

@@ -133,8 +133,7 @@ class NotificationsScreen extends StatelessWidget {
 
   Widget _buildListItem(BuildContext context,
       UserNotificationProvider notificationProvider, int index) {
-    final importantNotifications =
-        notificationProvider.importantNotifications;
+    final importantNotifications = notificationProvider.importantNotifications;
 
     // If we're still in the important notifications section
     if (index < importantNotifications.length) {
@@ -159,7 +158,7 @@ class NotificationsScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Important',
+                      'Betting Guidance',
                       style: TextStyle(
                         color: AppColors.secondary.shade400,
                         fontSize: 12,

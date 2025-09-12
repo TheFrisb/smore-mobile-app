@@ -40,6 +40,8 @@ class NotificationItem extends StatefulWidget {
         return LucideIcons.circleCheck;
       case NotificationIcon.XMARK:
         return LucideIcons.circleX;
+      case NotificationIcon.MONEY:
+        return LucideIcons.dollarSign;
     }
   }
 
