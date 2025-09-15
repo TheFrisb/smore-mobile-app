@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class FilterBar extends StatelessWidget {
+class ObjectFilterBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onChanged;
 
-  const FilterBar({
+  const ObjectFilterBar({
     super.key,
     required this.selectedIndex,
     required this.onChanged,

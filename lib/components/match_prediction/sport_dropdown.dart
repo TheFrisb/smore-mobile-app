@@ -166,9 +166,13 @@ class _SportSelectorBarState extends State<SportSelectorBar>
   }
 
   Widget _buildBarDisplay(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 8 : 16, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

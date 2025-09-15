@@ -112,6 +112,9 @@ class _LogoAppBarState extends State<LogoAppBar>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+
     return AppBar(
       elevation: 0,
       toolbarHeight: 60,
@@ -138,10 +141,10 @@ class _LogoAppBarState extends State<LogoAppBar>
         ),
       ),
       centerTitle: true,
-      leadingWidth: 88,
+      leadingWidth: isSmallScreen ? 88 : 96,
       leading: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.only(left: 8.0),
+        padding: EdgeInsets.only(left: isSmallScreen ? 8 : 16),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -217,7 +220,7 @@ class _LogoAppBarState extends State<LogoAppBar>
                   logger.d("Navigated to notifications screen");
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 8),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -297,8 +300,8 @@ class _LogoAppBarState extends State<LogoAppBar>
               Scaffold.of(context).openEndDrawer();
               logger.d("End drawer opened");
             },
-            child: const Padding(
-              padding: EdgeInsets.only(right: 8.0),
+            child: Padding(
+              padding: EdgeInsets.only(right: isSmallScreen ? 8 : 16),
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xB50D151E),

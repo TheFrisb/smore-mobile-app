@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fetchUpcomingPredictions(false);
             },
           ),
-          FilterBar(
+          ObjectFilterBar(
             selectedIndex: _getFilterIndex(userProvider.predictionObjectFilter),
             onChanged: (index) {
               // Set the prediction object filter based on selected index

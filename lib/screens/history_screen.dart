@@ -79,7 +79,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               _fetchHistoryPredictions(true, forceRefresh: true);
             },
           ),
-          FilterBar(
+          ObjectFilterBar(
             selectedIndex: _getFilterIndex(userProvider.predictionObjectFilter),
             onChanged: (index) {
               // Set the prediction object filter based on selected index
