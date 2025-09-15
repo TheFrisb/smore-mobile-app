@@ -151,7 +151,6 @@ class _NotificationItemState extends State<NotificationItem> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [Colors.black, Colors.transparent],
-              stops: [0.65, 1.0],
             ).createShader(bounds),
             blendMode: BlendMode.dstIn,
             child: htmlWidget,
@@ -161,10 +160,10 @@ class _NotificationItemState extends State<NotificationItem> {
             right: 0,
             child: GestureDetector(
               onTap: () => setState(() => _isExpanded = true),
-              child: const Text(
+              child: Text(
                 'Show More',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: AppColors.secondary.shade400,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -303,10 +302,10 @@ class _NotificationItemState extends State<NotificationItem> {
                                     child: GestureDetector(
                                       onTap: () =>
                                           setState(() => _isExpanded = false),
-                                      child: const Text(
+                                      child: Text(
                                         'Show Less',
                                         style: TextStyle(
-                                          color: Colors.blue,
+                                          color: AppColors.secondary.shade400,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
