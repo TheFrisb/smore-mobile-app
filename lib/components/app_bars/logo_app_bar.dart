@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logger/logger.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +10,7 @@ import 'package:smore_mobile_app/providers/user_provider.dart';
 import 'package:smore_mobile_app/screens/wrappers/authenticated_user_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../screens/contact_us_screen.dart';
 import '../../screens/notifications_screen.dart';
 
 class LogoAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -47,9 +48,18 @@ class _LogoAppBarState extends State<LogoAppBar>
       vsync: this,
     );
     _shakeAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 8.0).chain(CurveTween(curve: Curves.easeOut)), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: -6.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)), weight: 20),
+      TweenSequenceItem(
+          tween: Tween(begin: 0.0, end: 8.0)
+              .chain(CurveTween(curve: Curves.easeOut)),
+          weight: 40),
+      TweenSequenceItem(
+          tween: Tween(begin: 8.0, end: -6.0)
+              .chain(CurveTween(curve: Curves.easeInOut)),
+          weight: 40),
+      TweenSequenceItem(
+          tween: Tween(begin: -6.0, end: 0.0)
+              .chain(CurveTween(curve: Curves.easeOut)),
+          weight: 20),
     ]).animate(_shakeController);
   }
 
@@ -128,20 +138,62 @@ class _LogoAppBarState extends State<LogoAppBar>
         ),
       ),
       centerTitle: true,
+      leadingWidth: 88,
       leading: Container(
         alignment: Alignment.center,
-        child: IconButton(
-          icon: const Icon(FontAwesomeIcons.telegram,
-              size: 32, color: Color(0xFFB7C9DB)),
-          onPressed: () async {
-            logger.i("Telegram icon tapped");
-            Uri url = Uri.parse("https://t.me/smoreinfo");
-            if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-              logger.e("Failed to launch Telegram URL");
-            } else {
-              logger.d("Telegram URL launched successfully");
-            }
-          },
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Telegram icon
+            InkResponse(
+              onTap: () async {
+                logger.i("Telegram icon tapped");
+                Uri url = Uri.parse("https://t.me/smoreinfo");
+                if (!await launchUrl(url,
+                    mode: LaunchMode.externalApplication)) {
+                  logger.e("Failed to launch Telegram URL");
+                } else {
+                  logger.d("Telegram URL launched successfully");
+                }
+              },
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: const Color(0xB50D151E),
+                child: SvgPicture.asset(
+                  'assets/svg/telegram.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFFB7C9DB),
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Chat icon
+            InkResponse(
+              onTap: () {
+                logger.i("Chat icon tapped, navigating to contact us");
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ContactUsScreen(),
+                  ),
+                );
+                logger.d("Navigated to contact us screen");
+              },
+              child: const CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xB50D151E),
+                child: Icon(
+                  LucideIcons.messageSquare,
+                  size: 20,
+                  color: Color(0xFFB7C9DB),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       actions: [

@@ -1,5 +1,7 @@
-Notifications:
-1. SMORE Picks are in - 30 minuti posle kosarkata avtomatsko -> important
+1. Da aktiviram da se trgnuvat od  betting instructions notifikaciite
+2. Fudbal da izlevat notifikaciite posle poslednio tiket
+3. Show More da go sredam da e pocitko
+4. Telegram i Contact us gore levo ikonki
 
 
 6. Plans:
