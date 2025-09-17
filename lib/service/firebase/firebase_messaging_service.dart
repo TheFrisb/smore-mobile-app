@@ -21,10 +21,10 @@ class FirebaseMessagingService {
 
   // Backend logger instance
   final BackendLogger _logger = BackendLogger();
-  
+
   // User service for backend operations
   final UserService _userService = UserService();
-  
+
   // Callback function to refresh notifications
   Future<void> Function()? _onNotificationReceivedCallback;
 
@@ -41,7 +41,7 @@ class FirebaseMessagingService {
     try {
       // Init local notifications service
       _localNotificationsService = localNotificationsService;
-      
+
       // Set notification received callback
       _onNotificationReceivedCallback = onNotificationReceived;
 
@@ -117,7 +117,7 @@ class FirebaseMessagingService {
           'operation': 'token_refresh',
           'newToken': fcmToken
         });
-        
+
         // Send refreshed token to backend
         _sendTokenToBackend(fcmToken);
       }).onError((error) {
@@ -207,8 +207,24 @@ class FirebaseMessagingService {
     }
   }
 
+  bool _isSilentRefreshNotification(RemoteMessage message) {
+    return message.data['silent'] == 'true';
+  }
+
   /// Handles messages received while the app is in the foreground
   void _onForegroundMessage(RemoteMessage message) {
+    if (_isSilentRefreshNotification(message)) {
+      _logger.info('Silent refresh notification received', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'silent_refresh',
+        'messageId': message.messageId,
+      });
+
+      // Refresh notifications without showing any UI
+      _refreshNotifications('silent_refresh');
+      return;
+    }
+
     _logger.info('Foreground message received', additionalData: {
       'component': 'firebase_messaging_service',
       'operation': 'foreground_message',
@@ -241,13 +257,25 @@ class FirebaseMessagingService {
             'data': message.data
           });
     }
-    
+
     // Refresh notifications in the provider
     _refreshNotifications('foreground_message');
   }
 
   /// Handles notification taps when app is opened from the background or terminated state
   void _onMessageOpenedApp(RemoteMessage message) {
+    if (_isSilentRefreshNotification(message)) {
+      _logger.info('Silent refresh notification opened app', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'silent_refresh_opened_app',
+        'messageId': message.messageId,
+      });
+
+      // Refresh notifications without showing any UI
+      _refreshNotifications('silent_refresh_opened_app');
+      return;
+    }
+
     _logger.info('Notification caused the app to open', additionalData: {
       'component': 'firebase_messaging_service',
       'operation': 'notification_tap',
@@ -256,7 +284,7 @@ class FirebaseMessagingService {
       'from': message.from,
       'sentTime': message.sentTime?.toIso8601String()
     });
-    
+
     // Refresh notifications in the provider
     _refreshNotifications('notification_tap');
     // TODO: Add navigation or specific handling based on message data
@@ -266,14 +294,15 @@ class FirebaseMessagingService {
   Future<void> _refreshNotifications(String trigger) async {
     if (_onNotificationReceivedCallback != null) {
       try {
-        _logger.info('Refreshing notifications due to $trigger', additionalData: {
+        _logger
+            .info('Refreshing notifications due to $trigger', additionalData: {
           'component': 'firebase_messaging_service',
           'operation': 'refresh_notifications',
           'trigger': trigger
         });
-        
+
         await _onNotificationReceivedCallback!();
-        
+
         _logger.info('Notifications refreshed successfully', additionalData: {
           'component': 'firebase_messaging_service',
           'operation': 'refresh_notifications_success',
@@ -306,6 +335,21 @@ class FirebaseMessagingService {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   final BackendLogger logger = BackendLogger();
+
+  // Check if this is a silent refresh notification
+  if (message.data['type'] == 'refresh_notifications' &&
+      message.data['silent'] == 'true') {
+    logger.info('Silent refresh notification received in background',
+        additionalData: {
+          'component': 'firebase_messaging_service',
+          'operation': 'background_silent_refresh',
+          'messageId': message.messageId,
+        });
+
+    // Don't show any notification, just return
+    return;
+  }
+
   logger.info('Background message received', additionalData: {
     'component': 'firebase_messaging_service',
     'operation': 'background_message',

@@ -47,20 +47,17 @@ class StakeDisplay extends StatelessWidget {
       );
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    return GestureDetector(
+      onTap: () => _showStakeInfoModal(context),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
         stakeText,
         const SizedBox(width: 6),
-        GestureDetector(
-          onTap: () => _showStakeInfoModal(context),
-          child: Icon(
-            LucideIcons.info,
-            color: AppColors.secondary.shade400,
-            size: fontSize,
-          ),
+        Icon(
+          LucideIcons.info,
+          color: AppColors.secondary.shade400,
+          size: fontSize,
         ),
-      ],
+      ]),
     );
   }
 
