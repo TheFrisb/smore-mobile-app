@@ -195,6 +195,7 @@ class UserProvider with ChangeNotifier {
     } on DioException catch (e) {
       int? statusCode = e.response?.statusCode;
       logger.e(statusCode);
+      logger.e(e);
 
       if (statusCode == 401) {
         logger.e('Invalid credentials');

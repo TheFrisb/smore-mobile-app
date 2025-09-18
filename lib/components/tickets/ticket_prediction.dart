@@ -13,6 +13,7 @@ import 'package:smore_mobile_app/models/sport/ticket.dart';
 import 'package:smore_mobile_app/providers/user_provider.dart';
 
 import '../../models/product.dart';
+import '../../models/sport/sport_match.dart';
 import '../../utils/string_utils.dart';
 
 class TicketPrediction extends StatelessWidget {
@@ -112,11 +113,20 @@ class TicketPrediction extends StatelessWidget {
       children: ticket.betLines.asMap().entries.map((entry) {
         int index = entry.key;
         BetLine betLine = entry.value;
-        bool hasConnectingLine = index < ticket.betLines.length - 1;
+        // Connector rules:
+        // - Connect within the same match group
+        // - Connect if this match has only one pick (even if next is different)
+        // - Do NOT connect after the last item of a multi-pick group to a different match
+        bool isNotLastItem = index < ticket.betLines.length - 1;
+        bool nextIsSameMatch = _isNextSameMatch(index);
+        bool isSinglePick = _isSingleOccurrenceOfMatch(index);
+        bool hasConnectingLine = isNotLastItem && (nextIsSameMatch || isSinglePick);
         bool isPending = betLine.status == BetLineStatus.PENDING;
         bool hasScores = !isPending &&
             (betLine.match.homeTeamScore.isNotEmpty ||
                 betLine.match.awayTeamScore.isNotEmpty);
+        // Show match details only for the last bet line of the same match
+        final bool showMatchDetails = _isLastOccurrenceOfMatch(index);
         return _buildBetLine(
             context,
             betLine.bet,
@@ -126,6 +136,7 @@ class TicketPrediction extends StatelessWidget {
             isPending,
             hasConnectingLine,
             hasScores,
+            showMatchDetails,
             betLine);
       }).toList(),
     );
@@ -135,11 +146,12 @@ class TicketPrediction extends StatelessWidget {
       BuildContext context,
       String bet,
       String betType,
-      double odds,
+      double? odds,
       BetLineStatus status,
       bool isPending,
       bool hasConnectingLine,
       bool hasScores,
+      bool showMatchDetails,
       BetLine betLine) {
     return Stack(
       children: [
@@ -195,26 +207,28 @@ class TicketPrediction extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            odds.toStringAsFixed(2),
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                        if (odds != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              odds.toStringAsFixed(2),
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
-                    if (isPending || hasScores) ...[
+                    if (showMatchDetails && (isPending || hasScores)) ...[
                       const SizedBox(height: 12),
                       _buildMatchDetails(
                           context, isPending, hasScores, betLine),
@@ -227,6 +241,42 @@ class TicketPrediction extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // Returns true if the bet line at [index] is the last occurrence for its match
+  bool _isLastOccurrenceOfMatch(int index) {
+    final currentMatchKey = _matchKey(ticket.betLines[index].match);
+    for (int i = index + 1; i < ticket.betLines.length; i++) {
+      if (_matchKey(ticket.betLines[i].match) == currentMatchKey) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Returns true if the bet line at [index] is the only occurrence for its match
+  bool _isSingleOccurrenceOfMatch(int index) {
+    final currentMatchKey = _matchKey(ticket.betLines[index].match);
+    bool seenAnother = false;
+    for (int i = 0; i < ticket.betLines.length; i++) {
+      if (i == index) continue;
+      if (_matchKey(ticket.betLines[i].match) == currentMatchKey) {
+        seenAnother = true;
+        break;
+      }
+    }
+    return !seenAnother;
+  }
+
+  // Returns true if the next bet line exists and belongs to the same match
+  bool _isNextSameMatch(int index) {
+    if (index >= ticket.betLines.length - 1) return false;
+    return _matchKey(ticket.betLines[index].match) ==
+        _matchKey(ticket.betLines[index + 1].match);
+  }
+
+  String _matchKey(SportMatch match) {
+    return '${match.league.name}|${match.homeTeam.name}|${match.awayTeam.name}|${match.kickoffDateTime.toIso8601String()}';
   }
 
   Widget _buildMatchDetails(

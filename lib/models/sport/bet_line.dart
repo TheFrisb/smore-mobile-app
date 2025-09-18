@@ -11,7 +11,7 @@ class BetLine {
   final SportMatch match;
   final String bet;
   final String betType;
-  final double odds;
+  final double? odds;
   final BetLineStatus status;
 
   BetLine({
@@ -35,10 +35,12 @@ class BetLine {
         id: json['id'],
         match: SportMatch.fromJson(json['match']),
         bet: json['bet'],
-        betType: json['bet_type'], // This should match the JSON field name
-        odds: double.parse(json['odds'].toString()),
-        status: BetLineStatus.values
-            .firstWhere((e) => e.toString() == 'BetLineStatus.${json['status']}'),
+        betType: json['bet_type'],
+        // This should match the JSON field name
+        odds:
+            json['odds'] == null ? null : double.parse(json['odds'].toString()),
+        status: BetLineStatus.values.firstWhere(
+            (e) => e.toString() == 'BetLineStatus.${json['status']}'),
       );
     } catch (e) {
       print('Error parsing BetLine JSON: $e');
