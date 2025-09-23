@@ -132,6 +132,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       } else {
         // Internet connection restored
         _hideSnackBar();
+        _performBackgroundRefresh();
       }
     });
 

@@ -156,7 +156,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
         logger.e('DioException occurred: $e');
         _errorMessage = handleDioError(e);
       } else {
-        _errorMessage = 'An unexpected error occurred: $e';
+        _errorMessage = 'An unexpected error occurred. Please try again.';
         logger.e('Unexpected error: $e');
       }
     } finally {
@@ -229,7 +229,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
       PredictionObjectFilter? predictionObjectFilter,
       {bool updateIsLoading = true}) async {
     logger.i('Refreshing history predictions data while keeping existing data');
-    
+
     if (_isFetchingHistoryPredictions) {
       logger.i('Already fetching history predictions, skipping this request.');
       return;
@@ -289,7 +289,7 @@ class HistoryPredictionsProvider with ChangeNotifier {
         logger.e('DioException occurred: $e');
         _errorMessage = handleDioError(e);
       } else {
-        _errorMessage = 'An unexpected error occurred: $e';
+        _errorMessage = 'An unexpected error occurred. Please try again.';
         logger.e('Unexpected error: $e');
       }
     } finally {

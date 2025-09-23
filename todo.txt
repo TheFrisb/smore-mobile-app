@@ -1,19 +1,8 @@
-1. Da aktiviram da se trgnuvat od  betting instructions notifikaciite
-2. Fudbal da izlevat notifikaciite posle poslednio tiket
-3. Show More da go sredam da e pocitko
-4. Telegram i Contact us gore levo ikonki
+1. Subskripcii i purchases za free useri
+2. Notifikacii za free useri
+2. Parse revenuecat subscriptions
 
 
-6. Plans:
--- Integriri weekly i 3 meseci plan, izbrisi yearly plan
 
-
-3. App must recover from no internet scenarios
----------------------------------------
-
----------------------------------------
-
-7. Backend
--- Protect AI
--- Parse revenuecat subscriptions
----------------------------------------
+2. Protect AI on backend
+3. Integriri weekly i 3 meseci plan, izbrisi yearly plan

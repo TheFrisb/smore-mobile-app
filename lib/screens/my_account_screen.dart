@@ -371,7 +371,8 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                             onPressed: () async {
                               final confirmed = await showDialog<bool>(
                                 context: context,
-                                builder: (context) => const DeleteAccountDialog(),
+                                builder: (context) =>
+                                    const DeleteAccountDialog(),
                               );
                               if (confirmed == true) {
                                 try {
@@ -393,9 +394,9 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                                 } catch (e) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
+                                      const SnackBar(
                                         content: Text(
-                                            'Failed to delete account: $e'),
+                                            'Failed to delete account. Please try again'),
                                         backgroundColor: Colors.red,
                                       ),
                                     );

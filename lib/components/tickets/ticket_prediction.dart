@@ -120,7 +120,8 @@ class TicketPrediction extends StatelessWidget {
         bool isNotLastItem = index < ticket.betLines.length - 1;
         bool nextIsSameMatch = _isNextSameMatch(index);
         bool isSinglePick = _isSingleOccurrenceOfMatch(index);
-        bool hasConnectingLine = isNotLastItem && (nextIsSameMatch || isSinglePick);
+        bool hasConnectingLine =
+            isNotLastItem && (nextIsSameMatch || isSinglePick);
         bool isPending = betLine.status == BetLineStatus.PENDING;
         bool hasScores = !isPending &&
             (betLine.match.homeTeamScore.isNotEmpty ||
@@ -409,7 +410,7 @@ class TicketPrediction extends StatelessWidget {
                       ),
                     const SizedBox(width: 6),
                     Text(
-                      betLine.match.league.name,
+                      betLine.match.league.friendlyName,
                       style: const TextStyle(
                         color: Color(0xFFdbe4ed),
                         fontSize: 10,

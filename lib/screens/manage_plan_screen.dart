@@ -21,6 +21,42 @@ class ManagePlanScreen extends StatelessWidget {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return BaseBackButtonScreen(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      title: "Manage Plan",
+      body: Consumer<UserProvider>(
+        builder: (context, userProvider, child) {
+          if (userProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          final User? user = userProvider.user;
+          final UserSubscription? userSubscription =
+              userProvider.user?.userSubscription;
+          if (user == null) {
+            return const Center(
+              child: Text(
+                'No user data available. This is most likely a bug in the application. Please contact support.',
+              ),
+            );
+          }
+
+          if (userSubscription != null &&
+              userSubscription.providerType ==
+                  SubscriptionProviderType.STRIPE) {
+            return _buildStripeSubscriptionMessage(context);
+          }
+
+          // Show tabbed interface for non-Stripe users
+          return const TabbedPlanView();
+        },
+      ),
+    );
+  }
+
   Widget _buildStripeSubscriptionMessage(BuildContext context) {
     return Center(
       child: Padding(
@@ -181,42 +217,6 @@ class ManagePlanScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseBackButtonScreen(
-      padding: const EdgeInsets.only(left: 16, right: 16),
-      title: "Manage Plan",
-      body: Consumer<UserProvider>(
-        builder: (context, userProvider, child) {
-          if (userProvider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          final User? user = userProvider.user;
-          final UserSubscription? userSubscription =
-              userProvider.user?.userSubscription;
-          if (user == null) {
-            return const Center(
-              child: Text(
-                'No user data available. This is most likely a bug in the application. Please contact support.',
-              ),
-            );
-          }
-
-          if (userSubscription != null &&
-              userSubscription.providerType ==
-                  SubscriptionProviderType.STRIPE) {
-            return _buildStripeSubscriptionMessage(context);
-          }
-
-          // Show tabbed interface for non-Stripe users
-          return const TabbedPlanView();
-        },
       ),
     );
   }

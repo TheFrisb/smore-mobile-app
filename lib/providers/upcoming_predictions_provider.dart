@@ -51,7 +51,7 @@ class UpcomingPredictionsProvider with ChangeNotifier {
         logger.e('DioException occurred: $e');
         _errorMessage = handleDioError(e);
       } else {
-        _errorMessage = 'An unexpected error occurred: $e';
+        _errorMessage = 'An unexpected error occurred';
         logger.e('Unexpected error: $e');
       }
     } finally {

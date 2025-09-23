@@ -31,7 +31,7 @@ String handleDioError(DioException e) {
       }
       break;
     default:
-      message = 'An unexpected error occurred: ${e.message}';
+      message = 'An unexpected error occurred. Please try again.';
   }
 
   return message;

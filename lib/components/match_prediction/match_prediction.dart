@@ -82,7 +82,7 @@ class MatchPrediction extends StatelessWidget {
                         ),
                       const SizedBox(width: 8),
                       Text(
-                        prediction.match.league.name,
+                        prediction.match.league.friendlyName,
                         style: const TextStyle(
                           color: Color(0xB500DEA2),
                           fontWeight: FontWeight.bold,

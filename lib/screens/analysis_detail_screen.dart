@@ -66,7 +66,7 @@ class AnalysisDetailScreen extends StatelessWidget {
                             ),
                           const SizedBox(width: 8),
                           Text(
-                            prediction.match.league.name,
+                            prediction.match.league.friendlyName,
                             style: const TextStyle(
                               color: Color(0xFF00DEA2),
                             ),
@@ -94,7 +94,6 @@ class AnalysisDetailScreen extends StatelessWidget {
                         teamLogoHeight: 64,
                         vsImageHeight: 32,
                       ),
-
                     ],
                   ),
                 ),
@@ -160,69 +159,70 @@ class AnalysisDetailScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center, // start
-          children: [
-            if (canViewPrediction)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Prediction",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.primary.shade400,
-                      )),
-                  PredictionText(
-                      predictionText: prediction.prediction,
-                      fontSize: 16,
-                      color: Theme.of(context).primaryColor,
-                      textAlign: TextAlign.left),
-                ],
-              )
-            else
-              const Row(
-                children: [
-                  Icon(
-                    Icons.lock_outlined,
-                    color: Colors.red,
-                    size: 24,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "Prediction locked",
+        if (canViewPrediction) ...[
+          // Prediction section
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Prediction",
                     style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              )
-          ],
-        ),
-        if (canViewPrediction)
-          const Row(
+                      fontSize: 12,
+                      color: AppColors.primary.shade400,
+                    )),
+                PredictionText(
+                    predictionText: prediction.prediction,
+                    fontSize: 16,
+                    color: Theme.of(context).primaryColor,
+                    textAlign: TextAlign.left),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Odds section
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
+              const Icon(
                 Icons.arrow_drop_up,
                 color: Color(0xFF00DEA2),
               ),
-              Text(
+              const Text(
                 "Odds",
               ),
-              // add spacing between text and icon
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
-                "1.66",
-                style: TextStyle(
+                prediction.odds.toStringAsFixed(2),
+                style: const TextStyle(
                   color: Color(0xFF00DEA2),
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
+        ] else ...[
+          // Locked state
+          const Row(
+            children: [
+              Icon(
+                Icons.lock_outlined,
+                color: Colors.red,
+                size: 24,
+              ),
+              SizedBox(
+                width: 8,
+              ),
+              Text(
+                "Prediction locked",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
