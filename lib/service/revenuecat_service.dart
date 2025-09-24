@@ -27,8 +27,9 @@ enum SubscriptionIdentifiers {
 }
 
 enum EntitlementPeriod {
+  weekly("weekly"),
   monthly("monthly"),
-  yearly("yearly");
+  quarterly("quarterly");
 
   final String value;
 
@@ -351,9 +352,18 @@ class RevenueCatService {
       return false;
     }
 
-    final Package? package = entitlementPeriod == EntitlementPeriod.monthly
-        ? offering.monthly
-        : offering.annual;
+    Package? package;
+    switch (entitlementPeriod) {
+      case EntitlementPeriod.weekly:
+        package = offering.weekly;
+        break;
+      case EntitlementPeriod.monthly:
+        package = offering.monthly;
+        break;
+      case EntitlementPeriod.quarterly:
+        package = offering.threeMonth;
+        break;
+    }
 
     if (package == null) {
       logger.e(

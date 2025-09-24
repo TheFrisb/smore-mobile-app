@@ -95,8 +95,13 @@ class UserProvider with ChangeNotifier {
       return false;
     }
 
-    return _user!.hasAccessToProduct(productName) ||
-        hasAccessToEntitlement(productName);
+    final backendAccess = _user!.hasAccessToProduct(productName);
+    final entitlementAccess = hasAccessToEntitlement(productName);
+
+    logger.i(
+        'Access check for $productName: backend=$backendAccess, entitlement=$entitlementAccess');
+
+    return backendAccess || entitlementAccess;
   }
 
   String? get userTimezone => _userTimezone;
@@ -108,7 +113,8 @@ class UserProvider with ChangeNotifier {
       return true;
     }
 
-    return _user?.canViewPrediction(prediction) ?? false;
+    return (_user?.canViewPrediction(prediction) ?? false) || 
+           hasAccessToEntitlement(prediction.product.name);
   }
 
   bool canViewTicket(Ticket ticket) {
@@ -116,7 +122,8 @@ class UserProvider with ChangeNotifier {
       return true;
     }
 
-    return _user?.canViewTicket(ticket) ?? false;
+    return (_user?.canViewTicket(ticket) ?? false) || 
+           hasAccessToEntitlement(ticket.product.name);
   }
 
   ProductName? get selectedProductName => _selectedProductName;
@@ -538,12 +545,17 @@ class UserProvider with ChangeNotifier {
 
   bool hasAccessToEntitlement(ProductName productName) {
     if (_customerInfo == null) {
+      logger.i('No customer info available for entitlement check');
       return false;
     }
 
     String normalizedName = productName.name.toLowerCase().replaceAll(' ', '_');
-
     final entitlement = _customerInfo!.entitlements.active[normalizedName];
+
+    logger.i(
+        'Checking entitlement for $productName (normalized: $normalizedName): ${entitlement != null}');
+    logger.i(
+        'Available entitlements: ${_customerInfo!.entitlements.active.keys.toList()}');
 
     return entitlement != null;
   }
@@ -553,16 +565,8 @@ class UserProvider with ChangeNotifier {
 
     return customerInfo!.entitlements.active.keys
         .map((id) {
-          if (!id.startsWith('monthly_') && !id.startsWith('yearly_')) {
-            return null;
-          }
-
-          final parts = id.split('_');
-          final periodKey = parts.first;
-          final productKey = parts.sublist(1).join('_');
-
           String? productName;
-          switch (productKey) {
+          switch (id) {
             case 'soccer':
               productName = 'Soccer';
               break;
@@ -575,11 +579,8 @@ class UserProvider with ChangeNotifier {
             default:
               productName = null;
           }
-          if (productName == null) return null;
 
-          final periodName = periodKey == 'monthly' ? 'Monthly' : 'Yearly';
-
-          return '$productName $periodName';
+          return productName;
         })
         .whereType<String>() // drop any nulls
         .toList();

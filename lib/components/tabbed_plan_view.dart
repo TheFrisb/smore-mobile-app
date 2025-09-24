@@ -27,7 +27,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
 
   late TabController _tabController;
   bool _isLoading = true;
-  String _selectedSubscription = 'yearly';
+  String _selectedSubscription = 'monthly';
 
   List<Product> _products = [];
 
@@ -100,14 +100,18 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
     }
 
     if (currentOfferings != null) {
-      // Prefer yearly if available, otherwise monthly
-      if (currentOfferings.annual != null) {
-        setState(() {
-          _selectedSubscription = 'yearly';
-        });
-      } else if (currentOfferings.monthly != null) {
+      // Default to monthly if available, otherwise weekly, then quarterly
+      if (currentOfferings.monthly != null) {
         setState(() {
           _selectedSubscription = 'monthly';
+        });
+      } else if (currentOfferings.weekly != null) {
+        setState(() {
+          _selectedSubscription = 'weekly';
+        });
+      } else if (currentOfferings.threeMonth != null) {
+        setState(() {
+          _selectedSubscription = 'quarterly';
         });
       }
     }
@@ -187,9 +191,16 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
 
     if (currentOfferings == null) return null;
 
-    return _selectedSubscription == 'yearly'
-        ? currentOfferings.annual
-        : currentOfferings.monthly;
+    switch (_selectedSubscription) {
+      case 'weekly':
+        return currentOfferings.weekly;
+      case 'monthly':
+        return currentOfferings.monthly;
+      case 'quarterly':
+        return currentOfferings.threeMonth;
+      default:
+        return currentOfferings.monthly;
+    }
   }
 
   Future<void> _launchUrl(String url) async {
@@ -251,21 +262,25 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
   }
 
   Widget _buildTabContent(ProductName category) {
+    Package? weeklyPackage;
     Package? monthlyPackage;
-    Package? yearlyPackage;
+    Package? quarterlyPackage;
 
     switch (category) {
       case ProductName.SOCCER:
+        weeklyPackage = _soccerOfferings?.weekly;
         monthlyPackage = _soccerOfferings?.monthly;
-        yearlyPackage = _soccerOfferings?.annual;
+        quarterlyPackage = _soccerOfferings?.threeMonth;
         break;
       case ProductName.BASKETBALL:
+        weeklyPackage = _basketballOfferings?.weekly;
         monthlyPackage = _basketballOfferings?.monthly;
-        yearlyPackage = _basketballOfferings?.annual;
+        quarterlyPackage = _basketballOfferings?.threeMonth;
         break;
       case ProductName.AI_ANALYST:
+        weeklyPackage = _aiAnalystOfferings?.weekly;
         monthlyPackage = _aiAnalystOfferings?.monthly;
-        yearlyPackage = _aiAnalystOfferings?.annual;
+        quarterlyPackage = _aiAnalystOfferings?.threeMonth;
         break;
       case ProductName.NFL_NHL:
         throw UnimplementedError();
@@ -273,7 +288,9 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
         throw UnimplementedError();
     }
 
-    bool hasOfferings = monthlyPackage != null || yearlyPackage != null;
+    bool hasOfferings = weeklyPackage != null ||
+        monthlyPackage != null ||
+        quarterlyPackage != null;
 
     Provider.of<UserProvider>(context);
 
@@ -313,25 +330,27 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
             ),
 
             const SizedBox(height: 12),
-            // Subscription options
-            if (yearlyPackage != null)
+            // Subscription options - Weekly, Monthly, Quarterly order
+            if (weeklyPackage != null)
               SubscriptionOptionCard(
-                offeringPackage: yearlyPackage,
-                isYearly: true,
+                offeringPackage: weeklyPackage,
+                isQuarterly: false,
+                isWeekly: true,
                 onSelect: () {
                   setState(() {
-                    _selectedSubscription = 'yearly';
+                    _selectedSubscription = 'weekly';
                   });
                 },
-                isSelected: _selectedSubscription == 'yearly',
+                isSelected: _selectedSubscription == 'weekly',
                 isOwned:
-                    _isPackageOwned(yearlyPackage, EntitlementPeriod.yearly),
+                    _isPackageOwned(weeklyPackage, EntitlementPeriod.weekly),
               ),
 
             if (monthlyPackage != null)
               SubscriptionOptionCard(
                 offeringPackage: monthlyPackage,
-                isYearly: false,
+                isQuarterly: false,
+                isWeekly: false,
                 onSelect: () {
                   setState(() {
                     _selectedSubscription = 'monthly';
@@ -340,7 +359,22 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
                 isSelected: _selectedSubscription == 'monthly',
                 isOwned:
                     _isPackageOwned(monthlyPackage, EntitlementPeriod.monthly),
+                weeklyPackage: weeklyPackage, // Pass weekly package for savings calculation
               ),
+
+            if (quarterlyPackage != null)
+              SubscriptionOptionCard(
+                  offeringPackage: quarterlyPackage,
+                  isQuarterly: true,
+                  onSelect: () {
+                    setState(() {
+                      _selectedSubscription = 'quarterly';
+                    });
+                  },
+                  isSelected: _selectedSubscription == 'quarterly',
+                  isOwned: _isPackageOwned(
+                      quarterlyPackage, EntitlementPeriod.quarterly),
+                  isWeekly: false),
             const SizedBox(height: 24),
             // Purchase button
             SubscriptionButton(

@@ -1,50 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 
 class SubscriptionOptionCard extends StatelessWidget {
   final Package offeringPackage;
-  final bool isYearly;
+  final bool isQuarterly;
+  final bool isWeekly;
   final bool isSelected;
   final bool isOwned;
   final VoidCallback onSelect;
+  final Package? weeklyPackage; // For savings calculation
 
   const SubscriptionOptionCard({
     super.key,
     required this.offeringPackage,
-    required this.isYearly,
+    required this.isQuarterly,
+    required this.isWeekly,
     required this.isSelected,
     required this.isOwned,
     required this.onSelect,
+    this.weeklyPackage,
   });
 
-  String get _title => isYearly ? 'Yearly' : 'Monthly';
+  String get _title {
+    if (isQuarterly) return 'Three months';
+    if (isWeekly) return 'Weekly';
+    return 'Monthly';
+  }
 
   String get _subtitle {
-    if (isYearly) {
+    if (isQuarterly) {
       final currency = offeringPackage.storeProduct.priceString
           .replaceAll(RegExp(r'[\d.,]'), '')
           .trim();
-      final monthlyPrice = offeringPackage.storeProduct.price / 12;
+      final monthlyPrice = offeringPackage.storeProduct.price / 3;
       return '$currency${monthlyPrice.toStringAsFixed(2)}/mo';
+    } else if (isWeekly) {
+      return ''; // No subtitle for weekly plans
     } else {
       return 'Flexible monthly access';
     }
   }
 
   double _getMonthlyPrice() {
-    if (isYearly) {
-      return offeringPackage.storeProduct.price / 12;
+    if (isQuarterly) {
+      return offeringPackage.storeProduct.price / 3;
+    } else if (isWeekly) {
+      return offeringPackage.storeProduct.price * 4;
     } else {
       return offeringPackage.storeProduct.price;
     }
   }
 
   double _getSavings() {
-    if (isYearly) {
-      final monthlyPrice = offeringPackage.storeProduct.price / 12;
-      final yearlyPrice = offeringPackage.storeProduct.price;
-      return ((yearlyPrice - (monthlyPrice * 12)) / yearlyPrice * 100)
-          .roundToDouble();
+    // Show savings badge on monthly plan compared to weekly
+    if (!isWeekly && !isQuarterly && weeklyPackage != null) {
+      final weeklyPrice = weeklyPackage!.storeProduct.price;
+      final monthlyPrice = offeringPackage.storeProduct.price;
+      final weeklyMonthlyEquivalent = weeklyPrice * 4; // 4 weeks in a month
+      return weeklyMonthlyEquivalent - monthlyPrice; // Return dollar amount saved
     }
     return 0.0;
   }
@@ -89,7 +103,7 @@ class SubscriptionOptionCard extends StatelessWidget {
                   ),
                   child: isSelected
                       ? const Icon(
-                          Icons.check,
+                          LucideIcons.check,
                           color: Colors.white,
                           size: 16,
                         )
@@ -122,9 +136,11 @@ class SubscriptionOptionCard extends StatelessWidget {
                 ),
                 // Price
                 Text(
-                  isYearly
-                      ? '\$${offeringPackage.storeProduct.price.toStringAsFixed(2)}/year'
-                      : '\$${_getMonthlyPrice().toStringAsFixed(2)}/mo',
+                  isQuarterly
+                      ? '\$${offeringPackage.storeProduct.price.toStringAsFixed(2)}/quarterly'
+                      : isWeekly
+                          ? '\$${offeringPackage.storeProduct.price.toStringAsFixed(2)}/week'
+                          : '\$${_getMonthlyPrice().toStringAsFixed(2)}/mo',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -133,14 +149,14 @@ class SubscriptionOptionCard extends StatelessWidget {
                 ),
               ],
             ),
-            // Savings badge for yearly plan
-            if (isYearly)
+            // Savings badge for monthly plan (compared to weekly)
+            if (!isWeekly && !isQuarterly && _getSavings() > 0)
               Positioned(
-                top: -32,
+                top: -30,
                 right: -4,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(12),
@@ -150,7 +166,7 @@ class SubscriptionOptionCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Save ${_getSavings().toStringAsFixed(2)}%',
+                    'Save \$${_getSavings().toStringAsFixed(2)}/month',
                     style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
