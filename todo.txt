@@ -5,4 +5,3 @@
 
 
 2. Protect AI on backend
-3. Integriri weekly i 3 meseci plan, izbrisi yearly plan
