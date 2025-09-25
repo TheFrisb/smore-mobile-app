@@ -488,6 +488,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
 
     final baseFeatures = switch (category) {
       ProductName.SOCCER || ProductName.BASKETBALL => [
+          '${product.analysesPerMonth} analyses per month',
           'Daily Ticket Suggestions',
           'High Odds',
           'Betting Guidance',
@@ -504,10 +505,7 @@ class _TabbedPlanViewState extends State<TabbedPlanView>
       _ => <String>[],
     };
 
-    return [
-      '${product.analysesPerMonth} analyses per month',
-      ...baseFeatures,
-    ];
+    return baseFeatures;
   }
 
   @override

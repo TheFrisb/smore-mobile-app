@@ -23,8 +23,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Remove local filter index since we'll use UserProvider's filter
-
   @override
   void initState() {
     super.initState();
@@ -49,11 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _getFilterIndex(PredictionObjectFilter? filter) {
     switch (filter) {
       case null:
-        return 0; // All
+        return 0;
       case PredictionObjectFilter.predictions:
-        return 1; // Predictions
+        return 1;
       case PredictionObjectFilter.tickets:
-        return 2; // Parlays (Tickets)
+        return 2;
     }
   }
 
