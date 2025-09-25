@@ -11,6 +11,9 @@ class DioClient {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final Logger _logger = Logger();
 
+  // Callback function to notify when tokens are cleared
+  Future<void> Function()? _onTokensClearedCallback;
+
   factory DioClient() => _instance;
 
   DioClient._internal() {
@@ -50,6 +53,16 @@ class DioClient {
           return handler.resolve(response);
         } catch (e) {
           await _instance._storage.deleteAll();
+          
+          // Notify that tokens have been cleared
+          if (_instance._onTokensClearedCallback != null) {
+            try {
+              await _instance._onTokensClearedCallback!();
+            } catch (callbackError) {
+              _instance._logger.e('Error in tokens cleared callback: $callbackError');
+            }
+          }
+          
           return handler.reject(DioException(
             requestOptions: error.requestOptions,
             error: 'Session expired. Please login again.',
@@ -96,6 +109,11 @@ class DioClient {
     final newAccessToken = response.data['access'];
     await _storage.write(key: 'accessToken', value: newAccessToken);
     return newAccessToken;
+  }
+
+  /// Set callback to be called when tokens are cleared
+  void setOnTokensClearedCallback(Future<void> Function() callback) {
+    _onTokensClearedCallback = callback;
   }
 
   Dio get dio => _dio;

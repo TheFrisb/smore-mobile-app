@@ -26,8 +26,7 @@ class UnlockButton extends StatefulWidget {
   State<UnlockButton> createState() => _UnlockButtonState();
 }
 
-class _UnlockButtonState extends State<UnlockButton>
-    with RevenueCatErrorMixin {
+class _UnlockButtonState extends State<UnlockButton> with RevenueCatErrorMixin {
   bool _isLoading = false;
 
   UserProvider get userProvider =>
@@ -113,8 +112,9 @@ class _UnlockButtonState extends State<UnlockButton>
           .purchaseConsumable(widget.consumableIdentifier);
 
       if (purchaseResult.success) {
-        logInfo('Consumable purchase successful: ${widget.consumableIdentifier.value}');
-        
+        logInfo(
+            'Consumable purchase successful: ${widget.consumableIdentifier.value}');
+
         await consumablePurchasesVerifier.verifyConsumablePurchase(
             widget.consumableIdentifier,
             purchaseResult.transactionId!,
@@ -124,8 +124,10 @@ class _UnlockButtonState extends State<UnlockButton>
         showSuccessMessage('Purchase successful!');
         widget.onSuccess?.call();
       } else {
-        logError('Consumable purchase failed: ${purchaseResult.errorMessage}');
-        showErrorMessage('Purchase failed: ${purchaseResult.errorMessage}');
+        logError('Consumable purchase failed: ${purchaseResult.errorCode}');
+        if (purchaseResult.errorCode != "1") {
+          showErrorMessage('Purchase failed: ${purchaseResult.errorMessage}');
+        }
         widget.onError?.call();
       }
     } catch (e, stackTrace) {

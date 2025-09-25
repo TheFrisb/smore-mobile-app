@@ -36,7 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.toString()),
+              content: Text(
+                e.toString(),
+                textAlign: TextAlign.center,
+              ),
               backgroundColor: Colors.red,
             ),
           );

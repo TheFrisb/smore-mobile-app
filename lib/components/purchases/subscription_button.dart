@@ -56,8 +56,10 @@ class _SubscriptionButtonState extends State<SubscriptionButton>
       } else {
         logError(
             'Subscription purchase failed: ${consumablePurchaseResult.errorMessage}');
-        showErrorMessage(
-            'Purchase failed: ${consumablePurchaseResult.errorMessage}');
+        if (consumablePurchaseResult.errorCode != "1") {
+          showErrorMessage(
+              'Purchase failed: ${consumablePurchaseResult.errorMessage}');
+        }
         widget.onError?.call();
       }
     } catch (e, stackTrace) {

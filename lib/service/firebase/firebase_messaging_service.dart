@@ -51,6 +51,9 @@ class FirebaseMessagingService {
       // Request user permission for notifications
       _requestPermission();
 
+      // Subscribe to ALL topic (always subscribed regardless of login status)
+      await _subscribeToAllTopic();
+
       // Register handler for background messages (app terminated)
       FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler);
@@ -202,6 +205,27 @@ class FirebaseMessagingService {
         additionalData: {
           'component': 'firebase_messaging_service',
           'operation': 'permission_request_failed'
+        },
+      );
+    }
+  }
+
+  /// Subscribe to ALL topic (always subscribed regardless of login status)
+  Future<void> _subscribeToAllTopic() async {
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic("ALL");
+      _logger.info('Successfully subscribed to ALL topic', additionalData: {
+        'component': 'firebase_messaging_service',
+        'operation': 'subscribe_to_all_topic'
+      });
+    } catch (e, stackTrace) {
+      _logger.errorWithException(
+        'Failed to subscribe to ALL topic',
+        error: e,
+        stackTrace: stackTrace,
+        additionalData: {
+          'component': 'firebase_messaging_service',
+          'operation': 'subscribe_to_all_topic_failed'
         },
       );
     }

@@ -3,15 +3,18 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:smore_mobile_app/models/product.dart';
 import 'package:smore_mobile_app/models/sport/prediction.dart';
 import 'package:smore_mobile_app/models/user_subscription.dart';
+import 'package:smore_mobile_app/providers/user_notification_provider.dart';
 import 'package:smore_mobile_app/service/revenuecat_service.dart';
 import 'package:smore_mobile_app/service/user_service.dart';
 import 'package:smore_mobile_app/utils/backend_logger.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../main.dart';
 import '../models/sport/ticket.dart';
 import '../models/user.dart';
 import '../service/dio_client.dart';
@@ -165,11 +168,17 @@ class UserProvider with ChangeNotifier {
         await _setInitialTimezone();
         await _restoreSelectedProductName();
         await _restorePredictionObjectFilter();
+        
+        // Refresh notifications for existing logged-in user
+        await _refreshNotifications();
       } else {
         // For guests or unauthenticated users, still restore preferences
         await _restoreSelectedProductName();
         await _restorePredictionObjectFilter();
       }
+      
+      // Set up callback for when tokens are cleared by DioClient
+      _dioClient.setOnTokensClearedCallback(_handleTokensCleared);
     } catch (e) {
       logger.e('Error initializing user provider: $e');
       await logout();
@@ -199,6 +208,9 @@ class UserProvider with ChangeNotifier {
       subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
+      
+      // Refresh notifications after successful login
+      await _refreshNotifications();
     } on DioException catch (e) {
       int? statusCode = e.response?.statusCode;
       logger.e(statusCode);
@@ -236,6 +248,9 @@ class UserProvider with ChangeNotifier {
       subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
+      
+      // Refresh notifications after successful Google sign-in
+      await _refreshNotifications();
     } on DioException catch (e) {
       int? statusCode = e.response?.statusCode;
       logger.e('Google sign in error: $statusCode');
@@ -275,6 +290,9 @@ class UserProvider with ChangeNotifier {
       subscribeToFcmTopic();
 
       RevenueCatService().setUserId(_user!.id);
+      
+      // Refresh notifications after successful Apple sign-in
+      await _refreshNotifications();
     } on DioException catch (e) {
       int? statusCode = e.response?.statusCode;
       logger.e('Apple sign in error: $statusCode');
@@ -309,7 +327,8 @@ class UserProvider with ChangeNotifier {
 
   Future<void> subscribeToFcmTopic() async {
     try {
-      await FirebaseMessaging.instance.subscribeToTopic("ALL");
+      // ALL topic is now handled by Firebase messaging service initialization
+      // Only subscribe to sport topics and send token to backend
       await _subscribeToSportTopics();
       await UserService().sendFcmTokenToBackend(
           await FirebaseMessaging.instance.getToken() ?? '');
@@ -424,20 +443,47 @@ class UserProvider with ChangeNotifier {
 
   Future<void> _unsubscribeFromAllFcmTopics() async {
     try {
-      List<String> topicsToUnsubscribe = ["ALL"];
+      // Only unsubscribe from sport topics, keep ALL topic subscribed
+      List<String> topicsToUnsubscribe = ["SOCCER", "BASKETBALL"];
 
-      // Add sport topics to unsubscribe list
-      topicsToUnsubscribe.addAll(["SOCCER", "BASKETBALL"]);
-
-      // Unsubscribe from all topics
+      // Unsubscribe from sport topics only
       await Future.wait(topicsToUnsubscribe.map(
           (topic) => FirebaseMessaging.instance.unsubscribeFromTopic(topic)));
 
       logger
-          .i('Successfully unsubscribed from FCM topics: $topicsToUnsubscribe');
+          .i('Successfully unsubscribed from sport FCM topics: $topicsToUnsubscribe (ALL topic remains subscribed)');
     } catch (e) {
       logger.e('Error unsubscribing from FCM topics: $e');
       rethrow;
+    }
+  }
+
+  /// Handle when tokens are cleared by DioClient (e.g., session expired)
+  Future<void> _handleTokensCleared() async {
+    logger.i('Tokens cleared by DioClient - calling logout');
+    
+    try {
+      // Just call the existing logout function which handles all cleanup
+      await logout();
+      
+      logger.i('Successfully handled token clearing via logout');
+    } catch (e) {
+      logger.e('Error handling token clearing: $e');
+    }
+  }
+
+  /// Refresh notifications using the global navigator key
+  Future<void> _refreshNotifications() async {
+    try {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        final notificationProvider =
+            Provider.of<UserNotificationProvider>(context, listen: false);
+        await notificationProvider.refresh();
+        logger.i('Successfully refreshed notifications after login');
+      }
+    } catch (e) {
+      logger.e('Error refreshing notifications after login: $e');
     }
   }
 

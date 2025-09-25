@@ -247,7 +247,7 @@ class RevenueCatService {
 
       return ConsumablePurchaseResult(
         success: false,
-        errorMessage: error.message,
+        errorMessage: error.userMessage,
         errorCode: error.errorCode,
       );
     }
@@ -305,7 +305,7 @@ class RevenueCatService {
 
       return ConsumablePurchaseResult(
         success: false,
-        errorMessage: error.message,
+        errorMessage: error.userMessage,
         errorCode: error.errorCode,
       );
     }
